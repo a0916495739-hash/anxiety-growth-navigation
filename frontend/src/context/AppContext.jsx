@@ -1,0 +1,94 @@
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createGuestSession, logout as apiLogout, getMe } from '../api/auth';
+
+const AppContext = createContext(null);
+
+export function AppProvider({ children }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [guestToken, setGuestToken] = useState(null);
+
+  // Today's emotion count: { date: 'YYYY-MM-DD', count: N }
+  const [todayEmotion, setTodayEmotion] = useState(() => {
+    const saved = localStorage.getItem('today_emotion');
+    return saved ? JSON.parse(saved) : { date: null, count: 0 };
+  });
+
+  const todayDateStr = new Date().toISOString().slice(0, 10);
+  const todayCount = todayEmotion.date === todayDateStr ? todayEmotion.count : 0;
+
+  // On mount: check if JWT cookie is still valid; if not, fall back to guest session
+  useEffect(() => {
+    getMe()
+      .then(() => {
+        setIsLoggedIn(true);
+        setAuthChecked(true);
+      })
+      .catch(() => {
+        // Not logged in — initialize guest session
+        const stored = localStorage.getItem('guest_token');
+        if (stored) {
+          setGuestToken(stored);
+        } else {
+          createGuestSession()
+            .then((res) => {
+              const token = res.data.guest_token;
+              localStorage.setItem('guest_token', token);
+              setGuestToken(token);
+            })
+            .catch(console.error);
+        }
+        setAuthChecked(true);
+      });
+  }, []);
+
+  const incrementTodayCount = useCallback(() => {
+    setTodayEmotion((prev) => {
+      const newState =
+        prev.date === todayDateStr
+          ? { date: todayDateStr, count: prev.count + 1 }
+          : { date: todayDateStr, count: 1 };
+      localStorage.setItem('today_emotion', JSON.stringify(newState));
+      return newState;
+    });
+  }, [todayDateStr]);
+
+  const onLoginSuccess = useCallback(() => {
+    setIsLoggedIn(true);
+    localStorage.removeItem('guest_token');
+    setGuestToken(null);
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await apiLogout();
+    } catch (_) {}
+    setIsLoggedIn(false);
+    // Re-initialize guest session after logout
+    createGuestSession()
+      .then((res) => {
+        const token = res.data.guest_token;
+        localStorage.setItem('guest_token', token);
+        setGuestToken(token);
+      })
+      .catch(console.error);
+  }, []);
+
+  return (
+    <AppContext.Provider value={{
+      isLoggedIn,
+      authChecked,
+      guestToken,
+      todayCount,
+      incrementTodayCount,
+      onLoginSuccess,
+      handleLogout,
+    }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export function useApp() {
+  return useContext(AppContext);
+}

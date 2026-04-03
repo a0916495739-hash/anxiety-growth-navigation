@@ -1,0 +1,47 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AppProvider, useApp } from './context/AppContext';
+import { ToastProvider } from './components/Toast';
+
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Account from './pages/Account';
+import EmotionRecorder, { EmotionHistory } from './pages/EmotionRecorder';
+import { AchievementNew, AchievementList } from './pages/Achievements';
+import { ConflictNew, ConflictList, ConflictStats } from './pages/Conflicts';
+
+function AppRoutes() {
+  const { authChecked } = useApp();
+  if (!authChecked) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#faf8f3' }}>
+      <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    </div>
+  );
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/account" element={<Account />} />
+      <Route path="/emotions" element={<EmotionRecorder />} />
+      <Route path="/emotions/history" element={<EmotionHistory />} />
+      <Route path="/achievements" element={<AchievementList />} />
+      <Route path="/achievements/new" element={<AchievementNew />} />
+      <Route path="/conflicts" element={<ConflictList />} />
+      <Route path="/conflicts/new" element={<ConflictNew />} />
+      <Route path="/conflicts/stats" element={<ConflictStats />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <ToastProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AppProvider>
+    </ToastProvider>
+  );
+}
