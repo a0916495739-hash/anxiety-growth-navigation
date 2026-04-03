@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openspec status:*)",
+      "Bash(openspec instructions:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(docker compose:*)",
+      "Bash(ls /Users/wei0714/Desktop/attendace-management-system/.env*)",
+      "Bash(/usr/local/bin/docker compose:*)",
+      "Bash(/Applications/Docker.app/Contents/Resources/bin/docker compose:*)",
+      "Bash(npm run:*)",
+      "Bash(xargs kill:*)",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"testtest\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/guest)"
+    ]
+  }
+}
