@@ -114,9 +114,39 @@ router.get('/me', async (req, res) => {
   if (!token) return res.status(401).json({ error: 'Not logged in' });
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const result = await pool.query('SELECT id, email FROM users WHERE id = $1', [payload.userId]);
+    const result = await pool.query(
+      'SELECT id, email, display_name FROM users WHERE id = $1',
+      [payload.userId]
+    );
     if (result.rows.length === 0) return res.status(401).json({ error: 'User not found' });
-    res.json({ userId: payload.userId, email: result.rows[0].email });
+    res.json({
+      userId: payload.userId,
+      email: result.rows[0].email,
+      displayName: result.rows[0].display_name || null,
+    });
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// PUT /api/auth/profile
+router.put('/profile', async (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) return res.status(401).json({ error: 'Not logged in' });
+  const { display_name } = req.body;
+  if (!display_name?.trim()) {
+    return res.status(422).json({ error: '顯示名稱不能為空' });
+  }
+  if (display_name.trim().length > 30) {
+    return res.status(422).json({ error: '顯示名稱最多 30 個字元' });
+  }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    await pool.query(
+      'UPDATE users SET display_name = $1 WHERE id = $2',
+      [display_name.trim(), payload.userId]
+    );
+    res.json({ displayName: display_name.trim() });
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });
   }

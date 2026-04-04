@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
+import Privacy from './pages/Privacy';
 import EmotionRecorder, { EmotionHistory } from './pages/EmotionRecorder';
 import { AchievementNew, AchievementList } from './pages/Achievements';
 import { ConflictNew, ConflictList, ConflictStats } from './pages/Conflicts';
@@ -23,6 +24,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<Account />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route path="/emotions" element={<EmotionRecorder />} />
       <Route path="/emotions/history" element={<EmotionHistory />} />
       <Route path="/achievements" element={<AchievementList />} />

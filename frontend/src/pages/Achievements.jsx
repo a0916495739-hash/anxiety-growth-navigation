@@ -97,7 +97,7 @@ export function AchievementList() {
         <div style={styles.empty}>
           <IllustrationAchievement width={150} />
           <p style={styles.emptyTitle}>還沒有成就記錄</p>
-          <p style={styles.emptyDesc}>每一件小事都算數，從今天開始收集。</p>
+          <p style={styles.emptyDesc}>今天有沒有喝夠水？早起了嗎？說了一句貼心的話？<br />用你自己的標準定義「成就」。</p>
           <button style={styles.btn} onClick={() => navigate('/achievements/new')}>記錄今天的第一個小成就</button>
         </div>
       )}

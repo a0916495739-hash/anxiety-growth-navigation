@@ -1,20 +1,47 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMe, changePassword, logout } from '../api/auth';
+import { getMe, changePassword, logout, updateProfile } from '../api/auth';
 import { useApp } from '../context/AppContext';
 
 export default function Account() {
   const [email, setEmail] = useState('');
+  // Profile
+  const [nameInput, setNameInput] = useState('');
+  const [nameMsg, setNameMsg] = useState(null);
+  const [nameSaving, setNameSaving] = useState(false);
+  // Password
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
-  const [pwMsg, setPwMsg] = useState(null); // { type: 'success'|'error', text }
+  const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
-  const { handleLogout } = useApp();
+
+  const { handleLogout, displayName, setDisplayName } = useApp();
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMe().then((r) => setEmail(r.data.email || '')).catch(() => navigate('/'));
+    getMe()
+      .then((r) => {
+        setEmail(r.data.email || '');
+        setNameInput(r.data.displayName || '');
+      })
+      .catch(() => navigate('/'));
   }, [navigate]);
+
+  async function handleSaveName(e) {
+    e.preventDefault();
+    if (nameSaving || !nameInput.trim()) return;
+    setNameMsg(null);
+    setNameSaving(true);
+    try {
+      const r = await updateProfile(nameInput.trim());
+      setDisplayName(r.data.displayName);
+      setNameMsg({ type: 'success', text: '顯示名稱已更新' });
+    } catch (err) {
+      setNameMsg({ type: 'error', text: err.response?.data?.error || '更新失敗，請再試一次' });
+    } finally {
+      setNameSaving(false);
+    }
+  }
 
   async function handleChangePassword(e) {
     e.preventDefault();
@@ -35,7 +62,7 @@ export default function Account() {
 
   async function handleLogoutClick() {
     await handleLogout();
-    navigate('/');
+    navigate('/login');
   }
 
   return (
@@ -43,14 +70,43 @@ export default function Account() {
       <button style={s.back} onClick={() => navigate('/')}>← 返回首頁</button>
       <h2 style={s.heading}>帳號設定</h2>
 
+      {/* Profile */}
       <div style={s.section}>
-        <p style={s.sectionLabel}>帳號資訊</p>
-        <div style={s.infoRow}>
-          <span style={s.infoLabel}>Email</span>
-          <span style={s.infoValue}>{email || '—'}</span>
+        <p style={s.sectionLabel}>個人檔案</p>
+        <div style={s.avatar}>
+          <div style={s.avatarCircle}>
+            {displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?'}
+          </div>
+          <div>
+            <p style={s.avatarName}>{displayName || '（尚未設定顯示名稱）'}</p>
+            <p style={s.avatarEmail}>{email}</p>
+          </div>
         </div>
+        <form onSubmit={handleSaveName} style={s.form}>
+          <div style={s.field}>
+            <label style={s.label}>顯示名稱</label>
+            <input
+              style={s.input}
+              type="text"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              placeholder="輸入你想顯示的名稱（最多 30 字）"
+              maxLength={30}
+              autoComplete="nickname"
+            />
+          </div>
+          {nameMsg && (
+            <div style={nameMsg.type === 'success' ? s.successBox : s.errorBox}>
+              {nameMsg.text}
+            </div>
+          )}
+          <button type="submit" style={s.submitBtn} disabled={nameSaving || !nameInput.trim()}>
+            {nameSaving ? '儲存中...' : '儲存名稱'}
+          </button>
+        </form>
       </div>
 
+      {/* Password */}
       <div style={s.section}>
         <p style={s.sectionLabel}>修改密碼</p>
         <form onSubmit={handleChangePassword} style={s.form}>
@@ -87,6 +143,7 @@ export default function Account() {
         </form>
       </div>
 
+      {/* Logout */}
       <div style={s.section}>
         <p style={s.sectionLabel}>帳號操作</p>
         <button style={s.logoutBtn} onClick={handleLogoutClick}>登出</button>
@@ -101,9 +158,16 @@ const s = {
   heading: { fontSize: 22, marginBottom: 28 },
   section: { background: '#fff', border: '1.5px solid #e8e0d0', borderRadius: 14, padding: '20px', marginBottom: 16 },
   sectionLabel: { fontSize: 12, fontWeight: 600, color: '#9ca3af', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 14 },
-  infoRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  infoLabel: { fontSize: 14, color: '#6b7280' },
-  infoValue: { fontSize: 14, fontWeight: 600, color: '#2d3748' },
+  avatar: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 },
+  avatarCircle: {
+    width: 52, height: 52, borderRadius: '50%',
+    background: 'linear-gradient(135deg, #7fb5a0, #5a9fc0)',
+    color: '#fff', fontSize: 22, fontWeight: 700,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0,
+  },
+  avatarName: { fontWeight: 600, fontSize: 16, color: '#2d3748', margin: '0 0 2px' },
+  avatarEmail: { fontSize: 13, color: '#9ca3af', margin: 0 },
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: 13, fontWeight: 600, color: '#374151' },

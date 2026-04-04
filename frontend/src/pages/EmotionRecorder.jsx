@@ -195,20 +195,34 @@ function Confetti() {
   );
 }
 
+const SURPRISE_MESSAGES = [
+  '情緒不是敵人，它只是在提醒你在意什麼。',
+  '說出來，就已經比很多人勇敢了。',
+  '你不需要立刻解決它，先看見它就夠了。',
+  '每一次記錄，都是對自己多一點理解。',
+  '感受沒有對錯，只有真實。',
+  '你願意面對自己，這本身就是力量。',
+  '今天的情緒記下來了，明天的你會謝謝今天的你。',
+  '不是所有情緒都需要解釋，有時候只是需要空間。',
+];
+
 // Completion screen
 function CompletionScreen({ todayCount }) {
   const navigate = useNavigate();
   const [showAchievementPrompt, setShowAchievementPrompt] = useState(todayCount >= 3);
   const [showConflictPrompt, setShowConflictPrompt] = useState(true);
+  const [message] = useState(
+    () => SURPRISE_MESSAGES[Math.floor(Math.random() * SURPRISE_MESSAGES.length)]
+  );
 
   return (
-    <div style={styles.page}>
+    <div style={{ ...styles.page, animation: 'completionEnter 0.4s ease both' }}>
       <Confetti />
       <div style={{ display: 'flex', justifyContent: 'center', animation: 'popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both' }}>
         <IllustrationDone width={140} />
       </div>
       <h2 style={{ ...styles.heading, textAlign: 'center', animation: 'popIn 0.5s 0.15s both' }}>記錄完成</h2>
-      <p style={{ ...styles.sub, textAlign: 'center', animation: 'popIn 0.5s 0.25s both' }}>你很勇敢，願意面對自己的情緒。</p>
+      <p style={{ ...styles.sub, textAlign: 'center', animation: 'popIn 0.5s 0.25s both' }}>{message}</p>
 
       {showAchievementPrompt && (
         <PromptCard
@@ -236,21 +250,26 @@ function CompletionScreen({ todayCount }) {
 export default function EmotionRecorder() {
   const [mode, setMode] = useState(null);
   const [done, setDone] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const { todayCount, incrementTodayCount } = useApp();
   const [finalCount, setFinalCount] = useState(todayCount);
   const navigate = useNavigate();
 
   async function handleSubmit(data) {
+    setExiting(true);
     await createEmotion(data);
     incrementTodayCount();
     setFinalCount(todayCount + 1);
+    await new Promise((r) => setTimeout(r, 320));
     setDone(true);
   }
 
   if (done) return <CompletionScreen todayCount={finalCount} />;
-  if (!mode) return <ModeSelect onSelect={setMode} onBack={() => navigate('/')} />;
-  if (mode === 'guided') return <GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} />;
-  return <FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} />;
+
+  const exitStyle = exiting ? { animation: 'formExit 0.32s ease forwards', pointerEvents: 'none' } : {};
+  if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} /></div>;
+  if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} /></div>;
+  return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} /></div>;
 }
 
 // History page
@@ -316,8 +335,8 @@ export function EmotionHistory() {
       {records?.length === 0 && (
         <div style={styles.empty}>
           <IllustrationEmptyEmotion width={150} />
-          <p style={styles.emptyTitle}>還沒有情緒記錄</p>
-          <p style={styles.emptyDesc}>記錄你的第一次情緒，開始認識自己。</p>
+          <p style={styles.emptyTitle}>今天還沒跟自己對話</p>
+          <p style={styles.emptyDesc}>情緒不需要是大事才值得記錄。<br />一點點煩躁、一點點落寞，都算。</p>
           <button style={styles.btn} onClick={() => navigate('/emotions')}>開始第一次記錄</button>
         </div>
       )}

@@ -4,9 +4,23 @@ import { login } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { IllustrationLogin } from '../components/Illustrations';
 
+function EyeIcon({ open }) {
+  return open ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  );
+}
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { onLoginSuccess } = useApp();
@@ -53,15 +67,20 @@ export default function Login() {
 
           <div style={s.field}>
             <label style={s.label}>密碼</label>
-            <input
-              style={s.input}
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
+            <div style={s.pwWrap}>
+              <input
+                style={s.pwInput}
+                type={showPw ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+              <button type="button" style={s.eyeBtn} onClick={() => setShowPw((v) => !v)} tabIndex={-1}>
+                <EyeIcon open={showPw} />
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -120,6 +139,31 @@ const s = {
     background: '#faf8f3',
     outline: 'none',
     transition: 'border-color 0.15s',
+  },
+  pwWrap: { position: 'relative', display: 'flex', alignItems: 'center' },
+  pwInput: {
+    flex: 1,
+    border: '1.5px solid #e8e0d0',
+    borderRadius: 10,
+    padding: '11px 44px 11px 14px',
+    fontSize: 15,
+    color: '#2d3748',
+    background: '#faf8f3',
+    outline: 'none',
+    transition: 'border-color 0.15s',
+    width: '100%',
+  },
+  eyeBtn: {
+    position: 'absolute',
+    right: 12,
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    color: '#9ca3af',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    minHeight: 'unset',
   },
   errorBox: {
     background: '#fef2f2',

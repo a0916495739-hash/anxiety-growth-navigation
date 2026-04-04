@@ -87,12 +87,20 @@
 
 ---
 
-### Requirement: 帳號設定頁
-系統 SHALL 提供登入使用者一個帳號設定頁，可查看 Email、修改密碼與登出。
+### Requirement: 帳號設定與個人檔案頁
+系統 SHALL 提供登入使用者一個帳號設定頁（`/account`），包含個人檔案（顯示名稱）、修改密碼與登出。
 
 #### Scenario: 查看帳號資訊
-- **WHEN** 登入使用者開啟帳號設定頁（`/account`）
-- **THEN** 系統顯示目前帳號的 Email，呼叫 `GET /api/auth/me`
+- **WHEN** 登入使用者開啟帳號設定頁
+- **THEN** 系統顯示 Avatar（名稱首字母）、顯示名稱（若有）、Email，資料來自 `GET /api/auth/me`
+
+#### Scenario: 修改顯示名稱
+- **WHEN** 登入使用者輸入顯示名稱（1–30 字元）並儲存
+- **THEN** 系統呼叫 `PUT /api/auth/profile`，更新 `users.display_name`，並同步更新 AppContext 中的 displayName，首頁 nav 立即反映
+
+#### Scenario: 顯示名稱驗證
+- **WHEN** 使用者提交超過 30 字元的顯示名稱
+- **THEN** 系統回傳 422 錯誤，不更新
 
 #### Scenario: 修改密碼成功
 - **WHEN** 登入使用者提交目前密碼與新密碼（至少 8 字元）
@@ -101,6 +109,10 @@
 #### Scenario: 目前密碼不正確
 - **WHEN** 登入使用者提交錯誤的目前密碼
 - **THEN** 系統回傳 401，顯示「目前密碼不正確」錯誤訊息，不更新密碼
+
+#### Scenario: 登出後跳轉登入頁
+- **WHEN** 登入使用者點擊「登出」按鈕
+- **THEN** 系統呼叫 `POST /api/auth/logout` 清除 JWT cookie、重置 AppContext 狀態（isLoggedIn=false、displayName=null），導向 `/login`
 
 #### Scenario: 未登入使用者訪問設定頁
 - **WHEN** 未登入使用者直接訪問 `/account`

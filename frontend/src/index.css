@@ -84,6 +84,16 @@ input, textarea { font-family: inherit; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+@keyframes formExit {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-24px) scale(0.97); }
+}
+
+@keyframes completionEnter {
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* RWD */
 @media (max-width: 480px) {
   body { font-size: 15px; }

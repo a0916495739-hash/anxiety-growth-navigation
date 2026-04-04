@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { createConflict, getConflicts, getConflictStats, deleteConflict } from '../api/conflicts';
+import { getCorrelation } from '../api/stats';
 import TagSelector from '../components/TagSelector';
 import { IllustrationDone, IllustrationEmptyConflict } from '../components/Illustrations';
 
@@ -155,7 +156,7 @@ export function ConflictList() {
         <div style={styles.empty}>
           <IllustrationEmptyConflict width={150} />
           <p style={styles.emptyTitle}>還沒有衝突記錄</p>
-          <p style={styles.emptyDesc}>記錄下讓你感到拉扯的時刻，慢慢看清自己。</p>
+          <p style={styles.emptyDesc}>「我應該去健身，但我想耍廢。」<br />「我應該接那個案子，但我想休息。」<br />有感覺到拉扯嗎？把它記下來。</p>
           <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>記錄第一個衝突</button>
         </div>
       )}
@@ -186,12 +187,21 @@ export function ConflictList() {
   );
 }
 
+const SOURCE_INSIGHTS = {
+  family: '來自家人的期望最多。試著思考，哪些是他們的擔心，哪些是你真正認同的？',
+  peers:  '同儕比較佔最大比例。你在意的，有多少是真正重要的，有多少只是不想落後？',
+  society:'社會期待的聲音最響亮。這些「應該」是誰定義的？對你真的有意義嗎？',
+  self:   '自我要求是最主要的來源。內在標準高是優點，但也記得給自己喘息的空間。',
+};
+
 export function ConflictStats() {
   const [stats, setStats] = useState(null);
+  const [correlation, setCorrelation] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     getConflictStats().then((r) => setStats(r.data)).catch(() => setStats({}));
+    getCorrelation().then((r) => setCorrelation(r.data)).catch(() => {});
   }, []);
 
   const total = stats ? Object.values(stats).reduce((a, b) => a + b, 0) : 0;
@@ -199,42 +209,125 @@ export function ConflictStats() {
     ? SOURCE_OPTIONS.map((o) => ({ name: o.label, value: stats[o.value] || 0, key: o.value })).filter((d) => d.value > 0)
     : [];
 
+  const dominant = stats
+    ? SOURCE_OPTIONS.reduce((best, o) => (!best || (stats[o.value] || 0) > (stats[best.value] || 0) ? o : best), null)
+    : null;
+
   return (
     <div style={styles.page}>
       <div style={styles.pageHeader}>
         <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
         <h2 style={styles.heading}>應該來源分析</h2>
+        <button style={styles.addBtn} onClick={() => navigate('/conflicts')}>歷史記錄</button>
       </div>
 
       {total === 0 ? (
         <div style={styles.empty}>
           <IllustrationEmptyConflict width={150} />
-          <p style={styles.emptyTitle}>還沒有足夠的資料</p>
-          <p style={styles.emptyDesc}>記錄幾個衝突時刻後，就能看到你的「應該」主要來自哪裡。</p>
+          <p style={styles.emptyTitle}>資料還不夠多</p>
+          <p style={styles.emptyDesc}>記錄 2–3 個衝突時刻後，<br />這裡會告訴你「你的焦慮主要來自哪裡」。</p>
           <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>記錄第一個衝突</button>
         </div>
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                {pieData.map((entry) => (
-                  <Cell key={entry.key} fill={PIE_COLORS[entry.key]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={styles.statList}>
-            {SOURCE_OPTIONS.map((o) => (
-              <div key={o.value} style={styles.statRow}>
-                <span style={{ ...styles.dot, background: PIE_COLORS[o.value] }} />
-                <span>{o.label}</span>
-                <span style={styles.statCount}>{stats?.[o.value] || 0} 次</span>
+          {/* Insight card */}
+          {dominant && total >= 2 && (
+            <div style={{ ...styles.insightCard, borderColor: PIE_COLORS[dominant.value] + '60', background: PIE_COLORS[dominant.value] + '0d' }}>
+              <div style={styles.insightHeader}>
+                <span style={{ ...styles.insightBadge, background: PIE_COLORS[dominant.value] }}>
+                  主要來源：{dominant.label}
+                </span>
+                <span style={styles.insightPct}>
+                  {Math.round(((stats[dominant.value] || 0) / total) * 100)}%
+                </span>
               </div>
-            ))}
+              <p style={styles.insightText}>{SOURCE_INSIGHTS[dominant.value]}</p>
+            </div>
+          )}
+
+          {/* Pie chart */}
+          <div style={styles.chartWrap}>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={95}
+                  innerRadius={40}
+                  paddingAngle={3}
+                  label={({ name, percent }) => percent > 0.08 ? `${(percent * 100).toFixed(0)}%` : ''}
+                  labelLine={false}
+                >
+                  {pieData.map((entry) => (
+                    <Cell key={entry.key} fill={PIE_COLORS[entry.key]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v, n) => [`${v} 次`, n]} contentStyle={{ fontSize: 13, borderRadius: 8 }} />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
+
+          {/* Bar breakdown */}
+          <div style={styles.barList}>
+            {SOURCE_OPTIONS.filter((o) => (stats?.[o.value] || 0) > 0)
+              .sort((a, b) => (stats[b.value] || 0) - (stats[a.value] || 0))
+              .map((o) => {
+                const count = stats?.[o.value] || 0;
+                const pct = total > 0 ? (count / total) * 100 : 0;
+                return (
+                  <div key={o.value} style={styles.barRow}>
+                    <div style={styles.barLabel}>
+                      <span style={{ ...styles.dot, background: PIE_COLORS[o.value] }} />
+                      <span style={styles.barName}>{o.label}</span>
+                      <span style={styles.barCount}>{count} 次</span>
+                    </div>
+                    <div style={styles.barTrack}>
+                      <div style={{ ...styles.barFill, width: `${pct}%`, background: PIE_COLORS[o.value] }} />
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          <p style={styles.totalNote}>共 {total} 筆衝突記錄</p>
+
+          {/* Correlation section */}
+          {correlation.length > 0 && (
+            <div style={styles.corrSection}>
+              <p style={styles.corrTitle}>衝突當天的情緒強度</p>
+              <p style={styles.corrDesc}>當你記錄到某個來源的衝突時，同一天的情緒強度平均是多少</p>
+              {correlation.map((row) => {
+                const src = SOURCE_OPTIONS.find((o) => o.value === row.source);
+                const color = PIE_COLORS[row.source];
+                const pct = ((parseFloat(row.avg_intensity) / 5) * 100).toFixed(0);
+                return (
+                  <div key={row.source} style={styles.corrRow}>
+                    <div style={styles.corrHeader}>
+                      <span style={{ ...styles.corrBadge, background: color + '20', color }}>
+                        {src?.label}
+                      </span>
+                      <span style={styles.corrValue}>
+                        平均 <strong>{row.avg_intensity}</strong> / 5
+                      </span>
+                    </div>
+                    <div style={styles.corrTrack}>
+                      <div style={{ ...styles.corrFill, width: `${pct}%`, background: color }} />
+                    </div>
+                    <p style={styles.corrNote}>
+                      {parseFloat(row.avg_intensity) >= 4
+                        ? `來自「${src?.label}」的衝突對你影響很大，情緒反應明顯較強。`
+                        : parseFloat(row.avg_intensity) >= 2.5
+                        ? `來自「${src?.label}」的衝突讓你感到中等程度的情緒波動。`
+                        : `來自「${src?.label}」的衝突發生時，你的情緒相對平穩。`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -277,4 +370,28 @@ const styles = {
   statRow: { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid #f3f4f6' },
   dot: { width: 12, height: 12, borderRadius: '50%', flexShrink: 0 },
   statCount: { marginLeft: 'auto', fontWeight: 600 },
+  insightCard: { border: '1.5px solid', borderRadius: 14, padding: '16px 18px', marginBottom: 20 },
+  insightHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  insightBadge: { color: '#fff', borderRadius: 99, padding: '3px 12px', fontSize: 13, fontWeight: 600 },
+  insightPct: { fontSize: 28, fontWeight: 700, color: '#2d3748', lineHeight: 1 },
+  insightText: { fontSize: 14, color: '#6b7280', lineHeight: 1.7 },
+  chartWrap: { background: '#fff', border: '1px solid #f3f4f6', borderRadius: 14, padding: '8px 0', marginBottom: 20 },
+  barList: { display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 12 },
+  barRow: { display: 'flex', flexDirection: 'column', gap: 6 },
+  barLabel: { display: 'flex', alignItems: 'center', gap: 8 },
+  barName: { fontSize: 14, color: '#374151', flex: 1 },
+  barCount: { fontSize: 13, color: '#6b7280', fontWeight: 600 },
+  barTrack: { height: 8, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 99, transition: 'width 0.6s ease' },
+  totalNote: { textAlign: 'center', fontSize: 13, color: '#9ca3af', marginTop: 8 },
+  corrSection: { marginTop: 28, paddingTop: 20, borderTop: '1px solid #f3f4f6' },
+  corrTitle: { fontSize: 15, fontWeight: 700, color: '#2d3748', marginBottom: 4 },
+  corrDesc: { fontSize: 13, color: '#9ca3af', marginBottom: 16 },
+  corrRow: { marginBottom: 18 },
+  corrHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
+  corrBadge: { borderRadius: 99, padding: '3px 10px', fontSize: 13, fontWeight: 600 },
+  corrValue: { fontSize: 13, color: '#6b7280' },
+  corrTrack: { height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden', marginBottom: 6 },
+  corrFill: { height: '100%', borderRadius: 99, transition: 'width 0.8s ease' },
+  corrNote: { fontSize: 12, color: '#9ca3af', lineHeight: 1.5 },
 };

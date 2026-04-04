@@ -49,4 +49,37 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// GET /api/stats/correlation
+// 當某個來源的衝突發生時，同一天的平均情緒強度
+router.get('/correlation', auth, async (req, res) => {
+  try {
+    const userId = await resolveUserId(req, res);
+    if (!userId) return;
+
+    const result = await pool.query(
+      `SELECT
+         c.source,
+         ROUND(AVG(e.intensity)::numeric, 1)  AS avg_intensity,
+         COUNT(DISTINCT e.id)::int             AS emotion_count,
+         COUNT(DISTINCT c.id)::int             AS conflict_count
+       FROM conflicts c
+       JOIN emotion_records e
+         ON  e.user_id = c.user_id
+         AND date_trunc('day', e.created_at AT TIME ZONE 'UTC')
+           = date_trunc('day', c.created_at AT TIME ZONE 'UTC')
+         AND e.mode = 'guided'
+         AND e.intensity IS NOT NULL
+       WHERE c.user_id = $1
+       GROUP BY c.source
+       HAVING COUNT(DISTINCT e.id) > 0
+       ORDER BY avg_intensity ASC`,
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch correlation' });
+  }
+});
+
 module.exports = router;

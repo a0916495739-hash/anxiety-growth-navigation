@@ -36,7 +36,7 @@ const features = [
 ];
 
 export default function Home() {
-  const { isLoggedIn, handleLogout } = useApp();
+  const { isLoggedIn, handleLogout, displayName } = useApp();
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
@@ -57,8 +57,8 @@ export default function Home() {
         <div style={s.navActions}>
           {isLoggedIn ? (
             <>
+              {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
               <button style={s.ghostBtn} onClick={() => navigate('/account')}>設定</button>
-              <button style={s.ghostBtn} onClick={handleLogout}>登出</button>
             </>
           ) : (
             <>
@@ -139,6 +139,13 @@ export default function Home() {
         <button style={s.quickLink} onClick={() => navigate('/emotions/history')}>📋 情緒記錄歷史</button>
         <button style={s.quickLink} onClick={() => navigate('/conflicts/stats')}>📊 應該來源分析</button>
       </section>
+
+      {/* Footer */}
+      <footer style={s.footer}>
+        <button style={s.privacyLink} onClick={() => navigate('/privacy')}>🛡️ 隱私權政策</button>
+        <span style={s.footerDot}>·</span>
+        <span style={s.footerText}>資料加密保護，不販售個人資訊</span>
+      </footer>
     </div>
   );
 }
@@ -162,6 +169,7 @@ const s = {
   logoMark: { fontSize: 22 },
   logoText: { fontWeight: 700, fontSize: 17, color: '#2d3748', letterSpacing: '-0.3px' },
   navActions: { display: 'flex', gap: 8, alignItems: 'center' },
+  greeting: { fontSize: 14, color: '#6b7280', fontWeight: 500 },
   ghostBtn: {
     background: 'transparent',
     border: '1.5px solid #7fb5a0',
@@ -309,4 +317,8 @@ const s = {
   statItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 },
   statNum: { fontSize: 28, fontWeight: 700, color: '#2d3748', lineHeight: 1 },
   statDesc: { fontSize: 12, color: '#6b7280' },
+  footer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 40, paddingTop: 20, borderTop: '1px solid #e8e0d0' },
+  privacyLink: { background: 'none', border: 'none', color: '#9ca3af', fontSize: 13, cursor: 'pointer', padding: 0, fontWeight: 500 },
+  footerDot: { color: '#d1d5db', fontSize: 13 },
+  footerText: { fontSize: 13, color: '#9ca3af' },
 };

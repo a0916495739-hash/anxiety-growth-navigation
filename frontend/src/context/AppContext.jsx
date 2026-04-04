@@ -7,6 +7,7 @@ export function AppProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
+  const [displayName, setDisplayName] = useState(null);
 
   // Today's emotion count: { date: 'YYYY-MM-DD', count: N }
   const [todayEmotion, setTodayEmotion] = useState(() => {
@@ -20,8 +21,9 @@ export function AppProvider({ children }) {
   // On mount: check if JWT cookie is still valid; if not, fall back to guest session
   useEffect(() => {
     getMe()
-      .then(() => {
+      .then((r) => {
         setIsLoggedIn(true);
+        setDisplayName(r.data.displayName || null);
         setAuthChecked(true);
       })
       .catch(() => {
@@ -53,10 +55,14 @@ export function AppProvider({ children }) {
     });
   }, [todayDateStr]);
 
-  const onLoginSuccess = useCallback(() => {
+  const onLoginSuccess = useCallback(async () => {
     setIsLoggedIn(true);
     localStorage.removeItem('guest_token');
     setGuestToken(null);
+    try {
+      const r = await getMe();
+      setDisplayName(r.data.displayName || null);
+    } catch (_) {}
   }, []);
 
   const handleLogout = useCallback(async () => {
@@ -64,6 +70,7 @@ export function AppProvider({ children }) {
       await apiLogout();
     } catch (_) {}
     setIsLoggedIn(false);
+    setDisplayName(null);
     // Re-initialize guest session after logout
     createGuestSession()
       .then((res) => {
@@ -79,6 +86,8 @@ export function AppProvider({ children }) {
       isLoggedIn,
       authChecked,
       guestToken,
+      displayName,
+      setDisplayName,
       todayCount,
       incrementTodayCount,
       onLoginSuccess,
