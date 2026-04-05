@@ -95,6 +95,9 @@ export default function Login() {
         </form>
 
         <p style={s.footer}>
+          <Link to="/forgot-password">忘記密碼？</Link>
+        </p>
+        <p style={s.footer}>
           還沒有帳號？ <Link to="/register">建立帳號</Link>
         </p>
         <p style={s.footer}>
