@@ -47,6 +47,10 @@ export default function Home() {
 
   return (
     <div style={s.page}>
+      {/* 背景光暈球 — 讓磨砂玻璃有東西可以折射 */}
+      <div style={s.blob1} />
+      <div style={s.blob2} />
+      <div style={s.blob3} />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       {/* Nav */}
       <nav style={s.nav}>
@@ -171,23 +175,30 @@ const s = {
   navActions: { display: 'flex', gap: 8, alignItems: 'center' },
   greeting: { fontSize: 14, color: '#6b7280', fontWeight: 500 },
   ghostBtn: {
-    background: 'transparent',
-    border: '1.5px solid #7fb5a0',
-    color: '#4a9580',
+    background: 'rgba(255,255,255,0.35)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.5)',
+    color: '#4a5568',
     borderRadius: 99,
     padding: '7px 18px',
     fontSize: 14,
     fontWeight: 500,
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.06)',
+    transition: 'background 0.2s, box-shadow 0.2s',
   },
   primaryBtn: {
-    background: '#7fb5a0',
-    border: 'none',
-    color: '#fff',
+    background: 'rgba(255,255,255,0.5)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.6)',
+    color: '#374151',
     borderRadius: 99,
     padding: '7px 18px',
     fontSize: 14,
-    fontWeight: 500,
-    boxShadow: '0 2px 8px rgba(127,181,160,0.35)',
+    fontWeight: 600,
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 8px rgba(0,0,0,0.08)',
+    transition: 'background 0.2s, box-shadow 0.2s',
   },
   hero: {
     textAlign: 'center',
@@ -236,14 +247,17 @@ const s = {
     color: '#78600a',
   },
   bannerBtn: {
-    background: '#f59e0b',
-    border: 'none',
-    color: '#fff',
+    background: 'rgba(255,255,255,0.55)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255,255,255,0.7)',
+    color: '#374151',
     borderRadius: 8,
     padding: '5px 12px',
     fontSize: 13,
     fontWeight: 600,
     marginLeft: 4,
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.8)',
   },
   cards: {
     display: 'flex',
@@ -296,13 +310,17 @@ const s = {
     justifyContent: 'center',
   },
   quickLink: {
-    background: '#fff',
-    border: '1.5px solid #e8e0d0',
+    background: 'rgba(255,255,255,0.4)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255,255,255,0.55)',
     borderRadius: 99,
     padding: '8px 20px',
     fontSize: 14,
-    color: '#6b7280',
+    color: '#4a5568',
     fontWeight: 500,
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.7), 0 1px 4px rgba(0,0,0,0.05)',
+    transition: 'background 0.2s',
   },
   statsBar: {
     background: 'rgba(245, 241, 237, 0.7)',
@@ -319,6 +337,24 @@ const s = {
   statItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 },
   statNum: { fontSize: 28, fontWeight: 700, color: '#2d3748', lineHeight: 1 },
   statDesc: { fontSize: 12, color: '#6b7280' },
+  blob1: {
+    position: 'fixed', top: '-60px', right: '-40px',
+    width: 320, height: 320,
+    background: 'radial-gradient(circle, rgba(251,191,36,0.25) 0%, transparent 70%)',
+    borderRadius: '50%', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none',
+  },
+  blob2: {
+    position: 'fixed', bottom: '10%', left: '-80px',
+    width: 280, height: 280,
+    background: 'radial-gradient(circle, rgba(196,181,253,0.2) 0%, transparent 70%)',
+    borderRadius: '50%', filter: 'blur(50px)', zIndex: -1, pointerEvents: 'none',
+  },
+  blob3: {
+    position: 'fixed', top: '40%', right: '5%',
+    width: 200, height: 200,
+    background: 'radial-gradient(circle, rgba(249,168,212,0.18) 0%, transparent 70%)',
+    borderRadius: '50%', filter: 'blur(35px)', zIndex: -1, pointerEvents: 'none',
+  },
   footer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 40, paddingTop: 20, borderTop: '1px solid #e8e0d0' },
   privacyLink: { background: 'none', border: 'none', color: '#9ca3af', fontSize: 13, cursor: 'pointer', padding: 0, fontWeight: 500 },
   footerDot: { color: '#d1d5db', fontSize: 13 },
