@@ -305,8 +305,10 @@ const s = {
     fontWeight: 500,
   },
   statsBar: {
-    background: 'linear-gradient(135deg, #e8f4f0, #faf8f3)',
-    border: '1.5px solid #c8ddd7',
+    background: 'rgba(255, 245, 248, 0.7)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,182,193,0.3)',
     borderRadius: 16,
     padding: '16px 20px',
     marginBottom: 28,

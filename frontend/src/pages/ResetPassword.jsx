@@ -113,12 +113,16 @@ export default function ResetPassword() {
 const s = {
   bg: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #e8f4f0 0%, #faf8f3 50%, #e8f4fb 100%)',
+    background: 'linear-gradient(135deg, #f9fafb 0%, #fce7f3 55%, #ffe4e6 100%)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
   },
   card: {
-    background: '#fff', borderRadius: 24, padding: '40px 36px', width: '100%', maxWidth: 400,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+    background: 'rgba(255, 252, 250, 0.65)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: '1px solid rgba(255, 255, 255, 0.45)',
+    borderRadius: 32, padding: '40px 36px', width: '100%', maxWidth: 400,
+    boxShadow: '0 24px 48px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04)',
   },
   header: { textAlign: 'center', marginBottom: 32 },
   illusWrap: { display: 'flex', justifyContent: 'center', marginBottom: 8 },
@@ -142,13 +146,13 @@ const s = {
     padding: '10px 14px', fontSize: 14, color: '#dc2626', display: 'flex', gap: 8,
   },
   btn: {
-    background: '#7fb5a0', border: 'none', color: '#fff', borderRadius: 10,
+    background: '#fbbf24', border: 'none', color: '#fff', borderRadius: 10,
     padding: '13px', fontSize: 15, fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(127,181,160,0.4)', marginTop: 4, cursor: 'pointer', width: '100%',
+    boxShadow: '0 2px 10px rgba(251,191,36,0.4)', marginTop: 4, cursor: 'pointer', width: '100%',
   },
   btnDisabled: {
-    background: '#b8d9cf', border: 'none', color: '#fff', borderRadius: 10,
-    padding: '13px', fontSize: 15, fontWeight: 600, marginTop: 4, cursor: 'not-allowed',
+    background: '#fde68a', border: 'none', color: '#fff', borderRadius: 10,
+    padding: '13px', fontSize: 15, fontWeight: 600, marginTop: 4, cursor: 'not-allowed', width: '100%',
   },
   successBox: { textAlign: 'center', padding: '8px 0 8px' },
   successIcon: { fontSize: 48, marginBottom: 12 },
