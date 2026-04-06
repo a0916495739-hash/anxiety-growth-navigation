@@ -113,7 +113,7 @@ export default function ResetPassword() {
 const s = {
   bg: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #f9fafb 0%, #fce7f3 55%, #ffe4e6 100%)',
+    background: 'linear-gradient(135deg, #f5f3f0 0%, #ede8e3 50%, #f0ebe8 100%)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
   },
   card: {

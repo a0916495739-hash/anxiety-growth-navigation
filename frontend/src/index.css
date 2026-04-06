@@ -20,7 +20,7 @@
   --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
   --shadow-lg:  0 10px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.05);
   /* ROSÉ palette */
-  --rose-bg:    linear-gradient(135deg, #f9fafb 0%, #fce7f3 55%, #ffe4e6 100%);
+  --rose-bg:    linear-gradient(135deg, #f5f3f0 0%, #ede8e3 50%, #f0ebe8 100%);
   --amber:      #fbbf24;
   --amber-glow: rgba(251,191,36,0.35);
 }

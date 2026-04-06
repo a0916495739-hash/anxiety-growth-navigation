@@ -305,7 +305,7 @@ const s = {
     fontWeight: 500,
   },
   statsBar: {
-    background: 'rgba(255, 245, 248, 0.7)',
+    background: 'rgba(245, 241, 237, 0.7)',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     border: '1px solid rgba(255,182,193,0.3)',
