@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const DEFAULT_TAGS = ['焦慮', '比較', '委屈', '迷茫', '憤怒', '悲傷', '壓力', '孤獨', '挫折', '疲憊'];
 
-export default function TagSelector({ selected, onChange, presets = DEFAULT_TAGS }) {
+export default function TagSelector({ selected, onChange, presets = DEFAULT_TAGS, placeholder = '自訂標籤（按 Enter 新增）', addLabel = '新增' }) {
   const [custom, setCustom] = useState('');
 
   function toggle(tag) {
@@ -50,10 +50,10 @@ export default function TagSelector({ selected, onChange, presets = DEFAULT_TAGS
           value={custom}
           onChange={(e) => setCustom(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustom())}
-          placeholder="自訂標籤（按 Enter 新增）"
+          placeholder={placeholder}
           style={styles.input}
         />
-        <button type="button" onClick={addCustom} style={styles.addBtn}>新增</button>
+        <button type="button" onClick={addCustom} style={styles.addBtn}>{addLabel}</button>
       </div>
     </div>
   );

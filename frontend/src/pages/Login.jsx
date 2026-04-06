@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { IllustrationLogin } from '../components/Illustrations';
+import { getT } from '../i18n';
 
 function EyeIcon({ open }) {
   return open ? (
@@ -23,7 +24,8 @@ export default function Login() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { onLoginSuccess } = useApp();
+  const { onLoginSuccess, lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -35,7 +37,7 @@ export default function Login() {
       onLoginSuccess();
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || '登入失敗，請確認帳號密碼後再試');
+      setError(err.response?.data?.error || t.loginFailed);
     } finally {
       setLoading(false);
     }
@@ -44,11 +46,10 @@ export default function Login() {
   return (
     <div style={s.bg}>
       <div style={s.card}>
-        {/* Header */}
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={100} /></div>
-          <h1 style={s.title}>歡迎回來</h1>
-          <p style={s.sub}>登入以繼續你的成長旅程</p>
+          <h1 style={s.title}>{t.welcomeBack}</h1>
+          <p style={s.sub}>{t.loginSub}</p>
         </div>
 
         <form onSubmit={handleSubmit} style={s.form}>
@@ -66,7 +67,7 @@ export default function Login() {
           </div>
 
           <div style={s.field}>
-            <label style={s.label}>密碼</label>
+            <label style={s.label}>{t.password}</label>
             <div style={s.pwWrap}>
               <input
                 style={s.pwInput}
@@ -90,19 +91,13 @@ export default function Login() {
           )}
 
           <button style={loading ? s.btnDisabled : s.btn} type="submit" disabled={loading}>
-            {loading ? '登入中...' : '登入'}
+            {loading ? t.signingIn : t.signInBtn}
           </button>
         </form>
 
-        <p style={s.footer}>
-          <Link to="/forgot-password">忘記密碼？</Link>
-        </p>
-        <p style={s.footer}>
-          還沒有帳號？ <Link to="/register">建立帳號</Link>
-        </p>
-        <p style={s.footer}>
-          <Link to="/">← 以訪客身份繼續</Link>
-        </p>
+        <p style={s.footer}><Link to="/forgot-password">{t.forgotPassword}</Link></p>
+        <p style={s.footer}>{t.noAccount} <Link to="/register">{t.createAccount}</Link></p>
+        <p style={s.footer}><Link to="/">{t.continueGuest}</Link></p>
       </div>
     </div>
   );

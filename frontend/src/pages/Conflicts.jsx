@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { createConflict, getConflicts, getConflictStats, deleteConflict } from '../api/conflicts';
 import { getCorrelation } from '../api/stats';
 import TagSelector from '../components/TagSelector';
 import { IllustrationDone, IllustrationEmptyConflict } from '../components/Illustrations';
+import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
-const FEELING_TAGS = ['自由', '壓力', '期待', '委屈', '迷茫', '焦慮', '憤怒', '無奈', '不甘心'];
-const SOURCE_OPTIONS = [
-  { value: 'family', label: '家人' },
-  { value: 'peers', label: '同儕/朋友' },
-  { value: 'society', label: '社會期待' },
-  { value: 'self', label: '自我要求' },
-];
-const CHOSEN_OPTIONS = [
-  { value: 'should', label: '選了「應該」' },
-  { value: 'want', label: '選了「想要」' },
-  { value: 'neither', label: '都沒有' },
-  { value: 'pending', label: '還沒決定' },
-];
 const PIE_COLORS = { family: '#6366f1', peers: '#f59e0b', society: '#10b981', self: '#ef4444' };
 
 export function ConflictNew() {
@@ -26,15 +15,17 @@ export function ConflictNew() {
   const [errors, setErrors] = useState({});
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
 
   function set(key, val) { setForm((p) => ({ ...p, [key]: val })); }
 
   function validate() {
     const e = {};
-    if (!form.should_content.trim()) e.should_content = '請填寫「應該要」的內容';
-    if (!form.want_content.trim()) e.want_content = '請填寫「但我想要」的內容';
-    if (!form.source) e.source = '請選擇期望來源';
+    if (!form.should_content.trim()) e.should_content = t.shouldRequired;
+    if (!form.want_content.trim()) e.want_content = t.wantRequired;
+    if (!form.source) e.source = t.sourceRequired;
     return e;
   }
 
@@ -57,67 +48,66 @@ export function ConflictNew() {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <IllustrationDone width={140} />
       </div>
-      <h2 style={{ ...styles.heading, textAlign: 'center' }}>記錄完成</h2>
-      <p style={styles.sub}>看清楚衝突，是做出選擇的第一步。</p>
-      <button style={styles.btn} onClick={() => navigate('/conflicts')}>查看歷史記錄</button>
-      <button style={styles.ghost} onClick={() => navigate('/')}>回首頁</button>
+      <h2 style={{ ...styles.heading, textAlign: 'center' }}>{t.conflictSaved}</h2>
+      <p style={styles.sub}>{t.conflictSavedDesc}</p>
+      <button style={styles.btn} onClick={() => navigate('/conflicts')}>{t.viewHistory}</button>
+      <button style={styles.ghost} onClick={() => navigate('/')}>{t.backHome}</button>
     </div>
   );
 
   return (
     <div style={styles.page}>
-      <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
-      <h2 style={styles.heading}>應該 vs 想要</h2>
-      <p style={styles.sub}>記錄下這個讓你感到拉扯的時刻</p>
+      <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
+      <h2 style={styles.heading}>{t.shouldVsWant}</h2>
+      <p style={styles.sub}>{t.conflictSub}</p>
 
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>我「應該」要...</label>
+          <label style={styles.label}>{t.shouldLabel}</label>
           <textarea style={styles.textarea} rows={3} value={form.should_content}
-            onChange={(e) => set('should_content', e.target.value)} placeholder="填寫外在期望要你做的事" />
+            onChange={(e) => set('should_content', e.target.value)} placeholder={t.shouldPlaceholder} />
           {errors.should_content && <p style={styles.error}>{errors.should_content}</p>}
         </div>
 
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>但我「想要」...</label>
+          <label style={styles.label}>{t.wantLabel}</label>
           <textarea style={styles.textarea} rows={3} value={form.want_content}
-            onChange={(e) => set('want_content', e.target.value)} placeholder="填寫你內心真正想要的" />
+            onChange={(e) => set('want_content', e.target.value)} placeholder={t.wantPlaceholder} />
           {errors.want_content && <p style={styles.error}>{errors.want_content}</p>}
         </div>
 
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>這個「應該」來自...</label>
+          <label style={styles.label}>{t.sourceLabel}</label>
           <div style={styles.optionRow}>
-            {SOURCE_OPTIONS.map((o) => (
+            {t.sourceOptions.map((o) => (
               <button key={o.value} type="button"
                 style={form.source === o.value ? styles.optionActive : styles.option}
-                onClick={() => set('source', o.value)}>
-                {o.label}
-              </button>
+                onClick={() => set('source', o.value)}>{o.label}</button>
             ))}
           </div>
           {errors.source && <p style={styles.error}>{errors.source}</p>}
         </div>
 
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>這個衝突讓我感到...（選填）</label>
-          <TagSelector selected={form.feeling_tags} onChange={(v) => set('feeling_tags', v)} presets={FEELING_TAGS} />
+          <label style={styles.label}>{t.feelingLabel}</label>
+          <TagSelector selected={form.feeling_tags} onChange={(v) => set('feeling_tags', v)}
+            presets={t.feelingTags} placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
         </div>
 
         <div style={styles.fieldGroup}>
-          <label style={styles.label}>今天我選擇了...（選填）</label>
+          <label style={styles.label}>{t.chosenLabel}</label>
           <div style={styles.optionRow}>
-            {CHOSEN_OPTIONS.map((o) => (
+            {t.chosenOptions.map((o) => (
               <button key={o.value} type="button"
                 style={form.chosen === o.value ? styles.optionActive : styles.option}
-                onClick={() => set('chosen', o.value)}>
-                {o.label}
-              </button>
+                onClick={() => set('chosen', o.value)}>{o.label}</button>
             ))}
           </div>
         </div>
 
-        <button type="submit" style={styles.submitBtn} disabled={submitting}>{submitting ? '記錄中...' : '記錄下來'}</button>
+        <button type="submit" style={styles.submitBtn} disabled={submitting}>
+          {submitting ? t.saving : t.save}
+        </button>
       </form>
     </div>
   );
@@ -126,6 +116,9 @@ export function ConflictNew() {
 export function ConflictList() {
   const [conflicts, setConflicts] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const { lang } = useApp();
+  const t = getT(lang);
+  const locale = lang === 'en' ? 'en-US' : 'zh-TW';
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,7 +126,7 @@ export function ConflictList() {
   }, []);
 
   async function handleDelete(id) {
-    if (!window.confirm('確定要刪除這筆衝突記錄嗎？')) return;
+    if (!window.confirm(t.deleteConflictConfirm)) return;
     setDeletingId(id);
     try {
       await deleteConflict(id);
@@ -146,40 +139,36 @@ export function ConflictList() {
   return (
     <div style={styles.page}>
       <div style={styles.pageHeader}>
-        <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
-        <h2 style={styles.heading}>衝突紀錄</h2>
-        <button style={styles.addBtn} onClick={() => navigate('/conflicts/new')}>+ 新增</button>
+        <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
+        <h2 style={styles.heading}>{t.conflictListTitle}</h2>
+        <button style={styles.addBtn} onClick={() => navigate('/conflicts/new')}>{t.add}</button>
       </div>
 
-      {conflicts === null && <p>載入中...</p>}
+      {conflicts === null && <p>{t.loading}</p>}
       {conflicts?.length === 0 && (
         <div style={styles.empty}>
           <IllustrationEmptyConflict width={150} />
-          <p style={styles.emptyTitle}>還沒有衝突記錄</p>
-          <p style={styles.emptyDesc}>「我應該去健身，但我想耍廢。」<br />「我應該接那個案子，但我想休息。」<br />有感覺到拉扯嗎？把它記下來。</p>
-          <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>記錄第一個衝突</button>
+          <p style={styles.emptyTitle}>{t.noConflicts}</p>
+          <p style={styles.emptyDesc}>{t.conflictsEmptyDesc}</p>
+          <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>{t.firstConflict}</button>
         </div>
       )}
 
       {conflicts?.map((c) => (
         <div key={c.id} style={styles.card}>
           <div style={styles.cardHeader}>
-            <p style={styles.date}>{new Date(c.created_at).toLocaleDateString('zh-TW')}</p>
-            <button
-              style={styles.deleteBtn}
-              onClick={() => handleDelete(c.id)}
-              disabled={deletingId === c.id}
-            >
-              {deletingId === c.id ? '...' : '刪除'}
+            <p style={styles.date}>{new Date(c.created_at).toLocaleDateString(locale)}</p>
+            <button style={styles.deleteBtn} onClick={() => handleDelete(c.id)} disabled={deletingId === c.id}>
+              {deletingId === c.id ? '...' : t.delete}
             </button>
           </div>
           <div style={styles.versus}>
-            <div style={styles.should}><span style={styles.badge}>應該</span> {c.should_content}</div>
-            <div style={styles.want}><span style={styles.badgeWant}>想要</span> {c.want_content}</div>
+            <div style={styles.should}><span style={styles.badge}>{t.shouldBadge}</span> {c.should_content}</div>
+            <div style={styles.want}><span style={styles.badgeWant}>{t.wantBadge}</span> {c.want_content}</div>
           </div>
           <div style={styles.meta}>
-            <span style={styles.tag}>{SOURCE_OPTIONS.find((o) => o.value === c.source)?.label}</span>
-            <span style={styles.tag}>{CHOSEN_OPTIONS.find((o) => o.value === c.chosen)?.label}</span>
+            <span style={styles.tag}>{t.sourceOptions.find((o) => o.value === c.source)?.label}</span>
+            <span style={styles.tag}>{t.chosenOptions.find((o) => o.value === c.chosen)?.label}</span>
           </div>
         </div>
       ))}
@@ -187,16 +176,11 @@ export function ConflictList() {
   );
 }
 
-const SOURCE_INSIGHTS = {
-  family: '來自家人的期望最多。試著思考，哪些是他們的擔心，哪些是你真正認同的？',
-  peers:  '同儕比較佔最大比例。你在意的，有多少是真正重要的，有多少只是不想落後？',
-  society:'社會期待的聲音最響亮。這些「應該」是誰定義的？對你真的有意義嗎？',
-  self:   '自我要求是最主要的來源。內在標準高是優點，但也記得給自己喘息的空間。',
-};
-
 export function ConflictStats() {
   const [stats, setStats] = useState(null);
   const [correlation, setCorrelation] = useState([]);
+  const { lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -206,73 +190,62 @@ export function ConflictStats() {
 
   const total = stats ? Object.values(stats).reduce((a, b) => a + b, 0) : 0;
   const pieData = stats
-    ? SOURCE_OPTIONS.map((o) => ({ name: o.label, value: stats[o.value] || 0, key: o.value })).filter((d) => d.value > 0)
+    ? t.sourceOptions.map((o) => ({ name: o.label, value: stats[o.value] || 0, key: o.value })).filter((d) => d.value > 0)
     : [];
 
   const dominant = stats
-    ? SOURCE_OPTIONS.reduce((best, o) => (!best || (stats[o.value] || 0) > (stats[best.value] || 0) ? o : best), null)
+    ? t.sourceOptions.reduce((best, o) => (!best || (stats[o.value] || 0) > (stats[best.value] || 0) ? o : best), null)
     : null;
 
   return (
     <div style={styles.page}>
       <div style={styles.pageHeader}>
-        <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
-        <h2 style={styles.heading}>應該來源分析</h2>
-        <button style={styles.addBtn} onClick={() => navigate('/conflicts')}>歷史記錄</button>
+        <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
+        <h2 style={styles.heading}>{t.conflictStatsTitle}</h2>
+        <button style={styles.addBtn} onClick={() => navigate('/conflicts')}>{t.historyBtn}</button>
       </div>
 
       {total === 0 ? (
         <div style={styles.empty}>
           <IllustrationEmptyConflict width={150} />
-          <p style={styles.emptyTitle}>資料還不夠多</p>
-          <p style={styles.emptyDesc}>記錄 2–3 個衝突時刻後，<br />這裡會告訴你「你的焦慮主要來自哪裡」。</p>
-          <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>記錄第一個衝突</button>
+          <p style={styles.emptyTitle}>{t.notEnoughData}</p>
+          <p style={styles.emptyDesc}>{t.notEnoughDataDesc}</p>
+          <button style={styles.btn} onClick={() => navigate('/conflicts/new')}>{t.firstConflict}</button>
         </div>
       ) : (
         <>
-          {/* Insight card */}
           {dominant && total >= 2 && (
             <div style={{ ...styles.insightCard, borderColor: PIE_COLORS[dominant.value] + '60', background: PIE_COLORS[dominant.value] + '0d' }}>
               <div style={styles.insightHeader}>
                 <span style={{ ...styles.insightBadge, background: PIE_COLORS[dominant.value] }}>
-                  主要來源：{dominant.label}
+                  {t.primarySource(dominant.label)}
                 </span>
                 <span style={styles.insightPct}>
                   {Math.round(((stats[dominant.value] || 0) / total) * 100)}%
                 </span>
               </div>
-              <p style={styles.insightText}>{SOURCE_INSIGHTS[dominant.value]}</p>
+              <p style={styles.insightText}>{t.sourceInsights[dominant.value]}</p>
             </div>
           )}
 
-          {/* Pie chart */}
           <div style={styles.chartWrap}>
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={95}
-                  innerRadius={40}
-                  paddingAngle={3}
-                  label={({ name, percent }) => percent > 0.08 ? `${(percent * 100).toFixed(0)}%` : ''}
-                  labelLine={false}
-                >
+                <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                  outerRadius={95} innerRadius={40} paddingAngle={3}
+                  label={({ percent }) => percent > 0.08 ? `${(percent * 100).toFixed(0)}%` : ''}
+                  labelLine={false}>
                   {pieData.map((entry) => (
                     <Cell key={entry.key} fill={PIE_COLORS[entry.key]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v, n) => [`${v} 次`, n]} contentStyle={{ fontSize: 13, borderRadius: 8 }} />
+                <Tooltip formatter={(v, n) => [t.times(v), n]} contentStyle={{ fontSize: 13, borderRadius: 8 }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Bar breakdown */}
           <div style={styles.barList}>
-            {SOURCE_OPTIONS.filter((o) => (stats?.[o.value] || 0) > 0)
+            {t.sourceOptions.filter((o) => (stats?.[o.value] || 0) > 0)
               .sort((a, b) => (stats[b.value] || 0) - (stats[a.value] || 0))
               .map((o) => {
                 const count = stats?.[o.value] || 0;
@@ -282,7 +255,7 @@ export function ConflictStats() {
                     <div style={styles.barLabel}>
                       <span style={{ ...styles.dot, background: PIE_COLORS[o.value] }} />
                       <span style={styles.barName}>{o.label}</span>
-                      <span style={styles.barCount}>{count} 次</span>
+                      <span style={styles.barCount}>{t.times(count)}</span>
                     </div>
                     <div style={styles.barTrack}>
                       <div style={{ ...styles.barFill, width: `${pct}%`, background: PIE_COLORS[o.value] }} />
@@ -292,36 +265,30 @@ export function ConflictStats() {
               })}
           </div>
 
-          <p style={styles.totalNote}>共 {total} 筆衝突記錄</p>
+          <p style={styles.totalNote}>{t.totalConflicts(total)}</p>
 
-          {/* Correlation section */}
           {correlation.length > 0 && (
             <div style={styles.corrSection}>
-              <p style={styles.corrTitle}>衝突當天的情緒強度</p>
-              <p style={styles.corrDesc}>當你記錄到某個來源的衝突時，同一天的情緒強度平均是多少</p>
+              <p style={styles.corrTitle}>{t.corrTitle}</p>
+              <p style={styles.corrDesc}>{t.corrDesc}</p>
               {correlation.map((row) => {
-                const src = SOURCE_OPTIONS.find((o) => o.value === row.source);
+                const src = t.sourceOptions.find((o) => o.value === row.source);
                 const color = PIE_COLORS[row.source];
                 const pct = ((parseFloat(row.avg_intensity) / 5) * 100).toFixed(0);
+                const intensity = parseFloat(row.avg_intensity);
                 return (
                   <div key={row.source} style={styles.corrRow}>
                     <div style={styles.corrHeader}>
-                      <span style={{ ...styles.corrBadge, background: color + '20', color }}>
-                        {src?.label}
-                      </span>
-                      <span style={styles.corrValue}>
-                        平均 <strong>{row.avg_intensity}</strong> / 5
-                      </span>
+                      <span style={{ ...styles.corrBadge, background: color + '20', color }}>{src?.label}</span>
+                      <span style={styles.corrValue}>{t.avgOf5(row.avg_intensity)}</span>
                     </div>
                     <div style={styles.corrTrack}>
                       <div style={{ ...styles.corrFill, width: `${pct}%`, background: color }} />
                     </div>
                     <p style={styles.corrNote}>
-                      {parseFloat(row.avg_intensity) >= 4
-                        ? `來自「${src?.label}」的衝突對你影響很大，情緒反應明顯較強。`
-                        : parseFloat(row.avg_intensity) >= 2.5
-                        ? `來自「${src?.label}」的衝突讓你感到中等程度的情緒波動。`
-                        : `來自「${src?.label}」的衝突發生時，你的情緒相對平穩。`}
+                      {intensity >= 4 ? t.corrNoteHigh(src?.label)
+                        : intensity >= 2.5 ? t.corrNoteMid(src?.label)
+                        : t.corrNoteLow(src?.label)}
                     </p>
                   </div>
                 );

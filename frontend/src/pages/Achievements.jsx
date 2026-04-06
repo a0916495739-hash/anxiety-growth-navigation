@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAchievement, getAchievements, deleteAchievement } from '../api/achievements';
 import { IllustrationDone, IllustrationAchievement } from '../components/Illustrations';
+import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
 export function AchievementNew() {
   const [title, setTitle] = useState('');
@@ -9,11 +11,14 @@ export function AchievementNew() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { lang } = useApp();
+  const t = getT(lang);
+  const locale = lang === 'en' ? 'en-US' : 'zh-TW';
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim()) { setError('請填寫成就名稱'); return; }
+    if (!title.trim()) { setError(t.achievementRequired); return; }
     if (submitting) return;
     setSubmitting(true);
     try {
@@ -29,36 +34,28 @@ export function AchievementNew() {
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <IllustrationDone width={140} />
       </div>
-      <h2 style={{ ...styles.heading, textAlign: 'center' }}>太棒了！</h2>
-      <p style={styles.sub}>你又完成了一件小事，這都算數。</p>
-      <button style={styles.btn} onClick={() => navigate('/achievements')}>查看我的成就</button>
-      <button style={styles.ghost} onClick={() => navigate('/')}>回首頁</button>
+      <h2 style={{ ...styles.heading, textAlign: 'center' }}>{t.wellDone}</h2>
+      <p style={styles.sub}>{t.wellDoneDesc}</p>
+      <button style={styles.btn} onClick={() => navigate('/achievements')}>{t.viewMyAchievements}</button>
+      <button style={styles.ghost} onClick={() => navigate('/')}>{t.backHome}</button>
     </div>
   );
 
   return (
     <div style={styles.page}>
-      <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
-      <h2 style={styles.heading}>記錄一個小成就</h2>
+      <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
+      <h2 style={styles.heading}>{t.logSmallWinTitle}</h2>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <label style={styles.label}>今天做到了什麼？</label>
-        <input
-          style={styles.input}
-          placeholder="例如：今天喝夠了水"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <label style={styles.label}>{t.whatAccomplished}</label>
+        <input style={styles.input} placeholder={t.achievementPlaceholder}
+          value={title} onChange={(e) => setTitle(e.target.value)} />
         {error && <p style={styles.error}>{error}</p>}
-
-        <label style={styles.label}>為什麼這對你算是一個成就？（選填）</label>
-        <textarea
-          style={styles.textarea}
-          placeholder="為什麼這件事對你來說算是一個成就？（選填）"
-          value={standard}
-          onChange={(e) => setStandard(e.target.value)}
-          rows={3}
-        />
-        <button type="submit" style={styles.submitBtn} disabled={submitting}>{submitting ? '記錄中...' : '記錄下來'}</button>
+        <label style={styles.label}>{t.whyAchievement}</label>
+        <textarea style={styles.textarea} placeholder={t.whyAchievementPlaceholder}
+          value={standard} onChange={(e) => setStandard(e.target.value)} rows={3} />
+        <button type="submit" style={styles.submitBtn} disabled={submitting}>
+          {submitting ? t.saving : t.save}
+        </button>
       </form>
     </div>
   );
@@ -67,6 +64,9 @@ export function AchievementNew() {
 export function AchievementList() {
   const [achievements, setAchievements] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const { lang } = useApp();
+  const t = getT(lang);
+  const locale = lang === 'en' ? 'en-US' : 'zh-TW';
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export function AchievementList() {
   }, []);
 
   async function handleDelete(id) {
-    if (!window.confirm('確定要刪除這筆成就嗎？')) return;
+    if (!window.confirm(t.deleteAchievementConfirm)) return;
     setDeletingId(id);
     try {
       await deleteAchievement(id);
@@ -87,18 +87,18 @@ export function AchievementList() {
   return (
     <div style={styles.page}>
       <div style={styles.pageHeader}>
-        <button style={styles.back} onClick={() => navigate(-1)}>← 上一頁</button>
-        <h2 style={styles.heading}>我的成就</h2>
-        <button style={styles.addBtn} onClick={() => navigate('/achievements/new')}>+ 新增</button>
+        <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
+        <h2 style={styles.heading}>{t.myAchievements}</h2>
+        <button style={styles.addBtn} onClick={() => navigate('/achievements/new')}>{t.add}</button>
       </div>
 
-      {achievements === null && <p>載入中...</p>}
+      {achievements === null && <p>{t.loading}</p>}
       {achievements?.length === 0 && (
         <div style={styles.empty}>
           <IllustrationAchievement width={150} />
-          <p style={styles.emptyTitle}>還沒有成就記錄</p>
-          <p style={styles.emptyDesc}>今天有沒有喝夠水？早起了嗎？說了一句貼心的話？<br />用你自己的標準定義「成就」。</p>
-          <button style={styles.btn} onClick={() => navigate('/achievements/new')}>記錄今天的第一個小成就</button>
+          <p style={styles.emptyTitle}>{t.noAchievements}</p>
+          <p style={styles.emptyDesc}>{t.achievementsEmptyDesc}</p>
+          <button style={styles.btn} onClick={() => navigate('/achievements/new')}>{t.firstAchievement}</button>
         </div>
       )}
 
@@ -108,13 +108,9 @@ export function AchievementList() {
             <div style={styles.dot} />
             <div style={styles.content}>
               <div style={styles.itemHeader}>
-                <p style={styles.date}>{new Date(a.created_at).toLocaleDateString('zh-TW')}</p>
-                <button
-                  style={styles.deleteBtn}
-                  onClick={() => handleDelete(a.id)}
-                  disabled={deletingId === a.id}
-                >
-                  {deletingId === a.id ? '...' : '刪除'}
+                <p style={styles.date}>{new Date(a.created_at).toLocaleDateString(locale)}</p>
+                <button style={styles.deleteBtn} onClick={() => handleDelete(a.id)} disabled={deletingId === a.id}>
+                  {deletingId === a.id ? '...' : t.delete}
                 </button>
               </div>
               <p style={styles.title}>{a.title}</p>

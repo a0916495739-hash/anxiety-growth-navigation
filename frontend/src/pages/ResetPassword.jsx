@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { resetPassword } from '../api/auth';
 import { IllustrationLogin } from '../components/Illustrations';
+import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
 function EyeIcon({ open }) {
   return open ? (
@@ -20,6 +22,8 @@ export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
+  const { lang } = useApp();
+  const t = getT(lang);
 
   const [newPassword, setNewPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -28,14 +32,14 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!token) setError('連結無效，請重新申請忘記密碼');
+    if (!token) setError(t.invalidLink);
   }, [token]);
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (loading || !token) return;
     if (newPassword.length < 8) {
-      setError('密碼至少需要 8 個字元');
+      setError(t.passwordTooShortReset);
       return;
     }
     setError('');
@@ -44,7 +48,7 @@ export default function ResetPassword() {
       await resetPassword(token, newPassword);
       setDone(true);
     } catch (err) {
-      setError(err.response?.data?.error || '重設失敗，連結可能已失效');
+      setError(err.response?.data?.error || t.resetFailed);
     } finally {
       setLoading(false);
     }
@@ -55,26 +59,26 @@ export default function ResetPassword() {
       <div style={s.card}>
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={90} /></div>
-          <h1 style={s.title}>設定新密碼</h1>
-          <p style={s.sub}>請輸入你的新密碼</p>
+          <h1 style={s.title}>{t.setNewPassword}</h1>
+          <p style={s.sub}>{t.setNewPasswordSub}</p>
         </div>
 
         {done ? (
           <div style={s.successBox}>
             <div style={s.successIcon}>✅</div>
-            <p style={s.successTitle}>密碼已重設完成</p>
-            <p style={s.successDesc}>你現在可以使用新密碼登入了。</p>
-            <button style={s.btn} onClick={() => navigate('/login')}>前往登入</button>
+            <p style={s.successTitle}>{t.passwordResetDone}</p>
+            <p style={s.successDesc}>{t.passwordResetDesc}</p>
+            <button style={s.btn} onClick={() => navigate('/login')}>{t.goToSignIn}</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={s.form}>
             <div style={s.field}>
-              <label style={s.label}>新密碼</label>
+              <label style={s.label}>{t.newPassword}</label>
               <div style={s.pwWrap}>
                 <input
                   style={s.pwInput}
                   type={showPw ? 'text' : 'password'}
-                  placeholder="至少 8 個字元"
+                  placeholder={t.atLeast8}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -95,14 +99,14 @@ export default function ResetPassword() {
             )}
 
             <button style={(loading || !token) ? s.btnDisabled : s.btn} type="submit" disabled={loading || !token}>
-              {loading ? '設定中...' : '確認新密碼'}
+              {loading ? t.setting : t.confirmNewPassword}
             </button>
           </form>
         )}
 
         {!done && (
           <p style={s.footer}>
-            連結失效了？<Link to="/forgot-password">重新申請</Link>
+            {t.linkExpired}<Link to="/forgot-password">{t.requestNew}</Link>
           </p>
         )}
       </div>

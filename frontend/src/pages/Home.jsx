@@ -4,42 +4,20 @@ import { useApp } from '../context/AppContext';
 import { IllustrationHero } from '../components/Illustrations';
 import { getWeeklyStats } from '../api/stats';
 import Onboarding, { useOnboarding } from '../components/Onboarding';
-
-const features = [
-  {
-    label: '情緒除噪器',
-    desc: '記錄並轉化你的負面情緒，找到它想保護你的事',
-    path: '/emotions',
-    emoji: '🌊',
-    color: '#e8f4fb',
-    border: '#a8c8e8',
-    accent: '#5a9fc0',
-  },
-  {
-    label: '微小成就系統',
-    desc: '記錄生活中的小事，累積屬於你的成就感',
-    path: '/achievements',
-    emoji: '✨',
-    color: '#e8f4f0',
-    border: '#7fb5a0',
-    accent: '#4a9580',
-  },
-  {
-    label: '應該 vs 想要',
-    desc: '釐清外在期望與內心渴望的差異',
-    path: '/conflicts',
-    emoji: '⚖️',
-    color: '#fdf3ee',
-    border: '#f0b8a0',
-    accent: '#c87050',
-  },
-];
+import { getT } from '../i18n';
 
 export default function Home() {
-  const { isLoggedIn, handleLogout, displayName } = useApp();
+  const { isLoggedIn, displayName, lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
+
+  const features = [
+    { label: t.emotionFeatureLabel, desc: t.emotionFeatureDesc, path: '/emotions', emoji: '🌊', color: '#e8f4fb', border: '#a8c8e8', accent: '#5a9fc0' },
+    { label: t.achievementFeatureLabel, desc: t.achievementFeatureDesc, path: '/achievements', emoji: '✨', color: '#e8f4f0', border: '#7fb5a0', accent: '#4a9580' },
+    { label: t.conflictFeatureLabel, desc: t.conflictFeatureDesc, path: '/conflicts', emoji: '⚖️', color: '#fdf3ee', border: '#f0b8a0', accent: '#c87050' },
+  ];
 
   useEffect(() => {
     getWeeklyStats().then((r) => setWeekStats(r.data)).catch(() => {});
@@ -56,18 +34,18 @@ export default function Home() {
       <nav style={s.nav}>
         <div style={s.logo}>
           <span style={s.logoMark}>🌿</span>
-          <span style={s.logoText}>抗焦慮成長導航</span>
+          <span style={s.logoText}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
           {isLoggedIn ? (
             <>
               {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
-              <button style={s.ghostBtn} onClick={() => navigate('/account')}>設定</button>
+              <button style={s.ghostBtn} onClick={() => navigate('/account')}>{t.settings}</button>
             </>
           ) : (
             <>
-              <button style={s.ghostBtn} onClick={() => navigate('/login')}>登入</button>
-              <button style={s.primaryBtn} onClick={() => navigate('/register')}>建立帳號</button>
+              <button style={s.ghostBtn} onClick={() => navigate('/login')}>{t.signIn}</button>
+              <button style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
             </>
           )}
         </div>
@@ -78,17 +56,17 @@ export default function Home() {
         <div style={s.heroIllus}>
           <IllustrationHero width={240} />
         </div>
-        <p style={s.heroEyebrow}>給在社群比較中感到疲憊的你</p>
+        <p style={s.heroEyebrow}>{t.homeEyebrow}</p>
         <h1 style={s.heroTitle}>
-          不需要比任何人好，<br />只需要比昨天的自己<span style={s.heroAccent}>更理解自己</span>
+          {t.homeTitle1}<br />{t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
         </h1>
-        <p style={s.heroSub}>三個輕量工具，幫你梳理情緒、肯定自我、釐清方向。</p>
+        <p style={s.heroSub}>{t.homeSub}</p>
 
         {!isLoggedIn && (
           <div style={s.guestBanner}>
             <span>🔒</span>
-            <span>你目前以訪客身份體驗，<strong>建立帳號</strong>後資料永久保留</span>
-            <button style={s.bannerBtn} onClick={() => navigate('/register')}>立即建立</button>
+            <span>{t.guestBanner}</span>
+            <button style={s.bannerBtn} onClick={() => navigate('/register')}>{t.getStarted}</button>
           </div>
         )}
       </section>
@@ -96,24 +74,24 @@ export default function Home() {
       {/* Weekly Stats */}
       {weekStats && (weekStats.emotions > 0 || weekStats.achievements > 0 || weekStats.conflicts > 0) && (
         <section style={s.statsBar}>
-          <p style={s.statsLabel}>本週你做到了</p>
+          <p style={s.statsLabel}>{t.weekStatsLabel}</p>
           <div style={s.statsRow}>
             {weekStats.emotions > 0 && (
               <div style={s.statItem}>
                 <span style={s.statNum}>{weekStats.emotions}</span>
-                <span style={s.statDesc}>次情緒記錄</span>
+                <span style={s.statDesc}>{t.emotionLogs}</span>
               </div>
             )}
             {weekStats.achievements > 0 && (
               <div style={s.statItem}>
                 <span style={s.statNum}>{weekStats.achievements}</span>
-                <span style={s.statDesc}>個小成就</span>
+                <span style={s.statDesc}>{t.smallWins}</span>
               </div>
             )}
             {weekStats.conflicts > 0 && (
               <div style={s.statItem}>
                 <span style={s.statNum}>{weekStats.conflicts}</span>
-                <span style={s.statDesc}>次衝突釐清</span>
+                <span style={s.statDesc}>{t.conflictsRecorded}</span>
               </div>
             )}
           </div>
@@ -140,15 +118,15 @@ export default function Home() {
 
       {/* Quick links */}
       <section style={s.quick}>
-        <button style={s.quickLink} onClick={() => navigate('/emotions/history')}>📋 情緒記錄歷史</button>
-        <button style={s.quickLink} onClick={() => navigate('/conflicts/stats')}>📊 應該來源分析</button>
+        <button style={s.quickLink} onClick={() => navigate('/emotions/history')}>{t.emotionHistory}</button>
+        <button style={s.quickLink} onClick={() => navigate('/conflicts/stats')}>{t.conflictStats}</button>
       </section>
 
       {/* Footer */}
       <footer style={s.footer}>
-        <button style={s.privacyLink} onClick={() => navigate('/privacy')}>🛡️ 隱私權政策</button>
+        <button style={s.privacyLink} onClick={() => navigate('/privacy')}>{t.privacyPolicy}</button>
         <span style={s.footerDot}>·</span>
-        <span style={s.footerText}>資料加密保護，不販售個人資訊</span>
+        <span style={s.footerText}>{t.dataProtected}</span>
       </footer>
     </div>
   );

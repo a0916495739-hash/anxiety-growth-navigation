@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { IllustrationLogin } from '../components/Illustrations';
+import { getT } from '../i18n';
 
 function EyeIcon({ open }) {
   return open ? (
@@ -23,14 +24,15 @@ export default function Register() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { onLoginSuccess } = useApp();
+  const { onLoginSuccess, lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     if (password.length < 8) {
-      setError('密碼至少需要 8 個字元');
+      setError(t.passwordTooShort);
       return;
     }
     setLoading(true);
@@ -39,7 +41,7 @@ export default function Register() {
       onLoginSuccess();
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || '註冊失敗，請稍後再試');
+      setError(err.response?.data?.error || t.registerFailed);
     } finally {
       setLoading(false);
     }
@@ -50,8 +52,8 @@ export default function Register() {
       <div style={s.card}>
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={100} /></div>
-          <h1 style={s.title}>開始你的旅程</h1>
-          <p style={s.sub}>建立帳號，你的訪客資料會自動保留</p>
+          <h1 style={s.title}>{t.startJourney}</h1>
+          <p style={s.sub}>{t.registerSub}</p>
         </div>
 
         <form onSubmit={handleSubmit} style={s.form}>
@@ -69,12 +71,12 @@ export default function Register() {
           </div>
 
           <div style={s.field}>
-            <label style={s.label}>密碼</label>
+            <label style={s.label}>{t.password}</label>
             <div style={s.pwWrap}>
               <input
                 style={s.pwInput}
                 type={showPw ? 'text' : 'password'}
-                placeholder="至少 8 個字元"
+                placeholder={t.atLeast8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -93,16 +95,12 @@ export default function Register() {
           )}
 
           <button style={loading ? s.btnDisabled : s.btn} type="submit" disabled={loading}>
-            {loading ? '建立中...' : '建立帳號'}
+            {loading ? t.creating : t.createAccountBtn}
           </button>
         </form>
 
-        <p style={s.footer}>
-          已有帳號？ <Link to="/login">登入</Link>
-        </p>
-        <p style={s.footer}>
-          <Link to="/">← 以訪客身份繼續</Link>
-        </p>
+        <p style={s.footer}>{t.hasAccount} <Link to="/login">{t.signInBtn}</Link></p>
+        <p style={s.footer}><Link to="/">{t.continueGuest}</Link></p>
       </div>
     </div>
   );
@@ -111,19 +109,22 @@ export default function Register() {
 const s = {
   bg: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #e8f4f0 0%, #faf8f3 50%, #e8f4fb 100%)',
+    background: 'linear-gradient(135deg, #f5f3f0 0%, #ede8e3 50%, #f0ebe8 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
   card: {
-    background: '#fff',
-    borderRadius: 24,
+    background: 'rgba(255, 252, 250, 0.65)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: '1px solid rgba(255, 255, 255, 0.45)',
+    borderRadius: 32,
     padding: '40px 36px',
     width: '100%',
     maxWidth: 400,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+    boxShadow: '0 24px 48px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04)',
   },
   header: { textAlign: 'center', marginBottom: 32 },
   illusWrap: { display: 'flex', justifyContent: 'center', marginBottom: 8 },
@@ -178,18 +179,20 @@ const s = {
     alignItems: 'flex-start',
   },
   btn: {
-    background: '#7fb5a0',
+    background: '#fbbf24',
     border: 'none',
     color: '#fff',
     borderRadius: 10,
     padding: '13px',
     fontSize: 15,
     fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(127,181,160,0.4)',
+    boxShadow: '0 2px 10px rgba(251,191,36,0.4)',
     marginTop: 4,
+    cursor: 'pointer',
+    width: '100%',
   },
   btnDisabled: {
-    background: '#b8d9cf',
+    background: '#fde68a',
     border: 'none',
     color: '#fff',
     borderRadius: 10,
@@ -198,6 +201,7 @@ const s = {
     fontWeight: 600,
     marginTop: 4,
     cursor: 'not-allowed',
+    width: '100%',
   },
   footer: {
     textAlign: 'center',

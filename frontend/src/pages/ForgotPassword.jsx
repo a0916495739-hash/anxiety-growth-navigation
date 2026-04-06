@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { forgotPassword } from '../api/auth';
 import { IllustrationLogin } from '../components/Illustrations';
+import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -9,6 +11,8 @@ export default function ForgotPassword() {
   const [sent, setSent] = useState(false);
   const [devUrl, setDevUrl] = useState('');
   const [error, setError] = useState('');
+  const { lang } = useApp();
+  const t = getT(lang);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -20,7 +24,7 @@ export default function ForgotPassword() {
       if (res.data?.devResetUrl) setDevUrl(res.data.devResetUrl);
       setSent(true);
     } catch (err) {
-      setError(err.response?.data?.error || '發送失敗，請稍後再試');
+      setError(err.response?.data?.error || t.sendFailed);
     } finally {
       setLoading(false);
     }
@@ -31,22 +35,21 @@ export default function ForgotPassword() {
       <div style={s.card}>
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={90} /></div>
-          <h1 style={s.title}>忘記密碼</h1>
-          <p style={s.sub}>輸入你的 Email，我們會寄送重設連結</p>
+          <h1 style={s.title}>{t.forgotPasswordTitle}</h1>
+          <p style={s.sub}>{t.forgotPasswordSub}</p>
         </div>
 
         {sent ? (
           <div style={s.successBox}>
             <div style={s.successIcon}>📬</div>
-            <p style={s.successTitle}>重設連結已發送</p>
+            <p style={s.successTitle}>{t.resetLinkSent}</p>
             <p style={s.successDesc}>
-              若此 Email 已註冊，重設連結將在幾分鐘內抵達。<br />
-              連結有效期為 <strong>1 小時</strong>，請記得檢查垃圾郵件。
+              {t.resetEmailDesc}<br />{t.resetEmailExpiry}
             </p>
             {devUrl && (
               <div style={s.devBox}>
-                <p style={s.devLabel}>🛠 本地開發模式 — 點此重設密碼：</p>
-                <a href={devUrl} style={s.devLink}>前往設定新密碼</a>
+                <p style={s.devLabel}>{t.devModeLabel}</p>
+                <a href={devUrl} style={s.devLink}>{t.goToReset}</a>
               </div>
             )}
           </div>
@@ -73,13 +76,13 @@ export default function ForgotPassword() {
             )}
 
             <button style={loading ? s.btnDisabled : s.btn} type="submit" disabled={loading}>
-              {loading ? '發送中...' : '發送重設連結'}
+              {loading ? t.sending : t.sendResetLink}
             </button>
           </form>
         )}
 
         <p style={s.footer}>
-          <Link to="/login">← 返回登入</Link>
+          <Link to="/login">{t.backToSignIn}</Link>
         </p>
       </div>
     </div>

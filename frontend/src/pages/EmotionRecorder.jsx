@@ -6,30 +6,31 @@ import { useApp } from '../context/AppContext';
 import TagSelector from '../components/TagSelector';
 import PromptCard from '../components/PromptCard';
 import { IllustrationDone, IllustrationEmptyEmotion } from '../components/Illustrations';
+import { getT } from '../i18n';
 
-function BackButton({ onClick }) {
+function BackButton({ onClick, label }) {
   return (
-    <button style={styles.back} onClick={onClick}>← 上一頁</button>
+    <button style={styles.back} onClick={onClick}>{label}</button>
   );
 }
 
 // Mode selection screen
-function ModeSelect({ onSelect, onBack }) {
+function ModeSelect({ onSelect, onBack, t }) {
   return (
     <div style={styles.page}>
-      <BackButton onClick={onBack} />
-      <h2 style={styles.heading}>情緒除噪器</h2>
-      <p style={styles.sub}>你今天想要怎麼記錄？</p>
+      <BackButton onClick={onBack} label={t.back} />
+      <h2 style={styles.heading}>{t.emotionRecorderTitle}</h2>
+      <p style={styles.sub}>{t.howRecord}</p>
       <div style={styles.modeGrid}>
         <div style={styles.modeCard} onClick={() => onSelect('guided')}>
           <span style={styles.modeEmoji}>🧭</span>
-          <h3>引導我思考</h3>
-          <p>三個問題，幫你看清情緒</p>
+          <h3>{t.guided}</h3>
+          <p>{t.guidedDesc}</p>
         </div>
         <div style={styles.modeCard} onClick={() => onSelect('free')}>
           <span style={styles.modeEmoji}>✍️</span>
-          <h3>自由書寫</h3>
-          <p>不受拘束，盡情傾訴</p>
+          <h3>{t.freeWrite}</h3>
+          <p>{t.freeWriteDesc}</p>
         </div>
       </div>
     </div>
@@ -37,7 +38,7 @@ function ModeSelect({ onSelect, onBack }) {
 }
 
 // Guided mode: 3 steps
-function GuidedForm({ onSubmit, onBack }) {
+function GuidedForm({ onSubmit, onBack, t }) {
   const [step, setStep] = useState(1);
   const [intensity, setIntensity] = useState(null);
   const [trigger, setTrigger] = useState('');
@@ -59,68 +60,50 @@ function GuidedForm({ onSubmit, onBack }) {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
-    await onSubmit({
-      mode: 'guided',
-      intensity,
-      trigger_event: trigger,
-      protection,
-      emotion_tags: tags,
-    });
+    await onSubmit({ mode: 'guided', intensity, trigger_event: trigger, protection, emotion_tags: tags });
   }
 
   return (
     <div style={styles.page}>
-      <BackButton onClick={handleBack} />
-      <h2 style={styles.heading}>引導式記錄</h2>
+      <BackButton onClick={handleBack} label={t.back} />
+      <h2 style={styles.heading}>{t.guidedRecording}</h2>
       <p style={styles.stepIndicator}>Step {step} / 3</p>
 
       {step === 1 && (
         <div>
-          <p style={styles.question}>這個情緒有多強烈？</p>
+          <p style={styles.question}>{t.intensityQ}</p>
           <div style={styles.intensityRow}>
             {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
+              <button key={n} type="button"
                 style={intensity === n ? styles.intensityActive : styles.intensityBtn}
-                onClick={() => setIntensity(n)}
-              >
-                {n}
-              </button>
+                onClick={() => setIntensity(n)}>{n}</button>
             ))}
           </div>
-          <p style={styles.hint}>{intensity ? `${['很輕微', '有點強', '中等', '相當強', '非常強烈'][intensity - 1]}` : '請選擇強度'}</p>
-          <button style={styles.nextBtn} onClick={handleNext} disabled={!intensity}>繼續</button>
+          <p style={styles.hint}>{intensity ? t.intensityLabels[intensity - 1] : t.selectIntensity}</p>
+          <button style={styles.nextBtn} onClick={handleNext} disabled={!intensity}>{t.continue}</button>
         </div>
       )}
 
       {step === 2 && (
         <form>
-          <p style={styles.question}>是什麼事情引發了這個情緒？</p>
-          <textarea
-            style={styles.textarea}
-            placeholder="可以描述一下發生了什麼...(選填)"
-            value={trigger}
-            onChange={(e) => setTrigger(e.target.value)}
-            rows={4}
-          />
-          <button type="button" style={styles.nextBtn} onClick={() => setStep(3)}>繼續</button>
+          <p style={styles.question}>{t.triggerQ}</p>
+          <textarea style={styles.textarea} placeholder={t.triggerPlaceholder}
+            value={trigger} onChange={(e) => setTrigger(e.target.value)} rows={4} />
+          <button type="button" style={styles.nextBtn} onClick={() => setStep(3)}>{t.continue}</button>
         </form>
       )}
 
       {step === 3 && (
         <form onSubmit={handleSubmit}>
-          <p style={styles.question}>這個情緒在保護你什麼？</p>
-          <textarea
-            style={styles.textarea}
-            placeholder="也許它在提醒你某件重要的事...(選填)"
-            value={protection}
-            onChange={(e) => setProtection(e.target.value)}
-            rows={4}
-          />
-          <p style={styles.tagLabel}>情緒標籤（選填）</p>
-          <TagSelector selected={tags} onChange={setTags} />
-          <button type="submit" style={styles.submitBtn} disabled={submitting}>{submitting ? '記錄中...' : '完成記錄'}</button>
+          <p style={styles.question}>{t.protectionQ}</p>
+          <textarea style={styles.textarea} placeholder={t.protectionPlaceholder}
+            value={protection} onChange={(e) => setProtection(e.target.value)} rows={4} />
+          <p style={styles.tagLabel}>{t.emotionTags}</p>
+          <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
+            placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
+          <button type="submit" style={styles.submitBtn} disabled={submitting}>
+            {submitting ? t.saving : t.save}
+          </button>
         </form>
       )}
     </div>
@@ -128,7 +111,7 @@ function GuidedForm({ onSubmit, onBack }) {
 }
 
 // Free writing mode
-function FreeForm({ onSubmit, onBack }) {
+function FreeForm({ onSubmit, onBack, t }) {
   const [text, setText] = useState('');
   const [tags, setTags] = useState([]);
   const [error, setError] = useState('');
@@ -136,7 +119,7 @@ function FreeForm({ onSubmit, onBack }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!text.trim()) { setError('請輸入一些內容再送出'); return; }
+    if (!text.trim()) { setError(t.emptyInput); return; }
     if (submitting) return;
     setSubmitting(true);
     await onSubmit({ mode: 'free', raw_emotion: text, emotion_tags: tags });
@@ -144,21 +127,20 @@ function FreeForm({ onSubmit, onBack }) {
 
   return (
     <div style={styles.page}>
-      <BackButton onClick={onBack} />
-      <h2 style={styles.heading}>自由書寫</h2>
-      <p style={styles.sub}>把心裡的話都寫下來吧</p>
+      <BackButton onClick={onBack} label={t.back} />
+      <h2 style={styles.heading}>{t.freeWrite}</h2>
+      <p style={styles.sub}>{t.freeWriteSub}</p>
       <form onSubmit={handleSubmit}>
-        <textarea
-          style={{ ...styles.textarea, minHeight: 180 }}
-          placeholder="今天發生了什麼？你感覺如何？"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={7}
-        />
+        <textarea style={{ ...styles.textarea, minHeight: 180 }}
+          placeholder={t.freeWritePlaceholder} value={text}
+          onChange={(e) => setText(e.target.value)} rows={7} />
         {error && <p style={styles.error}>{error}</p>}
-        <p style={styles.tagLabel}>情緒標籤（選填）</p>
-        <TagSelector selected={tags} onChange={setTags} />
-        <button type="submit" style={styles.submitBtn} disabled={submitting}>{submitting ? '記錄中...' : '完成記錄'}</button>
+        <p style={styles.tagLabel}>{t.emotionTags}</p>
+        <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
+          placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
+        <button type="submit" style={styles.submitBtn} disabled={submitting}>
+          {submitting ? t.saving : t.save}
+        </button>
       </form>
     </div>
   );
@@ -195,24 +177,13 @@ function Confetti() {
   );
 }
 
-const SURPRISE_MESSAGES = [
-  '情緒不是敵人，它只是在提醒你在意什麼。',
-  '說出來，就已經比很多人勇敢了。',
-  '你不需要立刻解決它，先看見它就夠了。',
-  '每一次記錄，都是對自己多一點理解。',
-  '感受沒有對錯，只有真實。',
-  '你願意面對自己，這本身就是力量。',
-  '今天的情緒記下來了，明天的你會謝謝今天的你。',
-  '不是所有情緒都需要解釋，有時候只是需要空間。',
-];
-
 // Completion screen
-function CompletionScreen({ todayCount }) {
+function CompletionScreen({ todayCount, t }) {
   const navigate = useNavigate();
   const [showAchievementPrompt, setShowAchievementPrompt] = useState(todayCount >= 3);
   const [showConflictPrompt, setShowConflictPrompt] = useState(true);
   const [message] = useState(
-    () => SURPRISE_MESSAGES[Math.floor(Math.random() * SURPRISE_MESSAGES.length)]
+    () => t.surpriseMessages[Math.floor(Math.random() * t.surpriseMessages.length)]
   );
 
   return (
@@ -221,13 +192,13 @@ function CompletionScreen({ todayCount }) {
       <div style={{ display: 'flex', justifyContent: 'center', animation: 'popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both' }}>
         <IllustrationDone width={140} />
       </div>
-      <h2 style={{ ...styles.heading, textAlign: 'center', animation: 'popIn 0.5s 0.15s both' }}>記錄完成</h2>
+      <h2 style={{ ...styles.heading, textAlign: 'center', animation: 'popIn 0.5s 0.15s both' }}>{t.recordDone}</h2>
       <p style={{ ...styles.sub, textAlign: 'center', animation: 'popIn 0.5s 0.25s both' }}>{message}</p>
 
       {showAchievementPrompt && (
         <PromptCard
-          message={`你今天已經記錄了 ${todayCount} 次情緒，要不要停下來，紀錄一件今天還是做到的小事？`}
-          buttonLabel="去記錄小成就"
+          message={t.achievementPrompt(todayCount)}
+          buttonLabel={t.logSmallWin}
           to="/achievements/new"
           onDismiss={() => setShowAchievementPrompt(false)}
         />
@@ -236,13 +207,13 @@ function CompletionScreen({ todayCount }) {
       {showConflictPrompt && (
         <div style={styles.conflictHint}>
           <button style={styles.secondaryBtn} onClick={() => navigate('/conflicts/new')}>
-            這是某個衝突造成的嗎？
+            {t.conflictPrompt}
           </button>
-          <button style={styles.ghostBtn} onClick={() => setShowConflictPrompt(false)}>略過</button>
+          <button style={styles.ghostBtn} onClick={() => setShowConflictPrompt(false)}>{t.skip}</button>
         </div>
       )}
 
-      <button style={styles.homeBtn} onClick={() => navigate('/')}>回首頁</button>
+      <button style={styles.homeBtn} onClick={() => navigate('/')}>{t.backHome}</button>
     </div>
   );
 }
@@ -251,7 +222,8 @@ export default function EmotionRecorder() {
   const [mode, setMode] = useState(null);
   const [done, setDone] = useState(false);
   const [exiting, setExiting] = useState(false);
-  const { todayCount, incrementTodayCount } = useApp();
+  const { todayCount, incrementTodayCount, lang } = useApp();
+  const t = getT(lang);
   const [finalCount, setFinalCount] = useState(todayCount);
   const navigate = useNavigate();
 
@@ -264,12 +236,12 @@ export default function EmotionRecorder() {
     setDone(true);
   }
 
-  if (done) return <CompletionScreen todayCount={finalCount} />;
+  if (done) return <CompletionScreen todayCount={finalCount} t={t} />;
 
   const exitStyle = exiting ? { animation: 'formExit 0.32s ease forwards', pointerEvents: 'none' } : {};
-  if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} /></div>;
-  if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} /></div>;
-  return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} /></div>;
+  if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} t={t} /></div>;
+  if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} /></div>;
+  return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} /></div>;
 }
 
 // History page
@@ -277,7 +249,10 @@ export function EmotionHistory() {
   const [records, setRecords] = useState(null);
   const [trend, setTrend] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
+  const { lang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
+  const locale = lang === 'en' ? 'en-US' : 'zh-TW';
 
   useEffect(() => {
     import('../api/emotions').then(({ getEmotions }) =>
@@ -287,7 +262,7 @@ export function EmotionHistory() {
   }, []);
 
   async function handleDelete(id) {
-    if (!window.confirm('確定要刪除這筆記錄嗎？')) return;
+    if (!window.confirm(t.deleteRecordConfirm)) return;
     setDeletingId(id);
     try {
       await deleteEmotion(id);
@@ -297,19 +272,20 @@ export function EmotionHistory() {
     }
   }
 
+  const intensityKey = t.avgIntensity;
   const trendData = trend.map((d) => ({
-    day: new Date(d.day).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }),
-    強度: parseFloat(d.avg_intensity),
+    day: new Date(d.day).toLocaleDateString(locale, { month: 'numeric', day: 'numeric' }),
+    [intensityKey]: parseFloat(d.avg_intensity),
   }));
 
   return (
     <div style={styles.page}>
-      <BackButton onClick={() => navigate('/')} />
-      <h2 style={styles.heading}>情緒記錄歷史</h2>
+      <BackButton onClick={() => navigate('/')} label={t.back} />
+      <h2 style={styles.heading}>{t.emotionHistoryTitle}</h2>
 
       {trendData.length >= 2 && (
         <div style={styles.trendCard}>
-          <p style={styles.trendTitle}>近 7 天情緒強度趨勢</p>
+          <p style={styles.trendTitle}>{t.trendTitle}</p>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={trendData} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0ece4" />
@@ -317,9 +293,9 @@ export function EmotionHistory() {
               <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 11, fill: '#9ca3af' }} />
               <Tooltip
                 contentStyle={{ fontSize: 13, borderRadius: 8, border: '1px solid #e8e0d0', background: '#fff' }}
-                formatter={(v) => [`${v} / 5`, '平均強度']}
+                formatter={(v) => [`${v} / 5`, intensityKey]}
               />
-              <Line type="monotone" dataKey="強度" stroke="#7fb5a0" strokeWidth={2.5} dot={{ r: 4, fill: '#7fb5a0' }} activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey={intensityKey} stroke="#7fb5a0" strokeWidth={2.5} dot={{ r: 4, fill: '#7fb5a0' }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -328,37 +304,33 @@ export function EmotionHistory() {
       {records === null && (
         <div style={styles.loading}>
           <div style={styles.spinner} />
-          <p>載入中...</p>
+          <p>{t.loading}</p>
         </div>
       )}
 
       {records?.length === 0 && (
         <div style={styles.empty}>
           <IllustrationEmptyEmotion width={150} />
-          <p style={styles.emptyTitle}>今天還沒跟自己對話</p>
-          <p style={styles.emptyDesc}>情緒不需要是大事才值得記錄。<br />一點點煩躁、一點點落寞，都算。</p>
-          <button style={styles.btn} onClick={() => navigate('/emotions')}>開始第一次記錄</button>
+          <p style={styles.emptyTitle}>{t.noEntries}</p>
+          <p style={styles.emptyDesc}>{t.noEntriesDesc}</p>
+          <button style={styles.btn} onClick={() => navigate('/emotions')}>{t.startFirstRecord}</button>
         </div>
       )}
 
       {records?.map((r) => (
         <div key={r.id} style={styles.record}>
           <div style={styles.recordMeta}>
-            <span style={styles.date}>{new Date(r.created_at).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' })}</span>
-            <span style={styles.badge}>{r.mode === 'guided' ? '引導式' : '自由書寫'}</span>
-            {r.intensity && <span style={styles.intensity}>強度 {r.intensity}/5</span>}
-            <button
-              style={styles.deleteBtn}
-              onClick={() => handleDelete(r.id)}
-              disabled={deletingId === r.id}
-            >
-              {deletingId === r.id ? '...' : '刪除'}
+            <span style={styles.date}>{new Date(r.created_at).toLocaleDateString(locale, { month: 'long', day: 'numeric', weekday: 'short' })}</span>
+            <span style={styles.badge}>{r.mode === 'guided' ? t.modeGuided : t.modeFree}</span>
+            {r.intensity && <span style={styles.intensity}>{t.intensity(r.intensity)}</span>}
+            <button style={styles.deleteBtn} onClick={() => handleDelete(r.id)} disabled={deletingId === r.id}>
+              {deletingId === r.id ? '...' : t.delete}
             </button>
           </div>
-          <p style={styles.recordText}>{(r.raw_emotion || r.trigger_event || '（無文字記錄）').slice(0, 100)}</p>
+          <p style={styles.recordText}>{(r.raw_emotion || r.trigger_event || t.noText).slice(0, 100)}</p>
           {r.emotion_tags?.length > 0 && (
             <div style={styles.tagRow}>
-              {r.emotion_tags.map((t) => <span key={t} style={styles.tag}>{t}</span>)}
+              {r.emotion_tags.map((tag) => <span key={tag} style={styles.tag}>{tag}</span>)}
             </div>
           )}
         </div>

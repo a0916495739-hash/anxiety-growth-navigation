@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMe, changePassword, logout, updateProfile } from '../api/auth';
+import { getMe, changePassword, updateProfile } from '../api/auth';
 import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
 export default function Account() {
   const [email, setEmail] = useState('');
-  // Profile
   const [nameInput, setNameInput] = useState('');
   const [nameMsg, setNameMsg] = useState(null);
   const [nameSaving, setNameSaving] = useState(false);
-  // Password
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
 
-  const { handleLogout, displayName, setDisplayName } = useApp();
+  const { handleLogout, displayName, setDisplayName, lang, setLang } = useApp();
+  const t = getT(lang);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,9 +35,9 @@ export default function Account() {
     try {
       const r = await updateProfile(nameInput.trim());
       setDisplayName(r.data.displayName);
-      setNameMsg({ type: 'success', text: '顯示名稱已更新' });
+      setNameMsg({ type: 'success', text: t.nameUpdated });
     } catch (err) {
-      setNameMsg({ type: 'error', text: err.response?.data?.error || '更新失敗，請再試一次' });
+      setNameMsg({ type: 'error', text: err.response?.data?.error || t.updateFailed });
     } finally {
       setNameSaving(false);
     }
@@ -50,11 +50,11 @@ export default function Account() {
     setPwLoading(true);
     try {
       await changePassword(currentPw, newPw);
-      setPwMsg({ type: 'success', text: '密碼已更新' });
+      setPwMsg({ type: 'success', text: t.passwordUpdated });
       setCurrentPw('');
       setNewPw('');
     } catch (err) {
-      setPwMsg({ type: 'error', text: err.response?.data?.error || '更新失敗，請再試一次' });
+      setPwMsg({ type: 'error', text: err.response?.data?.error || t.updateFailed });
     } finally {
       setPwLoading(false);
     }
@@ -67,30 +67,30 @@ export default function Account() {
 
   return (
     <div style={s.page}>
-      <button style={s.back} onClick={() => navigate('/')}>← 返回首頁</button>
-      <h2 style={s.heading}>帳號設定</h2>
+      <button style={s.back} onClick={() => navigate('/')}>{t.backToHome}</button>
+      <h2 style={s.heading}>{t.accountSettings}</h2>
 
       {/* Profile */}
       <div style={s.section}>
-        <p style={s.sectionLabel}>個人檔案</p>
+        <p style={s.sectionLabel}>{t.profile}</p>
         <div style={s.avatar}>
           <div style={s.avatarCircle}>
             {displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?'}
           </div>
           <div>
-            <p style={s.avatarName}>{displayName || '（尚未設定顯示名稱）'}</p>
+            <p style={s.avatarName}>{displayName || t.noDisplayName}</p>
             <p style={s.avatarEmail}>{email}</p>
           </div>
         </div>
         <form onSubmit={handleSaveName} style={s.form}>
           <div style={s.field}>
-            <label style={s.label}>顯示名稱</label>
+            <label style={s.label}>{t.displayName}</label>
             <input
               style={s.input}
               type="text"
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              placeholder="輸入你想顯示的名稱（最多 30 字）"
+              placeholder={t.displayNamePlaceholder}
               maxLength={30}
               autoComplete="nickname"
             />
@@ -101,34 +101,34 @@ export default function Account() {
             </div>
           )}
           <button type="submit" style={s.submitBtn} disabled={nameSaving || !nameInput.trim()}>
-            {nameSaving ? '儲存中...' : '儲存名稱'}
+            {nameSaving ? t.savingName : t.saveName}
           </button>
         </form>
       </div>
 
       {/* Password */}
       <div style={s.section}>
-        <p style={s.sectionLabel}>修改密碼</p>
+        <p style={s.sectionLabel}>{t.changePassword}</p>
         <form onSubmit={handleChangePassword} style={s.form}>
           <div style={s.field}>
-            <label style={s.label}>目前密碼</label>
+            <label style={s.label}>{t.currentPassword}</label>
             <input
               style={s.input}
               type="password"
               value={currentPw}
               onChange={(e) => setCurrentPw(e.target.value)}
-              placeholder="輸入目前密碼"
+              placeholder={t.currentPasswordPlaceholder}
               autoComplete="current-password"
             />
           </div>
           <div style={s.field}>
-            <label style={s.label}>新密碼</label>
+            <label style={s.label}>{t.newPassword}</label>
             <input
               style={s.input}
               type="password"
               value={newPw}
               onChange={(e) => setNewPw(e.target.value)}
-              placeholder="至少 8 個字元"
+              placeholder={t.atLeast8}
               autoComplete="new-password"
             />
           </div>
@@ -138,15 +138,34 @@ export default function Account() {
             </div>
           )}
           <button type="submit" style={s.submitBtn} disabled={pwLoading}>
-            {pwLoading ? '更新中...' : '更新密碼'}
+            {pwLoading ? t.updating : t.updatePassword}
           </button>
         </form>
       </div>
 
+      {/* Language */}
+      <div style={s.section}>
+        <p style={s.sectionLabel}>{t.language}</p>
+        <div style={s.langRow}>
+          <button
+            style={lang === 'zh' ? s.langBtnActive : s.langBtn}
+            onClick={() => setLang('zh')}
+          >
+            中文
+          </button>
+          <button
+            style={lang === 'en' ? s.langBtnActive : s.langBtn}
+            onClick={() => setLang('en')}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
       {/* Logout */}
       <div style={s.section}>
-        <p style={s.sectionLabel}>帳號操作</p>
-        <button style={s.logoutBtn} onClick={handleLogoutClick}>登出</button>
+        <p style={s.sectionLabel}>{t.accountActions}</p>
+        <button style={s.logoutBtn} onClick={handleLogoutClick}>{t.signOut}</button>
       </div>
     </div>
   );
@@ -175,5 +194,8 @@ const s = {
   successBox: { background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#16a34a' },
   errorBox: { background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#dc2626' },
   submitBtn: { background: '#7fb5a0', border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4 },
+  langRow: { display: 'flex', gap: 10 },
+  langBtn: { flex: 1, background: '#f5f3f0', border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 500, color: '#6b7280', cursor: 'pointer' },
+  langBtnActive: { flex: 1, background: '#7fb5a0', border: '1.5px solid #7fb5a0', borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 600, color: '#fff', cursor: 'pointer' },
   logoutBtn: { background: '#fef2f2', border: '1.5px solid #fecaca', color: '#dc2626', borderRadius: 10, padding: '11px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', width: '100%' },
 };

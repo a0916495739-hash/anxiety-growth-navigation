@@ -8,6 +8,12 @@ export function AppProvider({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
   const [displayName, setDisplayName] = useState(null);
+  const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'zh');
+
+  const setLang = useCallback((l) => {
+    localStorage.setItem('lang', l);
+    setLangState(l);
+  }, []);
 
   // Today's emotion count: { date: 'YYYY-MM-DD', count: N }
   const [todayEmotion, setTodayEmotion] = useState(() => {
@@ -92,6 +98,8 @@ export function AppProvider({ children }) {
       incrementTodayCount,
       onLoginSuccess,
       handleLogout,
+      lang,
+      setLang,
     }}>
       {children}
     </AppContext.Provider>
