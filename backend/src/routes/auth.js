@@ -5,6 +5,14 @@ const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const pool = require('../db/pool');
 
+const isProd = process.env.NODE_ENV === 'production';
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: isProd ? 'None' : 'lax',
+  secure: isProd,
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+};
+
 function createMailer() {
   const nodemailer = require('nodemailer');
   return nodemailer.createTransport({
@@ -82,7 +90,7 @@ router.post('/register', async (req, res) => {
     await client.query('COMMIT');
 
     const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.cookie('token', token, cookieOptions);
     res.status(201).json({ message: 'Account created successfully' });
   } catch (err) {
     await client.query('ROLLBACK');
@@ -114,7 +122,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.cookie('token', token, cookieOptions);
     res.json({ message: 'Logged in successfully' });
   } catch (err) {
     console.error(err);
@@ -282,7 +290,7 @@ router.post('/reset-password', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', { ...cookieOptions, maxAge: undefined });
   res.json({ message: 'Logged out successfully' });
 });
 
