@@ -7,7 +7,7 @@ import Onboarding, { useOnboarding } from '../components/Onboarding';
 import { getT } from '../i18n';
 
 export default function Home() {
-  const { isLoggedIn, displayName, lang } = useApp();
+  const { isLoggedIn, displayName, lang, setLang } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
@@ -37,6 +37,9 @@ export default function Home() {
           <span style={s.logoText}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
+          <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
+            {lang === 'zh' ? 'EN' : '中文'}
+          </button>
           {isLoggedIn ? (
             <>
               {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
@@ -152,6 +155,19 @@ const s = {
   logoText: { fontWeight: 700, fontSize: 17, color: '#2d3748', letterSpacing: '-0.3px' },
   navActions: { display: 'flex', gap: 8, alignItems: 'center' },
   greeting: { fontSize: 14, color: '#6b7280', fontWeight: 500 },
+  langToggle: {
+    background: 'rgba(255,255,255,0.35)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.5)',
+    borderRadius: 99,
+    padding: '5px 12px',
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#4a5568',
+    cursor: 'pointer',
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)',
+  },
   ghostBtn: {
     background: 'rgba(255,255,255,0.35)',
     backdropFilter: 'blur(12px)',
