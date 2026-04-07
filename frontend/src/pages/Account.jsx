@@ -1,4 +1,29 @@
 import { useState, useEffect } from 'react';
+
+function SunIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  );
+}
+function MoonIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  );
+}
+function MonitorIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+  );
+}
 import { useNavigate } from 'react-router-dom';
 import { getMe, changePassword, updateProfile } from '../api/auth';
 import { submitFeedback } from '../api/feedback';
@@ -18,7 +43,7 @@ export default function Account() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
-  const { handleLogout, displayName, setDisplayName, lang, setLang } = useApp();
+  const { handleLogout, displayName, setDisplayName, lang, setLang, theme, setTheme, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
 
@@ -85,134 +110,155 @@ export default function Account() {
     navigate('/login');
   }
 
+  // Dynamic colour palette based on dark mode
+  const c = isDark ? {
+    page:        'transparent',
+    card:        'rgba(41,37,36,0.85)',
+    cardBorder:  '1.5px solid rgba(255,255,255,0.08)',
+    heading:     '#f5f5f4',
+    label:       '#a8a29e',
+    text:        '#e7e5e4',
+    textMid:     '#78716c',
+    input:       'rgba(28,25,23,0.6)',
+    inputBorder: '1.5px solid rgba(255,255,255,0.1)',
+    successBg:   '#14532d22',
+    successBorder:'#166534',
+    successText: '#4ade80',
+    errorBg:     '#7f1d1d22',
+    errorBorder: '#991b1b',
+    errorText:   '#f87171',
+    submitBg:    '#7fb5a0',
+    logoutBg:    'rgba(239,68,68,0.12)',
+    logoutBorder:'rgba(239,68,68,0.3)',
+    logoutText:  '#f87171',
+    langBtn:     'rgba(255,255,255,0.06)',
+    langBorder:  'rgba(255,255,255,0.1)',
+    langText:    '#a8a29e',
+  } : {
+    page:        'transparent',
+    card:        '#fff',
+    cardBorder:  '1.5px solid #e8e0d0',
+    heading:     '#2d3748',
+    label:       '#9ca3af',
+    text:        '#374151',
+    textMid:     '#6b7280',
+    input:       '#faf8f3',
+    inputBorder: '1.5px solid #e8e0d0',
+    successBg:   '#f0fdf4',
+    successBorder:'#bbf7d0',
+    successText: '#16a34a',
+    errorBg:     '#fef2f2',
+    errorBorder: '#fecaca',
+    errorText:   '#dc2626',
+    submitBg:    '#7fb5a0',
+    logoutBg:    '#fef2f2',
+    logoutBorder:'#fecaca',
+    logoutText:  '#dc2626',
+    langBtn:     '#f5f3f0',
+    langBorder:  '#e8e0d0',
+    langText:    '#6b7280',
+  };
+
   return (
-    <div style={s.page}>
-      <button style={s.back} onClick={() => navigate('/')}>{t.backToHome}</button>
-      <h2 style={s.heading}>{t.accountSettings}</h2>
+    <div style={{ ...s.page }}>
+      <button style={{ ...s.back, color: '#7fb5a0' }} onClick={() => navigate('/')}>{t.backToHome}</button>
+      <h2 style={{ ...s.heading, color: c.heading }}>{t.accountSettings}</h2>
 
       {/* Profile */}
-      <div style={s.section}>
-        <p style={s.sectionLabel}>{t.profile}</p>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.profile}</p>
         <div style={s.avatar}>
           <div style={s.avatarCircle}>
             {displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?'}
           </div>
           <div>
-            <p style={s.avatarName}>{displayName || t.noDisplayName}</p>
-            <p style={s.avatarEmail}>{email}</p>
+            <p style={{ ...s.avatarName, color: c.text }}>{displayName || t.noDisplayName}</p>
+            <p style={{ ...s.avatarEmail, color: c.textMid }}>{email}</p>
           </div>
         </div>
         <form onSubmit={handleSaveName} style={s.form}>
           <div style={s.field}>
-            <label style={s.label}>{t.displayName}</label>
-            <input
-              style={s.input}
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder={t.displayNamePlaceholder}
-              maxLength={30}
-              autoComplete="nickname"
-            />
+            <label style={{ ...s.label, color: c.text }}>{t.displayName}</label>
+            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder={t.displayNamePlaceholder} maxLength={30} autoComplete="nickname" />
           </div>
-          {nameMsg && (
-            <div style={nameMsg.type === 'success' ? s.successBox : s.errorBox}>
-              {nameMsg.text}
-            </div>
-          )}
-          <button type="submit" style={s.submitBtn} disabled={nameSaving || !nameInput.trim()}>
-            {nameSaving ? t.savingName : t.saveName}
-          </button>
+          {nameMsg && <div style={{ ...s.msgBox, background: nameMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${nameMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: nameMsg.type === 'success' ? c.successText : c.errorText }}>{nameMsg.text}</div>}
+          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={nameSaving || !nameInput.trim()}>{nameSaving ? t.savingName : t.saveName}</button>
         </form>
       </div>
 
       {/* Password */}
-      <div style={s.section}>
-        <p style={s.sectionLabel}>{t.changePassword}</p>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.changePassword}</p>
         <form onSubmit={handleChangePassword} style={s.form}>
           <div style={s.field}>
-            <label style={s.label}>{t.currentPassword}</label>
-            <input
-              style={s.input}
-              type="password"
-              value={currentPw}
-              onChange={(e) => setCurrentPw(e.target.value)}
-              placeholder={t.currentPasswordPlaceholder}
-              autoComplete="current-password"
-            />
+            <label style={{ ...s.label, color: c.text }}>{t.currentPassword}</label>
+            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder={t.currentPasswordPlaceholder} autoComplete="current-password" />
           </div>
           <div style={s.field}>
-            <label style={s.label}>{t.newPassword}</label>
-            <input
-              style={s.input}
-              type="password"
-              value={newPw}
-              onChange={(e) => setNewPw(e.target.value)}
-              placeholder={t.atLeast8}
-              autoComplete="new-password"
-            />
+            <label style={{ ...s.label, color: c.text }}>{t.newPassword}</label>
+            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder={t.atLeast8} autoComplete="new-password" />
           </div>
-          {pwMsg && (
-            <div style={pwMsg.type === 'success' ? s.successBox : s.errorBox}>
-              {pwMsg.text}
-            </div>
-          )}
-          <button type="submit" style={s.submitBtn} disabled={pwLoading}>
-            {pwLoading ? t.updating : t.updatePassword}
-          </button>
+          {pwMsg && <div style={{ ...s.msgBox, background: pwMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${pwMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: pwMsg.type === 'success' ? c.successText : c.errorText }}>{pwMsg.text}</div>}
+          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={pwLoading}>{pwLoading ? t.updating : t.updatePassword}</button>
         </form>
       </div>
 
       {/* Language */}
-      <div style={s.section}>
-        <p style={s.sectionLabel}>{t.language}</p>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.language}</p>
         <div style={s.langRow}>
-          <button
-            style={lang === 'zh' ? s.langBtnActive : s.langBtn}
-            onClick={() => setLang('zh')}
-          >
-            中文
-          </button>
-          <button
-            style={lang === 'en' ? s.langBtnActive : s.langBtn}
-            onClick={() => setLang('en')}
-          >
-            English
-          </button>
+          {['zh', 'en'].map((l) => (
+            <button key={l} onClick={() => setLang(l)} style={lang === l ? { ...s.langBtnActive } : { ...s.langBtn, background: c.langBtn, border: `1.5px solid ${c.langBorder}`, color: c.langText }}>
+              {l === 'zh' ? '中文' : 'English'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Appearance / Theme */}
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.themeLabel}</p>
+        <div style={s.themeRow}>
+          {[
+            { key: 'light', label: t.themeLight, icon: <SunIcon /> },
+            { key: 'dark',  label: t.themeDark,  icon: <MoonIcon /> },
+            { key: 'system',label: t.themeSystem,icon: <MonitorIcon /> },
+          ].map(({ key, label, icon }) => {
+            const active = theme === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setTheme(key)}
+                style={{
+                  ...s.themeBtn,
+                  background: active ? '#7fb5a0' : c.langBtn,
+                  border: `1.5px solid ${active ? '#7fb5a0' : c.langBorder}`,
+                  color: active ? '#fff' : c.langText,
+                  boxShadow: active ? '0 2px 8px rgba(127,181,160,0.35)' : 'none',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: active ? 1 : 0.7 }}>{icon}</span>
+                <span style={{ fontSize: 12, fontWeight: active ? 600 : 500 }}>{label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Feedback */}
-      <div style={s.section}>
-        <p style={s.sectionLabel}>{t.feedbackLabel}</p>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.feedbackLabel}</p>
         <form onSubmit={handleSubmitFeedback} style={s.form}>
-          <textarea
-            style={s.textarea}
-            value={feedbackText}
-            onChange={(e) => setFeedbackText(e.target.value)}
-            placeholder={t.feedbackPlaceholder}
-            rows={4}
-            maxLength={1000}
-          />
-          {feedbackMsg && (
-            <div style={feedbackMsg.type === 'success' ? s.successBox : s.errorBox}>
-              {feedbackMsg.text}
-            </div>
-          )}
-          <button
-            type="submit"
-            style={{ ...s.submitBtn, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }}
-            disabled={feedbackLoading || !feedbackText.trim()}
-          >
-            {feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}
-          </button>
+          <textarea style={{ ...s.textarea, background: c.input, border: c.inputBorder, color: c.text }} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder={t.feedbackPlaceholder} rows={4} maxLength={1000} />
+          {feedbackMsg && <div style={{ ...s.msgBox, background: feedbackMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${feedbackMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: feedbackMsg.type === 'success' ? c.successText : c.errorText }}>{feedbackMsg.text}</div>}
+          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }} disabled={feedbackLoading || !feedbackText.trim()}>{feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}</button>
         </form>
       </div>
 
       {/* Logout */}
-      <div style={s.section}>
-        <p style={s.sectionLabel}>{t.accountActions}</p>
-        <button style={s.logoutBtn} onClick={handleLogoutClick}>{t.signOut}</button>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+        <p style={{ ...s.sectionLabel, color: c.label }}>{t.accountActions}</p>
+        <button style={{ ...s.logoutBtn, background: c.logoutBg, border: `1.5px solid ${c.logoutBorder}`, color: c.logoutText }} onClick={handleLogoutClick}>{t.signOut}</button>
       </div>
     </div>
   );
@@ -237,13 +283,14 @@ const s = {
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-  input: { border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px 14px', fontSize: 15, background: '#faf8f3', outline: 'none' },
-  textarea: { border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px 14px', fontSize: 15, background: '#faf8f3', outline: 'none', resize: 'vertical', lineHeight: 1.6 },
-  successBox: { background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#16a34a' },
-  errorBox: { background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#dc2626' },
-  submitBtn: { background: '#7fb5a0', border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4 },
+  input: { borderRadius: 10, padding: '10px 14px', fontSize: 15, outline: 'none', transition: 'background 0.3s, border-color 0.3s' },
+  textarea: { borderRadius: 10, padding: '10px 14px', fontSize: 15, outline: 'none', resize: 'vertical', lineHeight: 1.6, transition: 'background 0.3s, border-color 0.3s' },
+  msgBox: { borderRadius: 8, padding: '10px 14px', fontSize: 14 },
+  submitBtn: { border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4, transition: 'opacity 0.2s, background 0.3s' },
   langRow: { display: 'flex', gap: 10 },
-  langBtn: { flex: 1, background: '#f5f3f0', border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 500, color: '#6b7280', cursor: 'pointer' },
+  langBtn: { flex: 1, borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 500, cursor: 'pointer', transition: 'background 0.2s, color 0.2s' },
   langBtnActive: { flex: 1, background: '#7fb5a0', border: '1.5px solid #7fb5a0', borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 600, color: '#fff', cursor: 'pointer' },
-  logoutBtn: { background: '#fef2f2', border: '1.5px solid #fecaca', color: '#dc2626', borderRadius: 10, padding: '11px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', width: '100%' },
+  logoutBtn: { borderRadius: 10, padding: '11px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', width: '100%', transition: 'background 0.2s' },
+  themeRow: { display: 'flex', gap: 10 },
+  themeBtn: { flex: 1, borderRadius: 12, padding: '12px 8px', fontSize: 13, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, transition: 'background 0.25s, color 0.25s, box-shadow 0.25s' },
 };

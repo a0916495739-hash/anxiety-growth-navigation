@@ -7,12 +7,21 @@ import Onboarding, { useOnboarding } from '../components/Onboarding';
 import { getT } from '../i18n';
 
 export default function Home() {
-  const { isLoggedIn, displayName, lang, setLang } = useApp();
+  const { isLoggedIn, displayName, lang, setLang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Dark mode colour tokens
+  const nav_bg   = isDark ? 'rgba(0,0,0,0.3)'        : 'rgba(255,255,255,0.35)';
+  const nav_bdr  = isDark ? 'rgba(255,255,255,0.1)'   : 'rgba(255,255,255,0.5)';
+  const nav_text = isDark ? '#d6d3d1'                 : '#4a5568';
+  const card_bg_d= isDark ? 'rgba(41,37,36,0.85)'     : 'rgba(245,241,237,0.7)';
+  const card_bdr = isDark ? 'rgba(255,255,255,0.08)'  : 'rgba(255,182,193,0.3)';
+  const text_head= isDark ? '#f5f5f4'                 : '#2d3748';
+  const text_sub = isDark ? '#a8a29e'                 : '#6b7280';
 
   const features = [
     { label: t.emotionFeatureLabel, desc: t.emotionFeatureDesc, path: '/emotions', emoji: '🌊', color: '#e8f4fb', border: '#a8c8e8', accent: '#5a9fc0' },
@@ -32,15 +41,15 @@ export default function Home() {
       <div style={s.blob3} />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       {/* Nav */}
-      <nav style={s.nav}>
+      <nav style={{ ...s.nav, borderBottomColor: isDark ? '#3d3530' : '#e8e0d0' }}>
         <div style={s.logo}>
           <span style={s.logoMark}>🌿</span>
-          <span style={s.logoText}>{t.appName}</span>
+          <span style={{ ...s.logoText, color: text_head }}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
           {/* 桌面版導覽 */}
           <div className="nav-desktop-only" style={s.desktopButtons}>
-            <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
+            <button style={{ ...s.langToggle, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
@@ -50,13 +59,13 @@ export default function Home() {
             </button>
             {isLoggedIn ? (
               <>
-                {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
-                <button style={s.ghostBtn} onClick={() => navigate('/account')}>{t.settings}</button>
+                {displayName && <span style={{ ...s.greeting, color: nav_text }}>Hi, {displayName}</span>}
+                <button style={{ ...s.ghostBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/account')}>{t.settings}</button>
               </>
             ) : (
               <>
-                <button style={s.ghostBtn} onClick={() => navigate('/login')}>{t.signIn}</button>
-                <button style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
+                <button style={{ ...s.ghostBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/login')}>{t.signIn}</button>
+                <button style={{ ...s.primaryBtn, background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)', borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/register')}>{t.createAccount}</button>
               </>
             )}
           </div>
@@ -64,7 +73,7 @@ export default function Home() {
           {/* 手機版漢堡按鈕 */}
           <button
             className="nav-hamburger"
-            style={s.hamburgerBtn}
+            style={{ ...s.hamburgerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }}
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Menu"
           >
@@ -92,20 +101,20 @@ export default function Home() {
 
         {/* 手機版下拉選單 */}
         {menuOpen && (
-          <div style={s.mobileMenu}>
-            <button style={s.menuItem} onClick={() => { setLang(lang === 'zh' ? 'en' : 'zh'); setMenuOpen(false); }}>
+          <div style={{ ...s.mobileMenu, background: isDark ? 'rgba(28,25,23,0.92)' : 'rgba(255,255,255,0.85)', borderColor: nav_bdr }}>
+            <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { setLang(lang === 'zh' ? 'en' : 'zh'); setMenuOpen(false); }}>
               🌐 {lang === 'zh' ? 'Switch to English' : '切換為中文'}
             </button>
             {isLoggedIn ? (
-              <button style={s.menuItem} onClick={() => { navigate('/account'); setMenuOpen(false); }}>
+              <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { navigate('/account'); setMenuOpen(false); }}>
                 ⚙️ {t.settings}
               </button>
             ) : (
               <>
-                <button style={s.menuItem} onClick={() => { navigate('/login'); setMenuOpen(false); }}>
+                <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { navigate('/login'); setMenuOpen(false); }}>
                   👤 {t.signIn}
                 </button>
-                <button style={{ ...s.menuItem, fontWeight: 600, color: '#4a9580' }} onClick={() => { navigate('/register'); setMenuOpen(false); }}>
+                <button style={{ ...s.menuItem, fontWeight: 600, color: '#7fb5a0' }} onClick={() => { navigate('/register'); setMenuOpen(false); }}>
                   ✨ {t.createAccount}
                 </button>
               </>
@@ -120,44 +129,44 @@ export default function Home() {
           <IllustrationHero width={240} />
         </div>
         <p style={s.heroEyebrow}>{t.homeEyebrow}</p>
-        <h1 style={s.heroTitle}>
+        <h1 style={{ ...s.heroTitle, color: text_head }}>
           {t.homeTitle1}<br />
           <span style={{ display: 'inline-block', wordBreak: 'keep-all' }}>
             {t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
           </span>
         </h1>
-        <p style={s.heroSub}>{t.homeSub}</p>
+        <p style={{ ...s.heroSub, color: text_sub }}>{t.homeSub}</p>
 
         {!isLoggedIn && (
-          <div style={s.guestBanner}>
+          <div style={{ ...s.guestBanner, background: isDark ? 'rgba(120,100,50,0.2)' : '#fefce8', borderColor: isDark ? 'rgba(251,191,36,0.25)' : '#fde68a', color: isDark ? '#d4a84b' : '#78600a' }}>
             <span>🔒</span>
             <span>{t.guestBanner}</span>
-            <button style={s.bannerBtn} onClick={() => navigate('/register')}>{t.getStarted}</button>
+            <button style={{ ...s.bannerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/register')}>{t.getStarted}</button>
           </div>
         )}
       </section>
 
       {/* Weekly Stats */}
       {weekStats && (weekStats.emotions > 0 || weekStats.achievements > 0 || weekStats.conflicts > 0) && (
-        <section style={s.statsBar}>
+        <section style={{ ...s.statsBar, background: card_bg_d, borderColor: card_bdr }}>
           <p style={s.statsLabel}>{t.weekStatsLabel}</p>
           <div style={s.statsRow}>
             {weekStats.emotions > 0 && (
               <div style={s.statItem}>
-                <span style={s.statNum}>{weekStats.emotions}</span>
-                <span style={s.statDesc}>{t.emotionLogs}</span>
+                <span style={{ ...s.statNum, color: text_head }}>{weekStats.emotions}</span>
+                <span style={{ ...s.statDesc, color: text_sub }}>{t.emotionLogs}</span>
               </div>
             )}
             {weekStats.achievements > 0 && (
               <div style={s.statItem}>
-                <span style={s.statNum}>{weekStats.achievements}</span>
-                <span style={s.statDesc}>{t.smallWins}</span>
+                <span style={{ ...s.statNum, color: text_head }}>{weekStats.achievements}</span>
+                <span style={{ ...s.statDesc, color: text_sub }}>{t.smallWins}</span>
               </div>
             )}
             {weekStats.conflicts > 0 && (
               <div style={s.statItem}>
-                <span style={s.statNum}>{weekStats.conflicts}</span>
-                <span style={s.statDesc}>{t.conflictsRecorded}</span>
+                <span style={{ ...s.statNum, color: text_head }}>{weekStats.conflicts}</span>
+                <span style={{ ...s.statDesc, color: text_sub }}>{t.conflictsRecorded}</span>
               </div>
             )}
           </div>
@@ -169,30 +178,30 @@ export default function Home() {
         {features.map((f) => (
           <div
             key={f.path}
-            style={{ ...s.card, background: f.color, borderColor: f.border }}
+            style={{ ...s.card, background: isDark ? 'rgba(41,37,36,0.7)' : f.color, borderColor: isDark ? 'rgba(255,255,255,0.08)' : f.border }}
             onClick={() => navigate(f.path)}
           >
-            <div style={{ ...s.cardIcon, background: f.border }}>{f.emoji}</div>
+            <div style={{ ...s.cardIcon, background: isDark ? 'rgba(255,255,255,0.08)' : f.border }}>{f.emoji}</div>
             <div style={s.cardBody}>
-              <h2 style={{ ...s.cardTitle, color: f.accent }}>{f.label}</h2>
-              <p style={s.cardDesc}>{f.desc}</p>
+              <h2 style={{ ...s.cardTitle, color: isDark ? '#d6d3d1' : f.accent }}>{f.label}</h2>
+              <p style={{ ...s.cardDesc, color: text_sub }}>{f.desc}</p>
             </div>
-            <span style={{ ...s.cardArrow, color: f.accent }}>→</span>
+            <span style={{ ...s.cardArrow, color: isDark ? '#7fb5a0' : f.accent }}>→</span>
           </div>
         ))}
       </section>
 
       {/* Quick links */}
       <section style={s.quick}>
-        <button style={s.quickLink} onClick={() => navigate('/emotions/history')}>{t.emotionHistory}</button>
-        <button style={s.quickLink} onClick={() => navigate('/conflicts/stats')}>{t.conflictStats}</button>
+        <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/emotions/history')}>{t.emotionHistory}</button>
+        <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/conflicts/stats')}>{t.conflictStats}</button>
       </section>
 
       {/* Footer */}
-      <footer style={s.footer}>
-        <button style={s.privacyLink} onClick={() => navigate('/privacy')}>{t.privacyPolicy}</button>
-        <span style={s.footerDot}>·</span>
-        <span style={s.footerText}>{t.dataProtected}</span>
+      <footer style={{ ...s.footer, borderTopColor: isDark ? '#3d3530' : '#e8e0d0' }}>
+        <button style={{ ...s.privacyLink, color: text_sub }} onClick={() => navigate('/privacy')}>{t.privacyPolicy}</button>
+        <span style={{ ...s.footerDot, color: text_sub }}>·</span>
+        <span style={{ ...s.footerText, color: text_sub }}>{t.dataProtected}</span>
       </footer>
     </div>
   );

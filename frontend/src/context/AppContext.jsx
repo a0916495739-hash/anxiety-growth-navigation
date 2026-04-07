@@ -9,11 +9,34 @@ export function AppProvider({ children }) {
   const [guestToken, setGuestToken] = useState(null);
   const [displayName, setDisplayName] = useState(null);
   const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'zh');
+  const [theme, setThemeState] = useState(() => localStorage.getItem('theme') || 'system');
+  const [isDark, setIsDark] = useState(false);
 
   const setLang = useCallback((l) => {
     localStorage.setItem('lang', l);
     setLangState(l);
   }, []);
+
+  const setTheme = useCallback((t) => {
+    localStorage.setItem('theme', t);
+    setThemeState(t);
+  }, []);
+
+  useEffect(() => {
+    const apply = () => {
+      const dark =
+        theme === 'dark' ||
+        (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      setIsDark(dark);
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply();
+    if (theme === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener('change', apply);
+      return () => mq.removeEventListener('change', apply);
+    }
+  }, [theme]);
 
   // Today's emotion count: { date: 'YYYY-MM-DD', count: N }
   const [todayEmotion, setTodayEmotion] = useState(() => {
@@ -100,6 +123,9 @@ export function AppProvider({ children }) {
       handleLogout,
       lang,
       setLang,
+      theme,
+      setTheme,
+      isDark,
     }}>
       {children}
     </AppContext.Provider>

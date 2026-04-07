@@ -25,6 +25,23 @@
   --amber-glow: rgba(251,191,36,0.35);
 }
 
+/* Dark mode overrides */
+html.dark {
+  color-scheme: dark;
+  --rose-bg:    linear-gradient(135deg, #1c1917 0%, #231f1d 50%, #1c1917 100%);
+  --text:       #e7e5e4;
+  --stone-dark: #f5f5f4;
+  --stone:      #a8a29e;
+  --stone-mid:  #78716c;
+  --cream:      #1c1917;
+  --warm-white: #292524;
+  --sand:       #292524;
+  --sand-border:#3d3530;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.6);
+  --shadow-lg:  0 10px 32px rgba(0,0,0,0.7);
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -35,6 +52,7 @@ html, body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
