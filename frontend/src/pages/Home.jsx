@@ -38,6 +38,11 @@ export default function Home() {
         </div>
         <div style={s.navActions}>
           <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
             {lang === 'zh' ? 'EN' : '中文'}
           </button>
           {isLoggedIn ? (
@@ -156,6 +161,9 @@ const s = {
   navActions: { display: 'flex', gap: 8, alignItems: 'center' },
   greeting: { fontSize: 14, color: '#6b7280', fontWeight: 500 },
   langToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
     background: 'rgba(255,255,255,0.35)',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
