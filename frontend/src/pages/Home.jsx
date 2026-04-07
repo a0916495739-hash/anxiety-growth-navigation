@@ -154,7 +154,6 @@ export default function Home() {
         </div>
 
         {/* 手機版下拉選單已移除 — 導覽改由底部 Tab Bar 處理 */}
-        )}
 
         {/* 通知下拉面板 */}
         {notifOpen && (
