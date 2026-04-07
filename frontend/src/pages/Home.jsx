@@ -125,7 +125,6 @@ export default function Home() {
                 style={{ ...s.bellBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text, position: 'relative' }}
                 onClick={() => {
                   setNotifOpen(o => !o);
-                  setMenuOpen(false);
                   if (!notifOpen) setNotifications(prev => prev.map(n => ({ ...n, read: true })));
                 }}
                 aria-label="Notifications"
