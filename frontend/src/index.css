@@ -156,6 +156,7 @@ input, textarea { font-family: inherit; }
 }
 
 /* Bottom tab bar — hidden on desktop, shown on mobile */
+/* Do NOT set display in inline style on BottomTabBar; only CSS controls it */
 .bottom-tab-bar { display: none !important; }
 
 /* RWD */

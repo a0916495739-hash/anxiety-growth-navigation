@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+// 自動判斷 API 位址：
+// 1. 明確設定 VITE_API_URL 優先（Railway 部署時請在前端服務加入這個環境變數）
+// 2. 本地開發回退到 localhost:3001
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  baseURL,
   withCredentials: true,
 });
 

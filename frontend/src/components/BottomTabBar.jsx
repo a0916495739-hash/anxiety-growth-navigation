@@ -72,9 +72,12 @@ export default function BottomTabBar() {
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         borderTop: `1px solid ${border}`,
-        display: 'flex',
         zIndex: 150,
         transition: 'background 0.3s',
+        /* iOS GPU compositing — prevents tab bar from scrolling with page */
+        WebkitTransform: 'translate3d(0,0,0)',
+        transform: 'translate3d(0,0,0)',
+        willChange: 'transform',
       }}
     >
       {tabs.map(({ path, label, Icon }) => {

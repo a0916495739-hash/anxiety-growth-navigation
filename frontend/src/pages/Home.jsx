@@ -12,7 +12,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [breathing, setBreathing] = useState(false);
@@ -140,56 +139,22 @@ export default function Home() {
             );
           })()}
 
-          {/* 手機版漢堡按鈕 */}
+          {/* 手機版語言切換（只顯示地球圖示，不需漢堡） */}
           <button
             className="nav-hamburger"
-            style={{ ...s.hamburgerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }}
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label="Menu"
+            style={{ ...s.hamburgerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text, padding: '7px 10px' }}
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            aria-label="Language"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
             </svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              {menuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <line x1="3" y1="12" x2="21" y2="12"/>
-                  <line x1="3" y1="18" x2="21" y2="18"/>
-                </>
-              )}
-            </svg>
           </button>
         </div>
 
-        {/* 手機版下拉選單 */}
-        {menuOpen && (
-          <div style={{ ...s.mobileMenu, background: isDark ? 'rgba(28,25,23,0.92)' : 'rgba(255,255,255,0.85)', borderColor: nav_bdr }}>
-            <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { setLang(lang === 'zh' ? 'en' : 'zh'); setMenuOpen(false); }}>
-              🌐 {lang === 'zh' ? 'Switch to English' : '切換為中文'}
-            </button>
-            {isLoggedIn ? (
-              <button style={{ ...s.menuItem, color: nav_text }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/account'); }}>
-                ⚙️ {t.settings}
-              </button>
-            ) : (
-              <>
-                <button style={{ ...s.menuItem, color: nav_text }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/login'); }}>
-                  👤 {t.signIn}
-                </button>
-                <button style={{ ...s.menuItem, fontWeight: 600, color: '#7fb5a0' }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/register'); }}>
-                  ✨ {t.createAccount}
-                </button>
-              </>
-            )}
-          </div>
+        {/* 手機版下拉選單已移除 — 導覽改由底部 Tab Bar 處理 */}
         )}
 
         {/* 通知下拉面板 */}
