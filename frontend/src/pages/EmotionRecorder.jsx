@@ -7,6 +7,41 @@ import TagSelector from '../components/TagSelector';
 import PromptCard from '../components/PromptCard';
 import { IllustrationDone, IllustrationEmptyEmotion } from '../components/Illustrations';
 import { getT } from '../i18n';
+import { detectEmotion } from '../utils/emotionFilter';
+
+function EmotionFeedback({ emotion }) {
+  if (!emotion.type) return null;
+
+  const isCritical = emotion.type === 'critical';
+  const box = {
+    marginBottom: 12,
+    padding: '14px 16px',
+    borderRadius: 14,
+    animation: 'fadeSlideIn 0.3s ease both',
+    ...(isCritical ? {
+      background: 'rgba(254, 242, 242, 0.85)',
+      border: '1px solid #fca5a5',
+      animation: 'gentlePulse 2.5s ease-in-out infinite, fadeSlideIn 0.3s ease both',
+    } : {
+      background: 'rgba(240, 253, 244, 0.85)',
+      border: '1px solid #86efac',
+    }),
+  };
+
+  return (
+    <div style={box}>
+      <p style={{ fontSize: 14, color: isCritical ? '#b91c1c' : '#15803d', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+        {emotion.message}
+      </p>
+      {isCritical && emotion.helpLink && (
+        <a href={emotion.helpLink} target="_blank" rel="noreferrer"
+          style={{ display: 'inline-block', marginTop: 10, fontSize: 13, color: '#dc2626', fontWeight: 600, textDecoration: 'underline' }}>
+          {emotion.helpLabel} →
+        </a>
+      )}
+    </div>
+  );
+}
 
 function BackButton({ onClick, label }) {
   return (
@@ -89,6 +124,7 @@ function GuidedForm({ onSubmit, onBack, t }) {
           <p style={styles.question}>{t.triggerQ}</p>
           <textarea style={styles.textarea} placeholder={t.triggerPlaceholder}
             value={trigger} onChange={(e) => setTrigger(e.target.value)} rows={4} />
+          <EmotionFeedback emotion={detectEmotion(trigger)} />
           <button type="button" style={styles.nextBtn} onClick={() => setStep(3)}>{t.continue}</button>
         </form>
       )}
@@ -98,6 +134,7 @@ function GuidedForm({ onSubmit, onBack, t }) {
           <p style={styles.question}>{t.protectionQ}</p>
           <textarea style={styles.textarea} placeholder={t.protectionPlaceholder}
             value={protection} onChange={(e) => setProtection(e.target.value)} rows={4} />
+          <EmotionFeedback emotion={detectEmotion(protection)} />
           <p style={styles.tagLabel}>{t.emotionTags}</p>
           <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
             placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
@@ -116,6 +153,7 @@ function FreeForm({ onSubmit, onBack, t }) {
   const [tags, setTags] = useState([]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const emotion = detectEmotion(text);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -135,6 +173,7 @@ function FreeForm({ onSubmit, onBack, t }) {
           placeholder={t.freeWritePlaceholder} value={text}
           onChange={(e) => setText(e.target.value)} rows={7} />
         {error && <p style={styles.error}>{error}</p>}
+        <EmotionFeedback emotion={emotion} />
         <p style={styles.tagLabel}>{t.emotionTags}</p>
         <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
           placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />

@@ -99,6 +99,16 @@ input, textarea { font-family: inherit; }
   100% { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes gentlePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.85; transform: scale(1.012); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* RWD */
 @media (max-width: 480px) {
   body { font-size: 15px; }
