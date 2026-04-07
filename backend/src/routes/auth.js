@@ -91,7 +91,7 @@ router.post('/register', async (req, res) => {
 
     const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.cookie('token', token, cookieOptions);
-    res.status(201).json({ message: 'Account created successfully' });
+    res.status(201).json({ message: 'Account created successfully', token });
   } catch (err) {
     await client.query('ROLLBACK');
     console.error(err);
@@ -123,7 +123,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.cookie('token', token, cookieOptions);
-    res.json({ message: 'Logged in successfully' });
+    res.json({ message: 'Logged in successfully', token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Login failed' });
@@ -132,7 +132,7 @@ router.post('/login', async (req, res) => {
 
 // GET /api/auth/me
 router.get('/me', async (req, res) => {
-  const token = req.cookies?.token;
+  const token = req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
   if (!token) return res.status(401).json({ error: 'Not logged in' });
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -153,7 +153,7 @@ router.get('/me', async (req, res) => {
 
 // PUT /api/auth/profile
 router.put('/profile', async (req, res) => {
-  const token = req.cookies?.token;
+  const token = req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
   if (!token) return res.status(401).json({ error: 'Not logged in' });
   const { display_name } = req.body;
   if (!display_name?.trim()) {
@@ -176,7 +176,7 @@ router.put('/profile', async (req, res) => {
 
 // PUT /api/auth/password
 router.put('/password', async (req, res) => {
-  const token = req.cookies?.token;
+  const token = req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
   if (!token) return res.status(401).json({ error: 'Not logged in' });
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) {
