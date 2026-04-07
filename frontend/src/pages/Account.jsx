@@ -53,7 +53,10 @@ export default function Account() {
         setEmail(r.data.email || '');
         setNameInput(r.data.displayName || '');
       })
-      .catch(() => navigate('/'));
+      .catch((err) => {
+        // 只有 401 未登入才導回首頁，其餘錯誤（網路抖動等）不跳轉
+        if (err?.response?.status === 401) navigate('/');
+      });
   }, [navigate]);
 
   async function handleSaveName(e) {

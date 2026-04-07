@@ -144,15 +144,15 @@ export default function Home() {
               🌐 {lang === 'zh' ? 'Switch to English' : '切換為中文'}
             </button>
             {isLoggedIn ? (
-              <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { navigate('/account'); setMenuOpen(false); }}>
+              <button style={{ ...s.menuItem, color: nav_text }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/account'); }}>
                 ⚙️ {t.settings}
               </button>
             ) : (
               <>
-                <button style={{ ...s.menuItem, color: nav_text }} onClick={() => { navigate('/login'); setMenuOpen(false); }}>
+                <button style={{ ...s.menuItem, color: nav_text }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/login'); }}>
                   👤 {t.signIn}
                 </button>
-                <button style={{ ...s.menuItem, fontWeight: 600, color: '#7fb5a0' }} onClick={() => { navigate('/register'); setMenuOpen(false); }}>
+                <button style={{ ...s.menuItem, fontWeight: 600, color: '#7fb5a0' }} onClick={(e) => { e.stopPropagation(); setMenuOpen(false); navigate('/register'); }}>
                   ✨ {t.createAccount}
                 </button>
               </>
