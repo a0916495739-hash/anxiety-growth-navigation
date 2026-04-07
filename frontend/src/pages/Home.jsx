@@ -14,6 +14,7 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, text: lang === 'zh' ? '歡迎回來！記得今天也記錄一下情緒 🌊' : 'Welcome back! Remember to log your emotions today 🌊', time: lang === 'zh' ? '剛才' : 'Just now', read: false },
     { id: 2, text: lang === 'zh' ? '你上週記錄了成就，繼續保持 ✨' : 'You logged achievements last week. Keep it up ✨', time: lang === 'zh' ? '1 天前' : '1 day ago', read: false },
@@ -270,12 +271,57 @@ export default function Home() {
         <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/conflicts/stats')}>{t.conflictStats}</button>
       </section>
 
+      {/* Story button */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32, marginBottom: 4 }}>
+        <button
+          style={{ ...s.storyBtn, color: text_sub }}
+          onClick={() => setStoryOpen(true)}
+        >
+          <span>📖</span>
+          <span>{t.storyBtn}</span>
+        </button>
+      </div>
+
       {/* Footer */}
-      <footer style={{ ...s.footer, borderTopColor: isDark ? '#3d3530' : '#e8e0d0' }}>
-        <button style={{ ...s.privacyLink, color: text_sub }} onClick={() => navigate('/privacy')}>{t.privacyPolicy}</button>
-        <span style={{ ...s.footerDot, color: text_sub }}>·</span>
-        <span style={{ ...s.footerText, color: text_sub }}>{t.dataProtected}</span>
+      <footer style={{ ...s.footer, borderTopColor: isDark ? '#3d3530' : '#e8e0d0', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <button style={{ ...s.privacyLink, color: text_sub }} onClick={() => navigate('/privacy')}>{t.privacyPolicy}</button>
+          <span style={{ color: isDark ? '#44403c' : '#d1d5db', fontSize: 13 }}>|</span>
+          <button style={{ ...s.privacyLink, color: text_sub }} onClick={() => {}}>{t.tos}</button>
+        </div>
+        <p style={{ fontSize: 12, color: isDark ? '#44403c' : '#d1d5db', margin: 0 }}>{t.version}</p>
       </footer>
+
+      {/* Story Modal */}
+      {storyOpen && (
+        <div style={s.storyOverlay} onClick={() => setStoryOpen(false)}>
+          <div
+            style={{
+              ...s.storyModal,
+              background: isDark ? 'rgba(28,25,23,0.95)' : 'rgba(255,255,255,0.92)',
+              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.8)',
+              boxShadow: isDark
+                ? '0 24px 60px rgba(0,0,0,0.7)'
+                : '0 24px 60px rgba(0,0,0,0.12)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ ...s.storyEyebrow, color: '#7fb5a0' }}>📖 Origin Story</p>
+            <h2 style={{ ...s.storyTitle, color: text_head }}>{t.storyTitle}</h2>
+            <div style={{ ...s.storyBody, color: text_sub }}>
+              {t.storyContent.split('\n\n').map((para, i) => (
+                <p key={i} style={{ margin: i > 0 ? '16px 0 0' : 0 }}>{para}</p>
+              ))}
+            </div>
+            <button
+              style={{ ...s.storyClose, background: '#7fb5a0', color: '#fff' }}
+              onClick={() => setStoryOpen(false)}
+            >
+              {t.storyClose}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -637,8 +683,58 @@ const s = {
     background: 'radial-gradient(circle, rgba(249,168,212,0.18) 0%, transparent 70%)',
     borderRadius: '50%', filter: 'blur(35px)', zIndex: -1, pointerEvents: 'none',
   },
-  footer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 40, paddingTop: 20, borderTop: '1px solid #e8e0d0' },
-  privacyLink: { background: 'none', border: 'none', color: '#9ca3af', fontSize: 13, cursor: 'pointer', padding: 0, fontWeight: 500 },
+  footer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24, paddingTop: 20, borderTop: '1px solid #e8e0d0' },
+  privacyLink: { background: 'none', border: 'none', fontSize: 12, cursor: 'pointer', padding: 0, fontWeight: 500 },
   footerDot: { color: '#d1d5db', fontSize: 13 },
   footerText: { fontSize: 13, color: '#9ca3af' },
+  storyBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    background: 'none',
+    border: 'none',
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
+    padding: '6px 12px',
+    borderRadius: 99,
+    transition: 'color 0.2s, opacity 0.2s',
+    opacity: 0.75,
+  },
+  storyOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.45)',
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    zIndex: 200,
+    animation: 'fadeSlideIn 0.2s ease',
+    padding: '0 0 0 0',
+  },
+  storyModal: {
+    width: '100%',
+    maxWidth: 560,
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: '1px solid',
+    borderRadius: '24px 24px 0 0',
+    padding: '28px 28px 40px',
+    animation: 'completionEnter 0.25s ease',
+  },
+  storyEyebrow: { fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', margin: '0 0 8px' },
+  storyTitle: { fontSize: 20, fontWeight: 700, margin: '0 0 18px', letterSpacing: '-0.3px' },
+  storyBody: { fontSize: 15, lineHeight: 1.8 },
+  storyClose: {
+    display: 'block',
+    width: '100%',
+    border: 'none',
+    borderRadius: 12,
+    padding: '13px',
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: 'pointer',
+    marginTop: 28,
+    transition: 'opacity 0.2s',
+  },
 };

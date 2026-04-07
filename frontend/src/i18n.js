@@ -34,8 +34,14 @@ const zh = {
   conflictFeatureDesc: '釐清外在期望與內心渴望的差異',
   emotionHistory: '📋 情緒記錄歷史',
   conflictStats: '📊 應該來源分析',
-  privacyPolicy: '🛡️ 隱私權政策',
+  privacyPolicy: '隱私權政策',
+  tos: '服務條款',
   dataProtected: '資料加密保護，不販售個人資訊',
+  storyBtn: '抗焦慮導航的誕生故事',
+  storyTitle: '為什麼我們存在',
+  storyContent: '許多年輕人在 20 多歲時，會因為看到他人精彩的生活而否定自己。無論是社群媒體上的高薪工作、完美旅行，還是令人羨慕的生活方式——這些畫面往往讓人陷入「我是不是哪裡不夠好」的焦慮漩渦。\n\n我想創造一個安靜的空間，讓你學會找回人生的掌控感，專注於自我探索，而非盲目追逐他人的標準。這裡沒有評分、沒有排名，只有你和你自己的對話。\n\n不需要比任何人好——只需要比昨天的自己，更理解自己一點。',
+  storyClose: '收起故事',
+  version: 'Version 1.0.0',
 
   // Login
   welcomeBack: '歡迎回來',
@@ -274,8 +280,14 @@ const en = {
   conflictFeatureDesc: 'Clarify the gap between external expectations and your inner desires.',
   emotionHistory: '📋 Emotion History',
   conflictStats: '📊 Expectation Source Analysis',
-  privacyPolicy: '🛡️ Privacy Policy',
+  privacyPolicy: 'Privacy Policy',
+  tos: 'Terms of Service',
   dataProtected: 'Your data is encrypted and never sold.',
+  storyBtn: 'The Story Behind This App',
+  storyTitle: 'Why We Exist',
+  storyContent: "Many people in their 20s find themselves feeling inadequate when they scroll through others' seemingly perfect lives — high-paying jobs, dream vacations, picture-perfect relationships.\n\nI wanted to create a quiet space where you can reclaim a sense of control, focus on self-discovery, and stop measuring yourself against someone else's highlight reel. No scores. No rankings. Just you, talking to yourself.\n\nYou don't need to be better than anyone — just understand yourself a little better than yesterday.",
+  storyClose: 'Close',
+  version: 'Version 1.0.0',
 
   // Login
   welcomeBack: 'Welcome Back',
