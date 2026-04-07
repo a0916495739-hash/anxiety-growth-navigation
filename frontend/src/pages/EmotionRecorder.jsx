@@ -80,6 +80,8 @@ function GuidedForm({ onSubmit, onBack, t }) {
   const [protection, setProtection] = useState('');
   const [tags, setTags] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const activeText = step === 2 ? trigger : step === 3 ? protection : '';
+  const isCritical = detectEmotion(activeText).type === 'critical';
 
   function handleNext() {
     if (step === 1 && !intensity) return;
@@ -99,7 +101,13 @@ function GuidedForm({ onSubmit, onBack, t }) {
   }
 
   return (
-    <div style={styles.page}>
+    <div style={{
+      ...styles.page,
+      background: isCritical ? 'rgba(255, 228, 230, 0.6)' : 'transparent',
+      borderRadius: 20,
+      transition: 'background 2s ease',
+      padding: '20px 16px 60px',
+    }}>
       <BackButton onClick={handleBack} label={t.back} />
       <h2 style={styles.heading}>{t.guidedRecording}</h2>
       <p style={styles.stepIndicator}>Step {step} / 3</p>
@@ -154,6 +162,7 @@ function FreeForm({ onSubmit, onBack, t }) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const emotion = detectEmotion(text);
+  const isCritical = emotion.type === 'critical';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -164,7 +173,13 @@ function FreeForm({ onSubmit, onBack, t }) {
   }
 
   return (
-    <div style={styles.page}>
+    <div style={{
+      ...styles.page,
+      background: isCritical ? 'rgba(255, 228, 230, 0.6)' : 'transparent',
+      borderRadius: 20,
+      transition: 'background 2s ease',
+      padding: '20px 16px 60px',
+    }}>
       <BackButton onClick={onBack} label={t.back} />
       <h2 style={styles.heading}>{t.freeWrite}</h2>
       <p style={styles.sub}>{t.freeWriteSub}</p>
