@@ -15,27 +15,49 @@ function EmotionFeedback({ emotion }) {
   const isCritical = emotion.type === 'critical';
   const box = {
     marginBottom: 12,
-    padding: '14px 16px',
-    borderRadius: 14,
-    animation: 'fadeSlideIn 0.3s ease both',
-    ...(isCritical ? {
-      background: 'rgba(254, 242, 242, 0.85)',
-      border: '1px solid #fca5a5',
-      animation: 'gentlePulse 2.5s ease-in-out infinite, fadeSlideIn 0.3s ease both',
-    } : {
-      background: 'rgba(240, 253, 244, 0.85)',
-      border: '1px solid #86efac',
-    }),
+    padding: '16px 18px',
+    borderRadius: 18,
+    background: isCritical
+      ? 'rgba(255, 255, 255, 0.45)'
+      : 'rgba(255, 255, 255, 0.45)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.65)',
+    boxShadow: isCritical
+      ? '0 4px 20px rgba(251, 113, 133, 0.15), inset 0 1px 1px rgba(255,255,255,0.8)'
+      : '0 4px 20px rgba(134, 239, 172, 0.15), inset 0 1px 1px rgba(255,255,255,0.8)',
+    animation: isCritical
+      ? 'gentlePulse 2.8s ease-in-out infinite, fadeSlideIn 0.5s ease both'
+      : 'fadeSlideIn 0.5s ease both',
   };
 
   return (
     <div style={box}>
-      <p style={{ fontSize: 14, color: isCritical ? '#b91c1c' : '#15803d', lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+      <p style={{
+        fontSize: 14,
+        color: isCritical ? '#be123c' : '#166534',
+        lineHeight: 1.75,
+        margin: 0,
+        fontWeight: 500,
+        letterSpacing: 0.1,
+      }}>
         {emotion.message}
       </p>
       {isCritical && emotion.helpLink && (
         <a href={emotion.helpLink} target="_blank" rel="noreferrer"
-          style={{ display: 'inline-block', marginTop: 10, fontSize: 13, color: '#dc2626', fontWeight: 600, textDecoration: 'underline' }}>
+          style={{
+            display: 'inline-block',
+            marginTop: 10,
+            fontSize: 12,
+            background: 'rgba(225, 29, 72, 0.85)',
+            color: '#fff',
+            borderRadius: 99,
+            padding: '4px 14px',
+            fontWeight: 600,
+            textDecoration: 'none',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}>
           {emotion.helpLabel} →
         </a>
       )}
