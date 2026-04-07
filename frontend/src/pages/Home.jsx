@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { IllustrationHero } from '../components/Illustrations';
-import { getWeeklyStats } from '../api/stats';
+import { getWeeklyStats, getHeatmap } from '../api/stats';
 import Onboarding, { useOnboarding } from '../components/Onboarding';
 import { getT } from '../i18n';
 
@@ -15,6 +15,9 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [breathing, setBreathing] = useState(false);
+  const [breathPhase, setBreathPhase] = useState('in'); // 'in' | 'out' | 'ready'
+  const [heatmapData, setHeatmapData] = useState([]);
   const [notifications, setNotifications] = useState([
     { id: 1, text: lang === 'zh' ? '歡迎回來！記得今天也記錄一下情緒 🌊' : 'Welcome back! Remember to log your emotions today 🌊', time: lang === 'zh' ? '剛才' : 'Just now', read: false },
     { id: 2, text: lang === 'zh' ? '你上週記錄了成就，繼續保持 ✨' : 'You logged achievements last week. Keep it up ✨', time: lang === 'zh' ? '1 天前' : '1 day ago', read: false },
@@ -38,7 +41,35 @@ export default function Home() {
 
   useEffect(() => {
     getWeeklyStats().then((r) => setWeekStats(r.data)).catch(() => {});
+    getHeatmap().then((r) => setHeatmapData(r.data)).catch(() => {});
   }, []);
+
+  // Breathing animation phase cycling
+  useEffect(() => {
+    if (!breathing) return;
+    const phases = ['in', 'out', 'in', 'out', 'ready'];
+    let i = 0;
+    setBreathPhase(phases[0]);
+    const timer = setInterval(() => {
+      i++;
+      if (i < phases.length) {
+        setBreathPhase(phases[i]);
+      } else {
+        clearInterval(timer);
+      }
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [breathing]);
+
+  function startBreathing() {
+    setBreathing(true);
+    setBreathPhase('in');
+  }
+
+  function goToEmotions() {
+    setBreathing(false);
+    navigate('/emotions');
+  }
 
   useEffect(() => {
     if (!notifOpen) return;
@@ -247,13 +278,16 @@ export default function Home() {
         </section>
       )}
 
+      {/* Heatmap */}
+      {heatmapData.length > 0 && <HeatmapGrid data={heatmapData} t={t} isDark={isDark} text_head={text_head} text_sub={text_sub} card_bg_d={card_bg_d} card_bdr={card_bdr} />}
+
       {/* Feature Cards */}
       <section style={s.cards}>
         {features.map((f) => (
           <div
             key={f.path}
             style={{ ...s.card, background: isDark ? 'rgba(41,37,36,0.7)' : f.color, borderColor: isDark ? 'rgba(255,255,255,0.08)' : f.border }}
-            onClick={() => navigate(f.path)}
+            onClick={() => f.path === '/emotions' ? startBreathing() : navigate(f.path)}
           >
             <div style={{ ...s.cardIcon, background: isDark ? 'rgba(255,255,255,0.08)' : f.border }}>{f.emoji}</div>
             <div style={s.cardBody}>
@@ -322,7 +356,95 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 深呼吸過場動畫 */}
+      {breathing && (
+        <div style={s.breathOverlay} onClick={breathPhase === 'ready' ? goToEmotions : undefined}>
+          <div style={s.breathCircleWrap}>
+            <div style={s.breathCircle} />
+            <div style={s.breathCircleInner} />
+          </div>
+          <p style={s.breathText}>
+            {breathPhase === 'in' && t.breatheIn}
+            {breathPhase === 'out' && t.breatheOut}
+            {breathPhase === 'ready' && t.breatheReady}
+          </p>
+          {breathPhase === 'ready' && (
+            <button style={s.breathBtn} onClick={goToEmotions}>{t.breatheTap}</button>
+          )}
+        </div>
+      )}
     </div>
+  );
+}
+
+function HeatmapGrid({ data, t, isDark, text_head, text_sub, card_bg_d, card_bdr }) {
+  const countMap = {};
+  data.forEach(({ day, count }) => { countMap[day] = count; });
+
+  const today = new Date();
+  // Align to start of week (Monday)
+  const startOffset = (today.getDay() + 6) % 7; // days since last Monday
+  const totalDays = 84;
+  const days = Array.from({ length: totalDays }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() - (totalDays - 1 - i) + (6 - startOffset));
+    return d.toISOString().slice(0, 10);
+  });
+
+  const getColor = (count) => {
+    if (!count || count === 0) return isDark ? 'rgba(255,255,255,0.07)' : '#ede8e3';
+    if (count === 1) return '#fad5c8';
+    if (count === 2) return '#f4a898';
+    return '#e8836c';
+  };
+
+  // Group into columns of 7 (weeks)
+  const weeks = [];
+  for (let w = 0; w < 12; w++) {
+    weeks.push(days.slice(w * 7, w * 7 + 7));
+  }
+
+  const maxCount = Math.max(...data.map(d => d.count), 0);
+
+  return (
+    <section style={{ marginBottom: 28 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#7fb5a0', letterSpacing: 0.6, textTransform: 'uppercase', margin: 0 }}>{t.heatmapLabel}</p>
+        <p style={{ fontSize: 11, color: text_sub, margin: 0 }}>{t.heatmapSub}</p>
+      </div>
+      <div style={{ background: card_bg_d, border: `1px solid ${card_bdr}`, borderRadius: 16, padding: '16px 18px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+        <div style={{ display: 'flex', gap: 4, overflowX: 'auto' }}>
+          {weeks.map((week, wi) => (
+            <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {week.map((day) => {
+                const count = countMap[day] || 0;
+                return (
+                  <div
+                    key={day}
+                    title={`${day}: ${count} 筆`}
+                    style={{
+                      width: 12, height: 12,
+                      borderRadius: 3,
+                      background: getColor(count),
+                      transition: 'background 0.3s',
+                      flexShrink: 0,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, justifyContent: 'flex-end' }}>
+          <span style={{ fontSize: 10, color: text_sub }}>{t.heatmapLess}</span>
+          {['#ede8e3','#fad5c8','#f4a898','#e8836c'].map((c) => (
+            <div key={c} style={{ width: 10, height: 10, borderRadius: 2, background: isDark && c === '#ede8e3' ? 'rgba(255,255,255,0.07)' : c }} />
+          ))}
+          <span style={{ fontSize: 10, color: text_sub }}>{t.heatmapMore}</span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -700,6 +822,57 @@ const s = {
     borderRadius: 99,
     transition: 'color 0.2s, opacity 0.2s',
     opacity: 0.75,
+  },
+  breathOverlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(28,23,20,0.88)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 300,
+    gap: 28,
+  },
+  breathCircleWrap: {
+    position: 'relative',
+    width: 180, height: 180,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  breathCircle: {
+    position: 'absolute',
+    width: '100%', height: '100%',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(248,177,149,0.35) 0%, rgba(232,131,108,0.15) 60%, transparent 100%)',
+    animation: 'breathe 4s ease-in-out infinite, breatheGlow 4s ease-in-out infinite',
+  },
+  breathCircleInner: {
+    width: 80, height: 80,
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(248,200,180,0.6) 0%, rgba(232,131,108,0.4) 100%)',
+    animation: 'breathe 4s ease-in-out infinite',
+    animationDelay: '0.5s',
+  },
+  breathText: {
+    fontSize: 20,
+    fontWeight: 300,
+    color: '#f5e6df',
+    letterSpacing: 2,
+    textAlign: 'center',
+    margin: 0,
+  },
+  breathBtn: {
+    background: 'rgba(255,255,255,0.12)',
+    border: '1px solid rgba(255,255,255,0.2)',
+    borderRadius: 99,
+    color: '#f5e6df',
+    fontSize: 14,
+    padding: '10px 24px',
+    cursor: 'pointer',
+    letterSpacing: 0.5,
+    animation: 'fadeSlideIn 0.4s ease',
   },
   storyOverlay: {
     position: 'fixed',

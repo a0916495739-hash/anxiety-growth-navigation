@@ -82,4 +82,38 @@ router.get('/correlation', auth, async (req, res) => {
   }
 });
 
+// GET /api/stats/heatmap — 過去 84 天每日活動次數
+router.get('/heatmap', auth, async (req, res) => {
+  try {
+    const userId = await resolveUserId(req, res);
+    if (!userId) return;
+
+    const result = await pool.query(
+      `SELECT
+         TO_CHAR(day, 'YYYY-MM-DD') AS day,
+         count::int
+       FROM (
+         SELECT
+           DATE(created_at AT TIME ZONE 'Asia/Taipei') AS day,
+           COUNT(*) AS count
+         FROM (
+           SELECT created_at FROM emotion_records WHERE user_id = $1
+           UNION ALL
+           SELECT created_at FROM achievements    WHERE user_id = $1
+           UNION ALL
+           SELECT created_at FROM conflicts       WHERE user_id = $1
+         ) all_records
+         WHERE created_at >= NOW() - INTERVAL '84 days'
+         GROUP BY day
+       ) grouped
+       ORDER BY day`,
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch heatmap' });
+  }
+});
+
 module.exports = router;
