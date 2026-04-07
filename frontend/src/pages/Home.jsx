@@ -13,6 +13,12 @@ export default function Home() {
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: lang === 'zh' ? '歡迎回來！記得今天也記錄一下情緒 🌊' : 'Welcome back! Remember to log your emotions today 🌊', time: lang === 'zh' ? '剛才' : 'Just now', read: false },
+    { id: 2, text: lang === 'zh' ? '你上週記錄了成就，繼續保持 ✨' : 'You logged achievements last week. Keep it up ✨', time: lang === 'zh' ? '1 天前' : '1 day ago', read: false },
+    { id: 3, text: lang === 'zh' ? '試試看「應該 vs 想要」，釐清內心的拉扯 ⚖️' : 'Try "Should vs Want" to clarify inner tension ⚖️', time: lang === 'zh' ? '3 天前' : '3 days ago', read: true },
+  ]);
 
   // Dark mode colour tokens
   const nav_bg   = isDark ? 'rgba(0,0,0,0.3)'        : 'rgba(255,255,255,0.35)';
@@ -32,6 +38,15 @@ export default function Home() {
   useEffect(() => {
     getWeeklyStats().then((r) => setWeekStats(r.data)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const close = (e) => {
+      if (!e.target.closest('[data-notif]')) setNotifOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [notifOpen]);
 
   return (
     <div style={s.page}>
@@ -69,6 +84,29 @@ export default function Home() {
               </>
             )}
           </div>
+
+          {/* 通知鈴鐺 — 桌面 + 手機都顯示 */}
+          {(() => {
+            const unread = notifications.filter(n => !n.read).length;
+            return (
+              <button
+                data-notif="1"
+                style={{ ...s.bellBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text, position: 'relative' }}
+                onClick={() => {
+                  setNotifOpen(o => !o);
+                  setMenuOpen(false);
+                  if (!notifOpen) setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                }}
+                aria-label="Notifications"
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                {unread > 0 && <span style={s.redDot} />}
+              </button>
+            );
+          })()}
 
           {/* 手機版漢堡按鈕 */}
           <button
@@ -119,6 +157,41 @@ export default function Home() {
                 </button>
               </>
             )}
+          </div>
+        )}
+
+        {/* 通知下拉面板 */}
+        {notifOpen && (
+          <div data-notif="1" style={{
+            ...s.notifPanel,
+            background: isDark ? 'rgba(28,25,23,0.92)' : 'rgba(255,255,255,0.82)',
+            borderColor: nav_bdr,
+            boxShadow: isDark
+              ? '0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)'
+              : '0 12px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.8)',
+          }}>
+            <p style={{ ...s.notifHeader, color: nav_text }}>{lang === 'zh' ? '通知' : 'Notifications'}</p>
+            {notifications.length === 0 ? (
+              <p style={{ ...s.notifEmpty, color: nav_text }}>
+                {lang === 'zh' ? '沒有新通知' : 'No notifications'}
+              </p>
+            ) : (
+              notifications.map(n => (
+                <div key={n.id} style={{ ...s.notifItem, background: n.read ? 'transparent' : (isDark ? 'rgba(127,181,160,0.08)' : 'rgba(127,181,160,0.07)'), borderBottomColor: isDark ? 'rgba(255,255,255,0.06)' : '#f0ede8' }}>
+                  {!n.read && <span style={s.unreadDot} />}
+                  <div style={{ flex: 1 }}>
+                    <p style={{ ...s.notifText, color: nav_text }}>{n.text}</p>
+                    <p style={{ ...s.notifTime, color: isDark ? '#78716c' : '#9ca3af' }}>{n.time}</p>
+                  </div>
+                </div>
+              ))
+            )}
+            <button
+              style={{ ...s.notifClear, color: '#7fb5a0' }}
+              onClick={() => { setNotifications([]); setNotifOpen(false); }}
+            >
+              {lang === 'zh' ? '清除全部' : 'Clear all'}
+            </button>
           </div>
         )}
       </nav>
@@ -239,6 +312,82 @@ const s = {
     display: 'flex',
     gap: 6,
     alignItems: 'center',
+  },
+  bellBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid',
+    borderRadius: 99,
+    padding: '7px 10px',
+    cursor: 'pointer',
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)',
+    flexShrink: 0,
+  },
+  redDot: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    background: '#fb7185',
+    border: '1.5px solid rgba(255,255,255,0.8)',
+    display: 'block',
+  },
+  notifPanel: {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    right: 0,
+    width: 300,
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid',
+    borderRadius: 16,
+    overflow: 'hidden',
+    zIndex: 100,
+    animation: 'fadeSlideIn 0.18s ease',
+  },
+  notifHeader: {
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    padding: '14px 16px 10px',
+    margin: 0,
+  },
+  notifItem: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: '12px 16px',
+    borderBottom: '1px solid',
+    transition: 'background 0.2s',
+  },
+  unreadDot: {
+    width: 7,
+    height: 7,
+    borderRadius: '50%',
+    background: '#fb7185',
+    flexShrink: 0,
+    marginTop: 5,
+    display: 'block',
+  },
+  notifText: { fontSize: 13, lineHeight: 1.5, margin: '0 0 3px', fontWeight: 500 },
+  notifTime: { fontSize: 11, margin: 0 },
+  notifEmpty: { fontSize: 13, padding: '12px 16px 16px', margin: 0, opacity: 0.6 },
+  notifClear: {
+    display: 'block',
+    width: '100%',
+    background: 'none',
+    border: 'none',
+    fontSize: 13,
+    fontWeight: 600,
+    padding: '12px 16px',
+    textAlign: 'center',
+    cursor: 'pointer',
   },
   hamburgerBtn: {
     display: 'flex',
