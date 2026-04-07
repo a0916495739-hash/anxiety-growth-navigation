@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="115" fill="#7fb5a0"/>
+  <circle cx="256" cy="220" r="95" fill="rgba(255,255,255,0.18)"/>
+  <!-- leaf stem -->
+  <line x1="256" y1="360" x2="256" y2="200" stroke="white" stroke-width="18" stroke-linecap="round"/>
+  <!-- left leaf -->
+  <path d="M256 260 Q190 200 200 130 Q270 150 256 260Z" fill="white" opacity="0.9"/>
+  <!-- right leaf -->
+  <path d="M256 230 Q330 175 320 105 Q250 130 256 230Z" fill="white" opacity="0.7"/>
+</svg>

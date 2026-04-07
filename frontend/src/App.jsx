@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './components/Toast';
+import BottomTabBar from './components/BottomTabBar';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -21,8 +22,9 @@ function AppRoutes() {
     </div>
   );
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<Account />} />
@@ -37,6 +39,8 @@ function AppRoutes() {
       <Route path="/conflicts/new" element={<ConflictNew />} />
       <Route path="/conflicts/stats" element={<ConflictStats />} />
     </Routes>
+    <BottomTabBar />
+  </>
   );
 }
 
