@@ -125,14 +125,13 @@ input, textarea { font-family: inherit; }
     min-width: unset;
   }
 
-  /* Navbar: 手機版語言文字隱藏，只留圖示 */
-  .nav-lang-text { display: none; }
-
-  /* 手機版「建立帳號」隱藏 */
-  .nav-register { display: none; }
+  /* 手機版：隱藏桌面導覽，顯示漢堡 */
+  .nav-desktop-only { display: none !important; }
+  .nav-hamburger { display: flex !important; }
 }
 
 @media (min-width: 481px) {
-  .nav-lang-text { display: inline; }
-  .nav-register { display: inline-flex; }
+  /* 桌面：顯示桌面導覽，隱藏漢堡 */
+  .nav-desktop-only { display: flex !important; }
+  .nav-hamburger { display: none !important; }
 }

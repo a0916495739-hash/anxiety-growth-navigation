@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMe, changePassword, updateProfile } from '../api/auth';
+import { submitFeedback } from '../api/feedback';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
 
@@ -13,6 +14,9 @@ export default function Account() {
   const [newPw, setNewPw] = useState('');
   const [pwMsg, setPwMsg] = useState(null);
   const [pwLoading, setPwLoading] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackMsg, setFeedbackMsg] = useState(null);
 
   const { handleLogout, displayName, setDisplayName, lang, setLang } = useApp();
   const t = getT(lang);
@@ -57,6 +61,22 @@ export default function Account() {
       setPwMsg({ type: 'error', text: err.response?.data?.error || t.updateFailed });
     } finally {
       setPwLoading(false);
+    }
+  }
+
+  async function handleSubmitFeedback(e) {
+    e.preventDefault();
+    if (feedbackLoading || !feedbackText.trim()) return;
+    setFeedbackMsg(null);
+    setFeedbackLoading(true);
+    try {
+      await submitFeedback(feedbackText.trim());
+      setFeedbackMsg({ type: 'success', text: t.feedbackSuccess });
+      setFeedbackText('');
+    } catch {
+      setFeedbackMsg({ type: 'error', text: t.feedbackError });
+    } finally {
+      setFeedbackLoading(false);
     }
   }
 
@@ -162,6 +182,33 @@ export default function Account() {
         </div>
       </div>
 
+      {/* Feedback */}
+      <div style={s.section}>
+        <p style={s.sectionLabel}>{t.feedbackLabel}</p>
+        <form onSubmit={handleSubmitFeedback} style={s.form}>
+          <textarea
+            style={s.textarea}
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
+            placeholder={t.feedbackPlaceholder}
+            rows={4}
+            maxLength={1000}
+          />
+          {feedbackMsg && (
+            <div style={feedbackMsg.type === 'success' ? s.successBox : s.errorBox}>
+              {feedbackMsg.text}
+            </div>
+          )}
+          <button
+            type="submit"
+            style={{ ...s.submitBtn, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }}
+            disabled={feedbackLoading || !feedbackText.trim()}
+          >
+            {feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}
+          </button>
+        </form>
+      </div>
+
       {/* Logout */}
       <div style={s.section}>
         <p style={s.sectionLabel}>{t.accountActions}</p>
@@ -191,6 +238,7 @@ const s = {
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
   label: { fontSize: 13, fontWeight: 600, color: '#374151' },
   input: { border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px 14px', fontSize: 15, background: '#faf8f3', outline: 'none' },
+  textarea: { border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '10px 14px', fontSize: 15, background: '#faf8f3', outline: 'none', resize: 'vertical', lineHeight: 1.6 },
   successBox: { background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#16a34a' },
   errorBox: { background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', fontSize: 14, color: '#dc2626' },
   submitBtn: { background: '#7fb5a0', border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4 },

@@ -79,6 +79,12 @@ const zh = {
   accountActions: '帳號操作',
   signOut: '登出',
   language: '語言',
+  feedbackLabel: '意見回饋',
+  feedbackPlaceholder: '有任何建議或想說的話，都歡迎告訴我們 :)',
+  feedbackSubmit: '送出回饋',
+  feedbackSubmitting: '送出中...',
+  feedbackSuccess: '感謝你的回饋！我們會認真閱讀每一則。',
+  feedbackError: '送出失敗，請再試一次',
 
   // Forgot Password
   forgotPasswordTitle: '忘記密碼',
@@ -309,6 +315,12 @@ const en = {
   accountActions: 'Account Actions',
   signOut: 'Sign Out',
   language: 'Language',
+  feedbackLabel: 'Feedback',
+  feedbackPlaceholder: 'Any suggestions or thoughts? We'd love to hear from you :)',
+  feedbackSubmit: 'Submit Feedback',
+  feedbackSubmitting: 'Submitting...',
+  feedbackSuccess: 'Thank you! We read every piece of feedback.',
+  feedbackError: 'Failed to submit. Please try again.',
 
   // Forgot Password
   forgotPasswordTitle: 'Forgot Password',

@@ -9,6 +9,7 @@ const emotionsRoutes = require('./routes/emotions');
 const achievementsRoutes = require('./routes/achievements');
 const conflictsRoutes = require('./routes/conflicts');
 const statsRoutes = require('./routes/stats');
+const feedbackRoutes = require('./routes/feedback');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,6 +29,7 @@ app.use('/api/emotions', emotionsRoutes);
 app.use('/api/achievements', achievementsRoutes);
 app.use('/api/conflicts', conflictsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

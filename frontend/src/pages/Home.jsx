@@ -12,6 +12,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [weekStats, setWeekStats] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const features = [
     { label: t.emotionFeatureLabel, desc: t.emotionFeatureDesc, path: '/emotions', emoji: '🌊', color: '#e8f4fb', border: '#a8c8e8', accent: '#5a9fc0' },
@@ -37,29 +38,80 @@ export default function Home() {
           <span style={s.logoText}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
-          {/* 語言切換：手機只顯示地球圖示，桌面顯示文字 */}
-          <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          {/* 桌面版導覽 */}
+          <div className="nav-desktop-only" style={s.desktopButtons}>
+            <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+            </button>
+            {isLoggedIn ? (
+              <>
+                {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
+                <button style={s.ghostBtn} onClick={() => navigate('/account')}>{t.settings}</button>
+              </>
+            ) : (
+              <>
+                <button style={s.ghostBtn} onClick={() => navigate('/login')}>{t.signIn}</button>
+                <button style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
+              </>
+            )}
+          </div>
+
+          {/* 手機版漢堡按鈕 */}
+          <button
+            className="nav-hamburger"
+            style={s.hamburgerBtn}
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label="Menu"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
             </svg>
-            <span className="nav-lang-text">{lang === 'zh' ? 'EN' : '中文'}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              {menuOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <line x1="3" y1="12" x2="21" y2="12"/>
+                  <line x1="3" y1="18" x2="21" y2="18"/>
+                </>
+              )}
+            </svg>
           </button>
-
-          {isLoggedIn ? (
-            <>
-              {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
-              <button style={s.ghostBtn} onClick={() => navigate('/account')}>{t.settings}</button>
-            </>
-          ) : (
-            <>
-              <button style={s.ghostBtn} onClick={() => navigate('/login')}>{t.signIn}</button>
-              {/* 桌面顯示「建立帳號」，手機隱藏 */}
-              <button className="nav-register" style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
-            </>
-          )}
         </div>
+
+        {/* 手機版下拉選單 */}
+        {menuOpen && (
+          <div style={s.mobileMenu}>
+            <button style={s.menuItem} onClick={() => { setLang(lang === 'zh' ? 'en' : 'zh'); setMenuOpen(false); }}>
+              🌐 {lang === 'zh' ? 'Switch to English' : '切換為中文'}
+            </button>
+            {isLoggedIn ? (
+              <button style={s.menuItem} onClick={() => { navigate('/account'); setMenuOpen(false); }}>
+                ⚙️ {t.settings}
+              </button>
+            ) : (
+              <>
+                <button style={s.menuItem} onClick={() => { navigate('/login'); setMenuOpen(false); }}>
+                  👤 {t.signIn}
+                </button>
+                <button style={{ ...s.menuItem, fontWeight: 600, color: '#4a9580' }} onClick={() => { navigate('/register'); setMenuOpen(false); }}>
+                  ✨ {t.createAccount}
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -156,12 +208,13 @@ const s = {
   nav: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: '16px 0',
     borderBottom: '1px solid #e8e0d0',
     marginBottom: 40,
     gap: 8,
-    overflow: 'hidden',
+    flexWrap: 'wrap',
+    position: 'relative',
   },
   logo: { display: 'flex', alignItems: 'center', gap: 8 },
   logoMark: { fontSize: 22 },
@@ -172,6 +225,51 @@ const s = {
     alignItems: 'center',
     flexWrap: 'nowrap',
     flexShrink: 0,
+  },
+  desktopButtons: {
+    display: 'flex',
+    gap: 6,
+    alignItems: 'center',
+  },
+  hamburgerBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    background: 'rgba(255,255,255,0.35)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.5)',
+    borderRadius: 99,
+    padding: '7px 12px',
+    cursor: 'pointer',
+    color: '#4a5568',
+    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)',
+  },
+  mobileMenu: {
+    width: '100%',
+    background: 'rgba(255,255,255,0.85)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: '1px solid rgba(255,255,255,0.6)',
+    borderRadius: 14,
+    padding: '8px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+    marginTop: 4,
+  },
+  menuItem: {
+    background: 'none',
+    border: 'none',
+    borderRadius: 10,
+    padding: '12px 16px',
+    fontSize: 15,
+    color: '#374151',
+    textAlign: 'left',
+    cursor: 'pointer',
+    fontWeight: 500,
+    transition: 'background 0.15s',
   },
   greeting: { fontSize: 13, color: '#6b7280', fontWeight: 500, whiteSpace: 'nowrap' },
   langToggle: {
