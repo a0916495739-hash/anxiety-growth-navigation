@@ -316,7 +316,7 @@ const en = {
   signOut: 'Sign Out',
   language: 'Language',
   feedbackLabel: 'Feedback',
-  feedbackPlaceholder: 'Any suggestions or thoughts? We'd love to hear from you :)',
+  feedbackPlaceholder: "Any suggestions or thoughts? We'd love to hear from you :)",
   feedbackSubmit: 'Submit Feedback',
   feedbackSubmitting: 'Submitting...',
   feedbackSuccess: 'Thank you! We read every piece of feedback.',
