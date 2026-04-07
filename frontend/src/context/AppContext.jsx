@@ -18,8 +18,10 @@ export function AppProvider({ children }) {
   }, []);
 
   const setTheme = useCallback((t) => {
+    document.documentElement.classList.add('theme-changing');
     localStorage.setItem('theme', t);
     setThemeState(t);
+    setTimeout(() => document.documentElement.classList.remove('theme-changing'), 400);
   }, []);
 
   useEffect(() => {

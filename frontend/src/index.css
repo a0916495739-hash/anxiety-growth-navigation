@@ -25,6 +25,17 @@
   --amber-glow: rgba(251,191,36,0.35);
 }
 
+/* 主題切換瞬間：對所有元素強制加上 transition，讓顏色平滑過渡 */
+html.theme-changing,
+html.theme-changing * {
+  transition:
+    background-color 0.35s ease,
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease !important;
+}
+
 /* Dark mode overrides */
 html.dark {
   color-scheme: dark;
