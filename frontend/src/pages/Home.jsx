@@ -37,14 +37,16 @@ export default function Home() {
           <span style={s.logoText}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
+          {/* 語言切換：手機只顯示地球圖示，桌面顯示文字 */}
           <button style={s.langToggle} onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
             </svg>
-            {lang === 'zh' ? 'EN' : '中文'}
+            <span className="nav-lang-text">{lang === 'zh' ? 'EN' : '中文'}</span>
           </button>
+
           {isLoggedIn ? (
             <>
               {displayName && <span style={s.greeting}>Hi, {displayName}</span>}
@@ -53,7 +55,8 @@ export default function Home() {
           ) : (
             <>
               <button style={s.ghostBtn} onClick={() => navigate('/login')}>{t.signIn}</button>
-              <button style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
+              {/* 桌面顯示「建立帳號」，手機隱藏 */}
+              <button className="nav-register" style={s.primaryBtn} onClick={() => navigate('/register')}>{t.createAccount}</button>
             </>
           )}
         </div>
@@ -154,30 +157,43 @@ const s = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '20px 0',
+    padding: '16px 0',
     borderBottom: '1px solid #e8e0d0',
     marginBottom: 40,
+    gap: 8,
+    overflow: 'hidden',
   },
   logo: { display: 'flex', alignItems: 'center', gap: 8 },
   logoMark: { fontSize: 22 },
   logoText: { fontWeight: 700, fontSize: 17, color: '#2d3748', letterSpacing: '-0.3px' },
-  navActions: { display: 'flex', gap: 8, alignItems: 'center' },
-  greeting: { fontSize: 14, color: '#6b7280', fontWeight: 500 },
+  navActions: {
+    display: 'flex',
+    gap: 6,
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    flexShrink: 0,
+  },
+  greeting: { fontSize: 13, color: '#6b7280', fontWeight: 500, whiteSpace: 'nowrap' },
   langToggle: {
     display: 'flex',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
     background: 'rgba(255,255,255,0.35)',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     border: '1px solid rgba(255,255,255,0.5)',
     borderRadius: 99,
-    padding: '5px 12px',
-    fontSize: 13,
+    padding: '5px 10px',
+    fontSize: 12,
     fontWeight: 600,
     color: '#4a5568',
     cursor: 'pointer',
     boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6)',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  },
+  langText: {
+    // 手機隱藏文字，只顯示圖示 — 用 JS 動態判斷
   },
   ghostBtn: {
     background: 'rgba(255,255,255,0.35)',
@@ -186,11 +202,13 @@ const s = {
     border: '1px solid rgba(255,255,255,0.5)',
     color: '#4a5568',
     borderRadius: 99,
-    padding: '7px 18px',
-    fontSize: 14,
+    padding: '6px 12px',
+    fontSize: 13,
     fontWeight: 500,
     boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.06)',
-    transition: 'background 0.2s, box-shadow 0.2s',
+    transition: 'background 0.2s',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   primaryBtn: {
     background: 'rgba(255,255,255,0.5)',
@@ -199,11 +217,13 @@ const s = {
     border: '1px solid rgba(255,255,255,0.6)',
     color: '#374151',
     borderRadius: 99,
-    padding: '7px 18px',
-    fontSize: 14,
+    padding: '6px 12px',
+    fontSize: 13,
     fontWeight: 600,
     boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.8), 0 2px 8px rgba(0,0,0,0.08)',
-    transition: 'background 0.2s, box-shadow 0.2s',
+    transition: 'background 0.2s',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   hero: {
     textAlign: 'center',
