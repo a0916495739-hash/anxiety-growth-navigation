@@ -1,4 +1,4 @@
-const CACHE = 'anxiety-nav-v1';
+const CACHE = 'anxiety-nav-v2';
 const STATIC = ['/', '/index.html'];
 
 self.addEventListener('install', (e) => {
