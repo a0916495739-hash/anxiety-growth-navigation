@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword';
 import EmotionRecorder, { EmotionHistory } from './pages/EmotionRecorder';
 import { AchievementNew, AchievementList } from './pages/Achievements';
 import { ConflictNew, ConflictList, ConflictStats } from './pages/Conflicts';
+import BreathingTool from './pages/BreathingTool';
 
 function AppRoutes() {
   const { authChecked } = useApp();
@@ -41,6 +42,7 @@ function AppRoutes() {
           <Route path="/conflicts" element={<ConflictList />} />
           <Route path="/conflicts/new" element={<ConflictNew />} />
           <Route path="/conflicts/stats" element={<ConflictStats />} />
+          <Route path="/breathing" element={<BreathingTool />} />
         </Routes>
       </PageTransition>
       <BottomTabBar />

@@ -14,8 +14,6 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
   const [notifOpen, setNotifOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
-  const [breathing, setBreathing] = useState(false);
-  const [breathPhase, setBreathPhase] = useState('in'); // 'in' | 'out' | 'ready'
   const [heatmapData, setHeatmapData] = useState([]);
   const [notifications, setNotifications] = useState([
     { id: 1, text: lang === 'zh' ? '歡迎回來！記得今天也記錄一下情緒 🌊' : 'Welcome back! Remember to log your emotions today 🌊', time: lang === 'zh' ? '剛才' : 'Just now', read: false },
@@ -42,33 +40,6 @@ export default function Home() {
     getWeeklyStats().then((r) => setWeekStats(r.data)).catch(() => {});
     getHeatmap().then((r) => setHeatmapData(r.data)).catch(() => {});
   }, []);
-
-  // Breathing animation phase cycling
-  useEffect(() => {
-    if (!breathing) return;
-    const phases = ['in', 'out', 'in', 'out', 'ready'];
-    let i = 0;
-    setBreathPhase(phases[0]);
-    const timer = setInterval(() => {
-      i++;
-      if (i < phases.length) {
-        setBreathPhase(phases[i]);
-      } else {
-        clearInterval(timer);
-      }
-    }, 2000);
-    return () => clearInterval(timer);
-  }, [breathing]);
-
-  function startBreathing() {
-    setBreathing(true);
-    setBreathPhase('in');
-  }
-
-  function goToEmotions() {
-    setBreathing(false);
-    navigate('/emotions');
-  }
 
   useEffect(() => {
     if (!notifOpen) return;
@@ -250,7 +221,7 @@ export default function Home() {
           <div
             key={f.path}
             style={{ ...s.card, background: isDark ? 'rgba(41,37,36,0.7)' : f.color, borderColor: isDark ? 'rgba(255,255,255,0.08)' : f.border }}
-            onClick={() => f.path === '/emotions' ? startBreathing() : navigate(f.path)}
+            onClick={() => navigate(f.path)}
           >
             <div style={{ ...s.cardIcon, background: isDark ? 'rgba(255,255,255,0.08)' : f.border }}>{f.emoji}</div>
             <div style={s.cardBody}>
@@ -266,6 +237,9 @@ export default function Home() {
       <section style={s.quick}>
         <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/emotions/history')}>{t.emotionHistory}</button>
         <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/conflicts/stats')}>{t.conflictStats}</button>
+        <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/breathing')}>
+          {lang === 'zh' ? '🌬️ 深呼吸' : '🌬️ Breathe'}
+        </button>
       </section>
 
       {/* Story button */}
@@ -320,23 +294,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 深呼吸過場動畫 */}
-      {breathing && (
-        <div style={s.breathOverlay} onClick={breathPhase === 'ready' ? goToEmotions : undefined}>
-          <div style={s.breathCircleWrap}>
-            <div style={s.breathCircle} />
-            <div style={s.breathCircleInner} />
-          </div>
-          <p style={s.breathText}>
-            {breathPhase === 'in' && t.breatheIn}
-            {breathPhase === 'out' && t.breatheOut}
-            {breathPhase === 'ready' && t.breatheReady}
-          </p>
-          {breathPhase === 'ready' && (
-            <button style={s.breathBtn} onClick={goToEmotions}>{t.breatheTap}</button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
@@ -785,57 +742,6 @@ const s = {
     borderRadius: 99,
     transition: 'color 0.2s, opacity 0.2s',
     opacity: 0.75,
-  },
-  breathOverlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(28,23,20,0.88)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 300,
-    gap: 28,
-  },
-  breathCircleWrap: {
-    position: 'relative',
-    width: 180, height: 180,
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-  },
-  breathCircle: {
-    position: 'absolute',
-    width: '100%', height: '100%',
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(248,177,149,0.35) 0%, rgba(232,131,108,0.15) 60%, transparent 100%)',
-    animation: 'breathe 4s ease-in-out infinite, breatheGlow 4s ease-in-out infinite',
-  },
-  breathCircleInner: {
-    width: 80, height: 80,
-    borderRadius: '50%',
-    background: 'radial-gradient(circle, rgba(248,200,180,0.6) 0%, rgba(232,131,108,0.4) 100%)',
-    animation: 'breathe 4s ease-in-out infinite',
-    animationDelay: '0.5s',
-  },
-  breathText: {
-    fontSize: 20,
-    fontWeight: 300,
-    color: '#f5e6df',
-    letterSpacing: 2,
-    textAlign: 'center',
-    margin: 0,
-  },
-  breathBtn: {
-    background: 'rgba(255,255,255,0.12)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    borderRadius: 99,
-    color: '#f5e6df',
-    fontSize: 14,
-    padding: '10px 24px',
-    cursor: 'pointer',
-    letterSpacing: 0.5,
-    animation: 'fadeSlideIn 0.4s ease',
   },
   storyOverlay: {
     position: 'fixed',
