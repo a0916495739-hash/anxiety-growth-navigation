@@ -67,11 +67,10 @@ export default function BottomTabBar() {
       style={{
         position: 'fixed',
         bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
-        left: '50%',
-        /* translate3d for GPU compositing (iOS fix) + horizontal centering */
-        transform: 'translateX(-50%) translate3d(0,0,0)',
-        WebkitTransform: 'translateX(-50%) translate3d(0,0,0)',
-        width: 'min(340px, calc(100% - 32px))',
+        left: 16,
+        right: 16,
+        margin: '0 auto',
+        maxWidth: 400,
         height: 60,
         background: bg,
         backdropFilter: 'blur(28px)',
@@ -81,10 +80,14 @@ export default function BottomTabBar() {
         boxShadow: shadow,
         zIndex: 150,
         transition: 'background 0.35s ease, box-shadow 0.35s ease',
+        /* GPU compositing for iOS — keeps bar fixed during scroll */
+        WebkitTransform: 'translate3d(0,0,0)',
+        transform: 'translate3d(0,0,0)',
         willChange: 'transform',
-        display: 'flex',
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: '0 8px',
+        justifyContent: 'space-around',
+        padding: '0 12px',
       }}
     >
       {tabs.map(({ path, label, Icon }) => {
