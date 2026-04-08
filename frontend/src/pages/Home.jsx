@@ -61,7 +61,7 @@ export default function Home() {
       <nav style={{ ...s.nav, borderBottomColor: isDark ? '#3d3530' : '#e8e0d0' }}>
         <div style={s.logo}>
           <span style={s.logoMark}>🌿</span>
-          <span style={{ ...s.logoText, color: text_head }}>{t.appName}</span>
+          <span style={{ ...s.logoText, color: text_head, fontSize: lang === 'en' ? 14 : 17 }}>{t.appName}</span>
         </div>
         <div style={s.navActions}>
           {/* 桌面版導覽 */}
@@ -329,8 +329,8 @@ function HeatmapGrid({ data, t, isDark, text_head, text_sub, card_bg_d, card_bdr
 
   return (
     <section style={{ marginBottom: 28 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#7fb5a0', letterSpacing: 0.6, textTransform: 'uppercase', margin: 0 }}>{t.heatmapLabel}</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, flexWrap: 'wrap', gap: '2px 8px' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#7fb5a0', letterSpacing: 0.6, textTransform: 'uppercase', margin: 0, flexShrink: 0 }}>{t.heatmapLabel}</p>
         <p style={{ fontSize: 11, color: text_sub, margin: 0 }}>{t.heatmapSub}</p>
       </div>
       <div style={{ background: card_bg_d, border: `1px solid ${card_bdr}`, borderRadius: 16, padding: '16px 18px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
