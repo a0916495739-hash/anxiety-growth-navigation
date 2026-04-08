@@ -66,7 +66,7 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '52px 16px 12px',   // 52px 留給關閉按鈕
+        padding: '36px 12px 8px',
         overflow: 'hidden',          // 不需要捲動，靠縮放自適應
       }}>
         {/* 縮放容器：讓卡片永遠不超出可用高度 */}
@@ -111,46 +111,46 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
         </CardScaler>
       </div>
 
-      {/* ── 下方：按鈕區（flexShrink:0，永遠固定在底部） ── */}
+      {/* ── 下方：按鈕列（橫排，高度最小化） ── */}
       <div style={{
         flexShrink: 0,
-        padding: '12px 20px calc(12px + env(safe-area-inset-bottom, 0px))',
-        display: 'flex', flexDirection: 'column', gap: 10,
+        padding: `10px 16px calc(10px + env(safe-area-inset-bottom, 0px))`,
+        display: 'flex', flexDirection: 'row', gap: 10,
         borderTop: '1px solid rgba(255,255,255,0.08)',
         background: 'rgba(18,15,14,0.6)',
         backdropFilter: 'blur(4px)',
         WebkitBackdropFilter: 'blur(4px)',
       }}>
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          style={{
-            width: '100%', background: exporting ? '#5a9a87' : '#7fb5a0',
-            color: '#fff', border: 'none', borderRadius: 14, padding: '14px',
-            fontSize: 16, fontWeight: 700,
-            cursor: exporting ? 'not-allowed' : 'pointer',
-            boxShadow: '0 6px 24px rgba(127,181,160,0.4)',
-          }}
-        >
-          {exporting ? '生成中…' : '匯出為圖片 📥'}
-        </button>
-
         {onSave && (
           <button
             onClick={handleSave}
             disabled={saving}
             style={{
-              width: '100%', background: 'transparent',
+              flex: 1, background: 'transparent',
               border: '1.5px solid rgba(255,255,255,0.22)',
               color: 'rgba(255,255,255,0.7)',
-              borderRadius: 14, padding: '12px',
-              fontSize: 15, fontWeight: 500,
+              borderRadius: 12, padding: '11px 8px',
+              fontSize: 14, fontWeight: 500,
               cursor: saving ? 'not-allowed' : 'pointer',
             }}
           >
-            {saving ? '儲存中…' : '儲存成就 ✓'}
+            {saving ? '儲存中…' : '儲存 ✓'}
           </button>
         )}
+        <button
+          onClick={handleExport}
+          disabled={exporting}
+          style={{
+            flex: onSave ? 2 : 1,
+            background: exporting ? '#5a9a87' : '#7fb5a0',
+            color: '#fff', border: 'none', borderRadius: 12, padding: '11px 8px',
+            fontSize: 14, fontWeight: 700,
+            cursor: exporting ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 16px rgba(127,181,160,0.4)',
+          }}
+        >
+          {exporting ? '生成中…' : '匯出圖片 📥'}
+        </button>
       </div>
     </div>
   );
