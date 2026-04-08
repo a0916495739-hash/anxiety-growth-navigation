@@ -4,6 +4,7 @@ import { createAchievement, getAchievements, deleteAchievement } from '../api/ac
 import { IllustrationDone, IllustrationAchievement } from '../components/Illustrations';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
+import PolaroidExport from '../components/PolaroidExport';
 
 export function AchievementNew() {
   const [title, setTitle] = useState('');
@@ -11,6 +12,7 @@ export function AchievementNew() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const { lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
@@ -40,11 +42,30 @@ export function AchievementNew() {
 
   if (done) return (
     <div style={styles.page}>
+      {showExport && (
+        <PolaroidExport
+          achievementText={title}
+          standard={standard}
+          onClose={() => setShowExport(false)}
+        />
+      )}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <IllustrationDone width={140} />
       </div>
       <h2 style={{ ...styles.heading, textAlign: 'center', color: c.text }}>{t.wellDone}</h2>
       <p style={{ ...styles.sub, color: c.sub }}>{t.wellDoneDesc}</p>
+      <button
+        style={{
+          ...styles.btn,
+          background: 'transparent',
+          border: '1.5px solid #7fb5a0',
+          color: '#7fb5a0',
+          marginBottom: 10,
+        }}
+        onClick={() => setShowExport(true)}
+      >
+        儲存為拍立得 📸
+      </button>
       <button style={styles.btn} onClick={() => navigate('/achievements')}>{t.viewMyAchievements}</button>
       <button style={{ ...styles.ghost, color: c.sub }} onClick={() => navigate('/')}>{t.backHome}</button>
     </div>
@@ -146,6 +167,7 @@ export function AchievementList() {
 }
 
 function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleting }) {
+  const [showExport, setShowExport] = useState(false);
   const encourage = t.achievementEncourage[a.id % t.achievementEncourage.length];
   const tilt = idx % 2 === 0 ? '-1.2deg' : '1.4deg';
 
@@ -168,6 +190,13 @@ function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleti
           : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
       }}
     >
+      {showExport && (
+        <PolaroidExport
+          achievementText={a.title}
+          standard={a.my_standard}
+          onClose={() => setShowExport(false)}
+        />
+      )}
       {/* Photo area */}
       <div style={{ ...styles.polaroidPhoto, background: isDark ? 'rgba(255,255,255,0.04)' : '#faf7f4' }}>
         <span style={styles.polaroidEmoji}>✨</span>
@@ -183,6 +212,20 @@ function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleti
           <p style={{ ...styles.polaroidStandard, color: subColor }}>「{a.my_standard}」</p>
         )}
         <p style={{ ...styles.polaroidEncourage, color: '#7fb5a0' }}>{encourage}</p>
+        <button
+          data-small
+          onClick={() => setShowExport(true)}
+          style={{
+            marginTop: 8, width: '100%',
+            background: 'transparent',
+            border: `1px solid ${isDark ? 'rgba(127,181,160,0.3)' : '#b8d9cf'}`,
+            color: '#7fb5a0', borderRadius: 6,
+            padding: '4px 0', fontSize: 11,
+            cursor: 'pointer',
+          }}
+        >
+          📸 儲存圖片
+        </button>
       </div>
 
       {/* Delete */}

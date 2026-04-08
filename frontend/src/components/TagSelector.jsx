@@ -24,9 +24,9 @@ export default function TagSelector({ selected, onChange, presets = DEFAULT_TAGS
   }
 
   const tagStyle = {
-    background:   isDark ? 'rgba(255,255,255,0.07)' : '#f3f4f6',
-    border:       `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#d1d5db'}`,
-    color:        isDark ? '#a8a29e' : '#374151',
+    background:   isDark ? 'rgba(255,255,255,0.11)' : '#f3f4f6',
+    border:       `1px solid ${isDark ? 'rgba(255,255,255,0.22)' : '#d1d5db'}`,
+    color:        isDark ? '#d6d3d1' : '#374151',
     borderRadius: 20,
     padding:      '4px 14px',
     cursor:       'pointer',
