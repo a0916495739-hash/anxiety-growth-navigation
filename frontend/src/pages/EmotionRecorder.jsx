@@ -67,7 +67,10 @@ function EmotionFeedback({ emotion }) {
 
 function BackButton({ onClick, label }) {
   return (
-    <button style={styles.back} onClick={onClick}>{label}</button>
+    <button
+      style={{ background: 'none', border: 'none', color: '#7fb5a0', cursor: 'pointer', fontSize: 14, fontWeight: 500, padding: '0 0 16px', display: 'block' }}
+      onClick={onClick}
+    >{label}</button>
   );
 }
 
