@@ -21,6 +21,8 @@ router.post('/', auth, async (req, res) => {
   if (!title?.trim()) {
     return res.status(422).json({ error: 'title is required' });
   }
+  if (title.trim().length > 200) return res.status(422).json({ error: 'title 最多 200 字' });
+  if (my_standard?.length > 500) return res.status(422).json({ error: 'my_standard 最多 500 字' });
 
   try {
     const userId = await resolveUserId(req, res);

@@ -3,7 +3,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 const pool = require('../db/pool');
+
+// 防暴力破解：每個 IP 每 15 分鐘最多 10 次
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: '嘗試次數過多，請 15 分鐘後再試' },
+});
 
 const isProd = process.env.NODE_ENV === 'production';
 const cookieOptions = {
@@ -44,7 +54,7 @@ router.post('/guest', async (req, res) => {
 });
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   const { email, password } = req.body;
   const guestToken = req.headers['x-guest-token'];
 
@@ -102,7 +112,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -200,7 +210,7 @@ router.put('/password', async (req, res) => {
 });
 
 // POST /api/auth/forgot-password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', authLimiter, async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(422).json({ error: 'Email 為必填' });
 

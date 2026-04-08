@@ -20,6 +20,8 @@ router.post('/', auth, async (req, res) => {
 
   if (!should_content?.trim()) return res.status(422).json({ error: 'should_content is required' });
   if (!want_content?.trim()) return res.status(422).json({ error: 'want_content is required' });
+  if (should_content.length > 500) return res.status(422).json({ error: 'should_content 最多 500 字' });
+  if (want_content.length > 500) return res.status(422).json({ error: 'want_content 最多 500 字' });
   if (!['family', 'peers', 'society', 'self'].includes(source)) {
     return res.status(422).json({ error: 'source must be one of: family, peers, society, self' });
   }

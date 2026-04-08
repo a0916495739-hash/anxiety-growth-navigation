@@ -27,6 +27,10 @@ router.post('/', auth, async (req, res) => {
   if (mode === 'free' && !raw_emotion?.trim()) {
     return res.status(422).json({ error: 'raw_emotion is required for free mode' });
   }
+  if (trigger_event?.length > 500) return res.status(422).json({ error: 'trigger_event 最多 500 字' });
+  if (protection?.length > 500) return res.status(422).json({ error: 'protection 最多 500 字' });
+  if (raw_emotion?.length > 1000) return res.status(422).json({ error: 'raw_emotion 最多 1000 字' });
+  if (reflection?.length > 1000) return res.status(422).json({ error: 'reflection 最多 1000 字' });
 
   try {
     const userId = await resolveUserId(req, res);
