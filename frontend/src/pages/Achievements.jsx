@@ -86,7 +86,11 @@ export function AchievementNew() {
     if (saving) return;
     setSaving(true);
     try {
-      await createAchievement({ title, my_standard: standard || undefined });
+      let image_data = null;
+      if (imageUrl && fileInputRef.current?.files?.[0]) {
+        image_data = await toBase64(fileInputRef.current.files[0]);
+      }
+      await createAchievement({ title, my_standard: standard || undefined, image_data });
       setDone(true);
     } finally {
       setSaving(false);
@@ -416,16 +420,23 @@ function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleti
         <PolaroidModal
           achievementText={a.title}
           standard={a.my_standard}
+          imageUrl={a.image_data || null}
           onClose={() => setShowModal(false)}
         />
       )}
 
       {/* 相片區 */}
-      <div style={{ ...styles.polaroidPhoto, background: isDark ? 'rgba(255,255,255,0.04)' : '#faf7f4' }}>
-        <span style={styles.polaroidEmoji}>✨</span>
-        <p style={{ ...styles.polaroidDate, color: subColor }}>
-          {new Date(a.created_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
-        </p>
+      <div style={{ ...styles.polaroidPhoto, background: isDark ? 'rgba(255,255,255,0.04)' : '#faf7f4', overflow: 'hidden', padding: 0 }}>
+        {a.image_data ? (
+          <img src={a.image_data} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <>
+            <span style={styles.polaroidEmoji}>✨</span>
+            <p style={{ ...styles.polaroidDate, color: subColor }}>
+              {new Date(a.created_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
+            </p>
+          </>
+        )}
       </div>
 
       {/* 文字區 */}
@@ -462,6 +473,18 @@ function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleti
       </button>
     </div>
   );
+}
+
+// ─────────────────────────────────────────────
+// 工具函式
+// ─────────────────────────────────────────────
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);   // data:image/...;base64,...
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // ─────────────────────────────────────────────

@@ -31,7 +31,7 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
 }));
-app.use(express.json({ limit: '50kb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);

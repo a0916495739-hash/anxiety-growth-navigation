@@ -16,7 +16,7 @@ async function resolveUserId(req, res) {
 
 // POST /api/achievements
 router.post('/', auth, async (req, res) => {
-  const { title, my_standard } = req.body;
+  const { title, my_standard, image_data } = req.body;
 
   if (!title?.trim()) {
     return res.status(422).json({ error: 'title is required' });
@@ -29,8 +29,8 @@ router.post('/', auth, async (req, res) => {
     if (!userId) return;
 
     const result = await pool.query(
-      'INSERT INTO achievements (user_id, title, my_standard) VALUES ($1, $2, $3) RETURNING *',
-      [userId, title, my_standard || null]
+      'INSERT INTO achievements (user_id, title, my_standard, image_data) VALUES ($1, $2, $3, $4) RETURNING *',
+      [userId, title, my_standard || null, image_data || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
