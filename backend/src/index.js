@@ -23,6 +23,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : [
       'http://localhost:5173',
+      'https://eloquent-reflection-production-da94.up.railway.app',
       process.env.FRONTEND_URL,
     ].filter(Boolean);
 
