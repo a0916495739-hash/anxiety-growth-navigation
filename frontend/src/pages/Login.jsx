@@ -24,9 +24,41 @@ export default function Login() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { onLoginSuccess, lang } = useApp();
+  const { onLoginSuccess, lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
+
+  const d = isDark ? {
+    bg:       'linear-gradient(135deg,#1c1917 0%,#231f1d 50%,#1c1917 100%)',
+    card:     'rgba(28,24,22,0.92)',
+    cardBdr:  '1px solid rgba(255,255,255,0.08)',
+    cardShd:  '0 24px 48px rgba(0,0,0,0.45)',
+    title:    '#f5f5f4',
+    sub:      '#a8a29e',
+    label:    '#d6d3d1',
+    inputBg:  'rgba(28,25,23,0.8)',
+    inputBdr: '1.5px solid rgba(255,255,255,0.1)',
+    inputC:   '#e7e5e4',
+    errBg:    'rgba(127,29,29,0.3)',
+    errBdr:   '1px solid rgba(153,27,27,0.5)',
+    errC:     '#f87171',
+    footer:   '#57534e',
+  } : {
+    bg:       'linear-gradient(135deg,#f5f3f0 0%,#ede8e3 50%,#f0ebe8 100%)',
+    card:     'rgba(255,252,250,0.65)',
+    cardBdr:  '1px solid rgba(255,255,255,0.45)',
+    cardShd:  '0 24px 48px rgba(0,0,0,0.07),0 4px 12px rgba(0,0,0,0.04)',
+    title:    '#2d3748',
+    sub:      '#6b7280',
+    label:    '#374151',
+    inputBg:  '#faf8f3',
+    inputBdr: '1.5px solid #e8e0d0',
+    inputC:   '#2d3748',
+    errBg:    '#fef2f2',
+    errBdr:   '1px solid #fecaca',
+    errC:     '#dc2626',
+    footer:   '#6b7280',
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -44,19 +76,19 @@ export default function Login() {
   }
 
   return (
-    <div style={s.bg}>
-      <div style={s.card}>
+    <div style={{ ...s.bg, background: d.bg }}>
+      <div style={{ ...s.card, background: d.card, border: d.cardBdr, boxShadow: d.cardShd }}>
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={100} /></div>
-          <h1 style={s.title}>{t.welcomeBack}</h1>
-          <p style={s.sub}>{t.loginSub}</p>
+          <h1 style={{ ...s.title, color: d.title }}>{t.welcomeBack}</h1>
+          <p style={{ ...s.sub, color: d.sub }}>{t.loginSub}</p>
         </div>
 
         <form onSubmit={handleSubmit} style={s.form}>
           <div style={s.field}>
-            <label style={s.label}>Email</label>
+            <label style={{ ...s.label, color: d.label }}>Email</label>
             <input
-              style={s.input}
+              style={{ ...s.input, background: d.inputBg, border: d.inputBdr, color: d.inputC }}
               type="email"
               placeholder="your@email.com"
               value={email}
@@ -67,10 +99,10 @@ export default function Login() {
           </div>
 
           <div style={s.field}>
-            <label style={s.label}>{t.password}</label>
+            <label style={{ ...s.label, color: d.label }}>{t.password}</label>
             <div style={s.pwWrap}>
               <input
-                style={s.pwInput}
+                style={{ ...s.pwInput, background: d.inputBg, border: d.inputBdr, color: d.inputC }}
                 type={showPw ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
@@ -85,7 +117,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <div style={s.errorBox}>
+            <div style={{ ...s.errorBox, background: d.errBg, border: d.errBdr, color: d.errC }}>
               <span>⚠️</span> {error}
             </div>
           )}
@@ -95,9 +127,9 @@ export default function Login() {
           </button>
         </form>
 
-        <p style={s.footer}><Link to="/forgot-password">{t.forgotPassword}</Link></p>
-        <p style={s.footer}>{t.noAccount} <Link to="/register">{t.createAccount}</Link></p>
-        <p style={s.footer}><Link to="/">{t.continueGuest}</Link></p>
+        <p style={{ ...s.footer, color: d.footer }}><Link to="/forgot-password">{t.forgotPassword}</Link></p>
+        <p style={{ ...s.footer, color: d.footer }}>{t.noAccount} <Link to="/register">{t.createAccount}</Link></p>
+        <p style={{ ...s.footer, color: d.footer }}><Link to="/">{t.continueGuest}</Link></p>
       </div>
     </div>
   );

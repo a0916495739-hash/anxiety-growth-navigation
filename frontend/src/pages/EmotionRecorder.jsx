@@ -72,7 +72,8 @@ function BackButton({ onClick, label }) {
 }
 
 // Mode selection screen
-function ModeSelect({ onSelect, onBack, t }) {
+function ModeSelect({ onSelect, onBack, t, isDark }) {
+  const styles = getStyles(isDark);
   return (
     <div style={styles.page}>
       <BackButton onClick={onBack} label={t.back} />
@@ -95,7 +96,8 @@ function ModeSelect({ onSelect, onBack, t }) {
 }
 
 // Guided mode: 3 steps
-function GuidedForm({ onSubmit, onBack, t }) {
+function GuidedForm({ onSubmit, onBack, t, isDark }) {
+  const styles = getStyles(isDark);
   const [step, setStep] = useState(1);
   const [intensity, setIntensity] = useState(null);
   const [trigger, setTrigger] = useState('');
@@ -178,7 +180,8 @@ function GuidedForm({ onSubmit, onBack, t }) {
 }
 
 // Free writing mode
-function FreeForm({ onSubmit, onBack, t }) {
+function FreeForm({ onSubmit, onBack, t, isDark }) {
+  const styles = getStyles(isDark);
   const [text, setText] = useState('');
   const [tags, setTags] = useState([]);
   const [error, setError] = useState('');
@@ -254,8 +257,9 @@ function Confetti() {
 }
 
 // Completion screen
-function CompletionScreen({ todayCount, t }) {
+function CompletionScreen({ todayCount, t, isDark }) {
   const navigate = useNavigate();
+  const styles = getStyles(isDark);
   const [showAchievementPrompt, setShowAchievementPrompt] = useState(todayCount >= 3);
   const [showConflictPrompt, setShowConflictPrompt] = useState(true);
   const [message] = useState(
@@ -298,7 +302,7 @@ export default function EmotionRecorder() {
   const [mode, setMode] = useState(null);
   const [done, setDone] = useState(false);
   const [exiting, setExiting] = useState(false);
-  const { todayCount, incrementTodayCount, lang } = useApp();
+  const { todayCount, incrementTodayCount, lang, isDark } = useApp();
   const t = getT(lang);
   const [finalCount, setFinalCount] = useState(todayCount);
   const navigate = useNavigate();
@@ -312,12 +316,11 @@ export default function EmotionRecorder() {
     setDone(true);
   }
 
-  if (done) return <CompletionScreen todayCount={finalCount} t={t} />;
-
   const exitStyle = exiting ? { animation: 'formExit 0.32s ease forwards', pointerEvents: 'none' } : {};
-  if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} t={t} /></div>;
-  if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} /></div>;
-  return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} /></div>;
+  if (done) return <CompletionScreen todayCount={finalCount} t={t} isDark={isDark} />;
+  if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} t={t} isDark={isDark} /></div>;
+  if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} isDark={isDark} /></div>;
+  return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} isDark={isDark} /></div>;
 }
 
 // History page
@@ -325,10 +328,11 @@ export function EmotionHistory() {
   const [records, setRecords] = useState(null);
   const [trend, setTrend] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
-  const { lang } = useApp();
+  const { lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
   const locale = lang === 'en' ? 'en-US' : 'zh-TW';
+  const styles = getStyles(isDark);
 
   useEffect(() => {
     import('../api/emotions').then(({ getEmotions }) =>
@@ -415,46 +419,49 @@ export function EmotionHistory() {
   );
 }
 
-const styles = {
-  page: { maxWidth: 560, margin: '0 auto', padding: '20px 16px 60px' },
-  back: { background: 'none', border: 'none', color: '#7fb5a0', cursor: 'pointer', fontSize: 14, fontWeight: 500, padding: '0 0 16px', display: 'block' },
-  heading: { fontSize: 22, marginBottom: 8 },
-  sub: { color: '#6b7280', marginBottom: 24 },
-  modeGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  modeCard: { background: '#f9fafb', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '20px 16px', cursor: 'pointer', textAlign: 'center' },
-  modeEmoji: { fontSize: 32, display: 'block', marginBottom: 8 },
-  stepIndicator: { color: '#9ca3af', fontSize: 13, marginBottom: 16, background: '#f3f4f6', display: 'inline-block', padding: '3px 10px', borderRadius: 99 },
-  question: { fontSize: 17, fontWeight: 600, marginBottom: 16, color: '#2d3748' },
-  hint: { color: '#6b7280', fontSize: 14, marginTop: 8, minHeight: 20 },
-  intensityRow: { display: 'flex', gap: 10, flexWrap: 'wrap' },
-  intensityBtn: { width: 48, height: 48, borderRadius: '50%', border: '2px solid #e5e7eb', background: '#f9fafb', fontSize: 17, cursor: 'pointer' },
-  intensityActive: { width: 48, height: 48, borderRadius: '50%', border: '2px solid #7fb5a0', background: '#7fb5a0', color: '#fff', fontSize: 17, cursor: 'pointer' },
-  textarea: { width: '100%', border: '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 12px', fontSize: 15, resize: 'vertical', boxSizing: 'border-box', background: '#faf8f3', lineHeight: 1.6 },
-  tagLabel: { fontWeight: 500, marginBottom: 8, marginTop: 16, fontSize: 14, color: '#374151' },
-  nextBtn: { marginTop: 16, background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 28px', cursor: 'pointer', fontSize: 15, fontWeight: 500 },
-  submitBtn: { marginTop: 20, width: '100%', background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', cursor: 'pointer', fontSize: 15, fontWeight: 600 },
-  error: { color: '#dc2626', fontSize: 14, background: '#fef2f2', padding: '8px 12px', borderRadius: 8, marginTop: 4 },
-  successIcon: { fontSize: 52, textAlign: 'center', color: '#7fb5a0', marginBottom: 4 },
-  conflictHint: { display: 'flex', gap: 10, marginTop: 16, alignItems: 'center', flexWrap: 'wrap' },
-  secondaryBtn: { background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 14 },
-  ghostBtn: { background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: 14 },
-  homeBtn: { marginTop: 24, display: 'block', width: '100%', background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', cursor: 'pointer', fontSize: 15, fontWeight: 600 },
-  loading: { textAlign: 'center', paddingTop: 60, color: '#9ca3af' },
-  spinner: { width: 32, height: 32, border: '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', margin: '0 auto 12px', animation: 'spin 0.8s linear infinite' },
-  empty: { textAlign: 'center', paddingTop: 60, paddingBottom: 40 },
-  emptyEmoji: { fontSize: 48, margin: '0 0 12px' },
-  emptyTitle: { fontWeight: 600, fontSize: 16, color: '#374151', marginBottom: 6 },
-  emptyDesc: { color: '#9ca3af', fontSize: 14, marginBottom: 20 },
-  btn: { background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', cursor: 'pointer', fontSize: 14, fontWeight: 500 },
-  trendCard: { background: '#fff', border: '1.5px solid #e8f4f0', borderRadius: 14, padding: '16px', marginBottom: 20 },
-  trendTitle: { fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 12 },
-  record: { background: '#fff', border: '1.5px solid #e8f4f0', borderRadius: 12, padding: '14px 16px', marginBottom: 12 },
-  recordMeta: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
-  date: { color: '#9ca3af', fontSize: 12 },
-  badge: { background: '#e8f4f0', color: '#4a9580', borderRadius: 99, padding: '2px 10px', fontSize: 12 },
-  intensity: { color: '#6b7280', fontSize: 12, background: '#f3f4f6', borderRadius: 99, padding: '2px 8px' },
-  recordText: { color: '#374151', fontSize: 14, lineHeight: 1.6 },
-  tagRow: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-  tag: { background: '#fef9c3', color: '#78600a', borderRadius: 99, padding: '2px 10px', fontSize: 12 },
-  deleteBtn: { marginLeft: 'auto', background: 'none', border: '1px solid #fca5a5', color: '#ef4444', borderRadius: 6, padding: '2px 10px', fontSize: 12, cursor: 'pointer' },
-};
+function getStyles(isDark) {
+  const D = isDark;
+  return {
+    page:          { maxWidth: 560, margin: '0 auto', padding: '20px 16px 60px' },
+    back:          { background: 'none', border: 'none', color: '#7fb5a0', cursor: 'pointer', fontSize: 14, fontWeight: 500, padding: '0 0 16px', display: 'block' },
+    heading:       { fontSize: 22, marginBottom: 8, color: D ? '#f5f5f4' : '#2d3748' },
+    sub:           { color: D ? '#a8a29e' : '#6b7280', marginBottom: 24 },
+    modeGrid:      { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
+    modeCard:      { background: D ? 'rgba(41,37,36,0.85)' : '#f9fafb', border: D ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid #e5e7eb', borderRadius: 14, padding: '20px 16px', cursor: 'pointer', textAlign: 'center', color: D ? '#e7e5e4' : 'inherit' },
+    modeEmoji:     { fontSize: 32, display: 'block', marginBottom: 8 },
+    stepIndicator: { color: D ? '#a8a29e' : '#9ca3af', fontSize: 13, marginBottom: 16, background: D ? 'rgba(255,255,255,0.07)' : '#f3f4f6', display: 'inline-block', padding: '3px 10px', borderRadius: 99 },
+    question:      { fontSize: 17, fontWeight: 600, marginBottom: 16, color: D ? '#f5f5f4' : '#2d3748' },
+    hint:          { color: D ? '#a8a29e' : '#6b7280', fontSize: 14, marginTop: 8, minHeight: 20 },
+    intensityRow:  { display: 'flex', gap: 10, flexWrap: 'wrap' },
+    intensityBtn:  { width: 48, height: 48, borderRadius: '50%', border: D ? '2px solid rgba(255,255,255,0.15)' : '2px solid #e5e7eb', background: D ? 'rgba(41,37,36,0.8)' : '#f9fafb', color: D ? '#d6d3d1' : 'inherit', fontSize: 17, cursor: 'pointer' },
+    intensityActive: { width: 48, height: 48, borderRadius: '50%', border: '2px solid #7fb5a0', background: '#7fb5a0', color: '#fff', fontSize: 17, cursor: 'pointer' },
+    textarea:      { width: '100%', border: D ? '1.5px solid rgba(255,255,255,0.1)' : '1.5px solid #e5e7eb', borderRadius: 10, padding: '10px 12px', fontSize: 15, resize: 'vertical', boxSizing: 'border-box', background: D ? 'rgba(28,25,23,0.8)' : '#faf8f3', color: D ? '#e7e5e4' : '#2d3748', lineHeight: 1.6 },
+    tagLabel:      { fontWeight: 500, marginBottom: 8, marginTop: 16, fontSize: 14, color: D ? '#d6d3d1' : '#374151' },
+    nextBtn:       { marginTop: 16, background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 28px', cursor: 'pointer', fontSize: 15, fontWeight: 500 },
+    submitBtn:     { marginTop: 20, width: '100%', background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', cursor: 'pointer', fontSize: 15, fontWeight: 600 },
+    error:         { color: D ? '#f87171' : '#dc2626', fontSize: 14, background: D ? 'rgba(127,29,29,0.3)' : '#fef2f2', padding: '8px 12px', borderRadius: 8, marginTop: 4 },
+    successIcon:   { fontSize: 52, textAlign: 'center', color: '#7fb5a0', marginBottom: 4 },
+    conflictHint:  { display: 'flex', gap: 10, marginTop: 16, alignItems: 'center', flexWrap: 'wrap' },
+    secondaryBtn:  { background: D ? 'rgba(255,255,255,0.07)' : '#f3f4f6', border: D ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e7eb', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 14, color: D ? '#d6d3d1' : 'inherit' },
+    ghostBtn:      { background: 'transparent', border: 'none', color: D ? '#57534e' : '#9ca3af', cursor: 'pointer', fontSize: 14 },
+    homeBtn:       { marginTop: 24, display: 'block', width: '100%', background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '13px', cursor: 'pointer', fontSize: 15, fontWeight: 600 },
+    loading:       { textAlign: 'center', paddingTop: 60, color: D ? '#78716c' : '#9ca3af' },
+    spinner:       { width: 32, height: 32, border: D ? '3px solid rgba(255,255,255,0.1)' : '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', margin: '0 auto 12px', animation: 'spin 0.8s linear infinite' },
+    empty:         { textAlign: 'center', paddingTop: 60, paddingBottom: 40 },
+    emptyEmoji:    { fontSize: 48, margin: '0 0 12px' },
+    emptyTitle:    { fontWeight: 600, fontSize: 16, color: D ? '#f5f5f4' : '#374151', marginBottom: 6 },
+    emptyDesc:     { color: D ? '#78716c' : '#9ca3af', fontSize: 14, marginBottom: 20 },
+    btn:           { background: '#7fb5a0', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', cursor: 'pointer', fontSize: 14, fontWeight: 500 },
+    trendCard:     { background: D ? 'rgba(41,37,36,0.85)' : '#fff', border: D ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid #e8f4f0', borderRadius: 14, padding: '16px', marginBottom: 20 },
+    trendTitle:    { fontSize: 13, fontWeight: 600, color: D ? '#a8a29e' : '#6b7280', marginBottom: 12 },
+    record:        { background: D ? 'rgba(41,37,36,0.85)' : '#fff', border: D ? '1.5px solid rgba(255,255,255,0.08)' : '1.5px solid #e8f4f0', borderRadius: 12, padding: '14px 16px', marginBottom: 12 },
+    recordMeta:    { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 },
+    date:          { color: D ? '#78716c' : '#9ca3af', fontSize: 12 },
+    badge:         { background: D ? 'rgba(127,181,160,0.2)' : '#e8f4f0', color: D ? '#7fb5a0' : '#4a9580', borderRadius: 99, padding: '2px 10px', fontSize: 12 },
+    intensity:     { color: D ? '#a8a29e' : '#6b7280', fontSize: 12, background: D ? 'rgba(255,255,255,0.07)' : '#f3f4f6', borderRadius: 99, padding: '2px 8px' },
+    recordText:    { color: D ? '#d6d3d1' : '#374151', fontSize: 14, lineHeight: 1.6 },
+    tagRow:        { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+    tag:           { background: D ? 'rgba(251,191,36,0.15)' : '#fef9c3', color: D ? '#fbbf24' : '#78600a', borderRadius: 99, padding: '2px 10px', fontSize: 12 },
+    deleteBtn:     { marginLeft: 'auto', background: 'none', border: D ? '1px solid rgba(239,68,68,0.3)' : '1px solid #fca5a5', color: '#ef4444', borderRadius: 6, padding: '2px 10px', fontSize: 12, cursor: 'pointer' },
+  };
+}
