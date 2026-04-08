@@ -1,48 +1,24 @@
 import { useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 
-/**
- * PolaroidModal
- *
- * Props:
- *   achievementText  {string}    成就標題（必填）
- *   standard         {string}    我的標準（選填）
- *   imageUrl         {string}    使用者上傳圖片的 Object URL 或 Base64（選填）
- *   onClose          {fn}        關閉 Modal
- *   onSave           {fn|null}   若傳入，顯示「儲存成就」按鈕
- */
 export default function PolaroidModal({ achievementText, standard, imageUrl, onClose, onSave }) {
-  const cardRef = useRef(null);
+  const cardRef  = useRef(null);
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving]       = useState(false);
 
-  const today = new Date();
-  const dateStr = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0'),
-  ].join('.');
-
-  // ── 根據螢幕高度計算縮放比 ──────────────────────────────────────────
-  // 卡片高度固定 568，保留 40px padding + 120px 按鈕區
-  const CARD_H  = 568;
-  const CARD_W  = 320;
-  const RESERVE = 40 + 120; // 上下 padding + 按鈕高度
-  const scale   = Math.min(1, (window.innerHeight - RESERVE) / CARD_H);
-  // transform: scale 不改變 layout 尺寸，需用負 margin 補回多餘空白
-  const excessH = CARD_H * (1 - scale); // 縮小後節省的 px
+  const today   = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
 
   async function handleExport() {
     if (!cardRef.current || exporting) return;
     setExporting(true);
     try {
-      // toPng 依 DOM offsetWidth/offsetHeight 截圖，不受 transform 影響
       const dataUrl = await toPng(cardRef.current, { pixelRatio: 3 });
       const a = document.createElement('a');
-      a.href = dataUrl;
+      a.href     = dataUrl;
       a.download = `成就-${dateStr}.png`;
       a.click();
-      onClose(); // 下載後自動關閉
+      onClose();
     } catch (err) {
       console.error('圖片生成失敗', err);
     } finally {
@@ -57,145 +33,103 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
   }
 
   return (
-    /* ── 全螢幕遮罩
-       justifyContent: flex-start + paddingTop 解決 center + overflow 捲動 bug ── */
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 1200,
-        background: 'rgba(18,15,14,0.9)',
+        background: 'rgba(18,15,14,0.92)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',   // ← 關鍵：讓內容從頂部開始排，才能正常捲動
-        paddingTop: 20, paddingBottom: 24,
-        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',   // 垂直分兩區：上方卡片（可捲）+ 下方按鈕（固定）
       }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* ── 關閉按鈕（fixed，永遠在右上角） ── */}
+      {/* ── 關閉按鈕 ── */}
       <button
         onClick={onClose}
         aria-label="關閉"
         style={{
-          position: 'fixed', top: 16, right: 16,
-          width: 36, height: 36, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.12)',
+          position: 'absolute', top: 16, right: 16,
+          width: 34, height: 34, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.1)',
           border: '1px solid rgba(255,255,255,0.18)',
-          color: 'rgba(255,255,255,0.7)',
-          fontSize: 20, lineHeight: 1,
+          color: 'rgba(255,255,255,0.6)',
+          fontSize: 18, lineHeight: 1,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', zIndex: 1201,
+          cursor: 'pointer', zIndex: 1,
         }}
-      >
-        ×
-      </button>
+      >×</button>
 
-      {/* ── 縮放包裝層（視覺縮放，不影響 cardRef DOM 尺寸） ── */}
+      {/* ── 上方：卡片預覽區（flex:1 佔滿剩餘空間，內容置中） ── */}
       <div style={{
-        transform: `scale(${scale})`,
-        transformOrigin: 'top center',
-        marginBottom: -excessH,   // 補回因縮放而多出的 layout 空白
-        flexShrink: 0,
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '52px 16px 12px',   // 52px 留給關閉按鈕
+        overflow: 'hidden',          // 不需要捲動，靠縮放自適應
       }}>
-        {/* ── 截圖目標 9:16 (320 × 568)，ref 只綁這裡 ── */}
-        <div
-          ref={cardRef}
-          style={{
-            width: CARD_W, height: CARD_H,
-            borderRadius: 20,
-            background: 'linear-gradient(145deg, #bdd9cf 0%, #ddeee8 40%, #f0ebe4 100%)',
-            position: 'relative', overflow: 'hidden',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          {/* 光暈 1 */}
-          <div style={{
-            position: 'absolute', top: -60, right: -60,
-            width: 240, height: 240, borderRadius: '50%',
-            background: 'rgba(127,181,160,0.38)',
-            filter: 'blur(70px)', pointerEvents: 'none',
-          }} />
-          {/* 光暈 2 */}
-          <div style={{
-            position: 'absolute', bottom: 50, left: -60,
-            width: 200, height: 200, borderRadius: '50%',
-            background: 'rgba(251,191,36,0.22)',
-            filter: 'blur(60px)', pointerEvents: 'none',
-          }} />
-
-          {/* 拍立得本體 */}
-          <div style={{
-            background: '#fff', borderRadius: 3,
-            padding: '14px 14px 36px', width: 232,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.24)',
-            transform: 'rotate(-2deg)',
-            position: 'relative', zIndex: 1,
-          }}>
-            {/* 1:1 相片區 */}
-            <div style={{
-              width: '100%', aspectRatio: '1 / 1',
-              borderRadius: 2, overflow: 'hidden', marginBottom: 14,
-              background: 'linear-gradient(135deg, #c8e6dc 0%, #f0e6d3 100%)',
+        {/* 縮放容器：讓卡片永遠不超出可用高度 */}
+        <CardScaler>
+          {/* ── 截圖目標 9:16 (320 × 568)，ref 只綁這裡 ── */}
+          <div
+            ref={cardRef}
+            style={{
+              width: 320, height: 568,
+              borderRadius: 20,
+              background: 'linear-gradient(145deg, #bdd9cf 0%, #ddeee8 40%, #f0ebe4 100%)',
+              position: 'relative', overflow: 'hidden',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {imageUrl ? (
-                <img src={imageUrl} alt="成就圖片"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              ) : (
-                <span style={{ fontSize: 54, userSelect: 'none' }}>✨</span>
-              )}
+            }}
+          >
+            {/* 光暈 */}
+            <div style={{ position:'absolute', top:-60, right:-60, width:240, height:240, borderRadius:'50%', background:'rgba(127,181,160,0.38)', filter:'blur(70px)', pointerEvents:'none' }} />
+            <div style={{ position:'absolute', bottom:50, left:-60, width:200, height:200, borderRadius:'50%', background:'rgba(251,191,36,0.22)', filter:'blur(60px)', pointerEvents:'none' }} />
+
+            {/* 拍立得本體 */}
+            <div style={{ background:'#fff', borderRadius:3, padding:'14px 14px 36px', width:232, boxShadow:'0 20px 60px rgba(0,0,0,0.24)', transform:'rotate(-2deg)', position:'relative', zIndex:1 }}>
+              {/* 1:1 相片區 */}
+              <div style={{ width:'100%', aspectRatio:'1/1', borderRadius:2, overflow:'hidden', marginBottom:14, background:'linear-gradient(135deg,#c8e6dc,#f0e6d3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                {imageUrl
+                  ? <img src={imageUrl} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                  : <span style={{ fontSize:54, userSelect:'none' }}>✨</span>
+                }
+              </div>
+              {/* 文字 */}
+              <div style={{ padding:'0 2px' }}>
+                <p style={{ fontSize:13, fontWeight:700, color:'#2d3748', lineHeight:1.6, margin:'0 0 6px', wordBreak:'break-all' }}>{achievementText}</p>
+                {standard && <p style={{ fontSize:11, color:'#9ca3af', fontStyle:'italic', lineHeight:1.45, margin:'0 0 8px' }}>「{standard}」</p>}
+                <p style={{ fontSize:11, color:'#b5b0a8', margin:0, letterSpacing:1.2 }}>{dateStr}</p>
+              </div>
             </div>
 
-            {/* 文字區 */}
-            <div style={{ padding: '0 2px' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#2d3748', lineHeight: 1.6, margin: '0 0 6px', wordBreak: 'break-all' }}>
-                {achievementText}
-              </p>
-              {standard && (
-                <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 8px' }}>
-                  「{standard}」
-                </p>
-              )}
-              <p style={{ fontSize: 11, color: '#b5b0a8', margin: 0, letterSpacing: 1.2 }}>
-                {dateStr}
-              </p>
-            </div>
+            {/* 浮水印 */}
+            <p style={{ position:'absolute', bottom:14, left:0, right:0, textAlign:'center', fontSize:10, letterSpacing:2.5, color:'rgba(127,181,160,0.55)', margin:0, userSelect:'none' }}>
+              微光成長導航
+            </p>
           </div>
-
-          {/* 浮水印 */}
-          <p style={{
-            position: 'absolute', bottom: 14,
-            left: 0, right: 0, textAlign: 'center',
-            fontSize: 10, letterSpacing: 2.5,
-            color: 'rgba(127,181,160,0.55)',
-            margin: 0, userSelect: 'none',
-          }}>
-            微光成長導航
-          </p>
-        </div>
+        </CardScaler>
       </div>
 
-      {/* ── 操作按鈕（在縮放層外，永遠緊貼卡片下方） ── */}
+      {/* ── 下方：按鈕區（flexShrink:0，永遠固定在底部） ── */}
       <div style={{
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 10,
-        marginTop: 20, width: '100%', maxWidth: 320, padding: '0 16px',
         flexShrink: 0,
+        padding: '12px 20px calc(12px + env(safe-area-inset-bottom, 0px))',
+        display: 'flex', flexDirection: 'column', gap: 10,
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgba(18,15,14,0.6)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
       }}>
         <button
           onClick={handleExport}
           disabled={exporting}
           style={{
-            width: '100%',
-            background: exporting ? '#5a9a87' : '#7fb5a0',
-            color: '#fff', border: 'none',
-            borderRadius: 14, padding: '13px',
-            fontSize: 15, fontWeight: 600,
+            width: '100%', background: exporting ? '#5a9a87' : '#7fb5a0',
+            color: '#fff', border: 'none', borderRadius: 14, padding: '14px',
+            fontSize: 16, fontWeight: 700,
             cursor: exporting ? 'not-allowed' : 'pointer',
             boxShadow: '0 6px 24px rgba(127,181,160,0.4)',
-            transition: 'background 0.2s',
           }}
         >
           {exporting ? '生成中…' : '匯出為圖片 📥'}
@@ -206,10 +140,9 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
             onClick={handleSave}
             disabled={saving}
             style={{
-              width: '100%',
-              background: 'transparent',
-              border: '1.5px solid rgba(255,255,255,0.25)',
-              color: 'rgba(255,255,255,0.75)',
+              width: '100%', background: 'transparent',
+              border: '1.5px solid rgba(255,255,255,0.22)',
+              color: 'rgba(255,255,255,0.7)',
               borderRadius: 14, padding: '12px',
               fontSize: 15, fontWeight: 500,
               cursor: saving ? 'not-allowed' : 'pointer',
@@ -218,17 +151,41 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
             {saving ? '儲存中…' : '儲存成就 ✓'}
           </button>
         )}
+      </div>
+    </div>
+  );
+}
 
-        <button
-          onClick={onClose}
-          style={{
-            background: 'transparent', border: 'none',
-            color: 'rgba(255,255,255,0.35)',
-            fontSize: 13, cursor: 'pointer', padding: '4px 0',
-          }}
-        >
-          關閉
-        </button>
+// ── 自動縮放卡片以適應可用空間 ──────────────────────────────
+// 用 ResizeObserver 量測父容器實際高度，動態計算 scale
+import { useState as _useState, useEffect as _useEffect, useRef as _useRef } from 'react';
+
+function CardScaler({ children }) {
+  const wrapRef = _useRef(null);
+  const [scale, setScale] = _useState(1);
+
+  _useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      const s = Math.min(1, width / 320, height / 568);
+      setScale(parseFloat(s.toFixed(3)));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={wrapRef} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{
+        transform: `scale(${scale})`,
+        transformOrigin: 'center center',
+        // transform 不改 layout，用固定尺寸讓父層正確量測
+        width: 320, height: 568,
+        flexShrink: 0,
+      }}>
+        {children}
       </div>
     </div>
   );
