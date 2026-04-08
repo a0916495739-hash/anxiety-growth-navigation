@@ -178,122 +178,131 @@ export function AchievementNew() {
       {/* ── 手風琴展開區塊 ── */}
       <div style={{
         overflow: 'hidden',
-        maxHeight: isPreviewOpen ? '700px' : '0',
+        maxHeight: isPreviewOpen ? '820px' : '0',
         transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       }}>
-        <div style={{
-          marginTop: 20,
-          padding: '20px 16px 24px',
-          background: c.accordion,
-          border: `1px solid ${c.accordionBdr}`,
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 16,
-        }}>
+        {/* 內容包裝 — padding 讓卡片有呼吸空間 */}
+        <div style={{ paddingTop: 20, paddingBottom: 8 }}>
 
-          {/* ── 截圖目標 9:16 (300 × 533) — flexShrink:0 防跑版 ── */}
-          <div
-            ref={polaroidRef}
-            style={{
-              width: 300, height: 533,
-              flexShrink: 0,          // 關鍵：不被 flex 擠壓
-              borderRadius: 16,
-              background: 'linear-gradient(145deg, #bdd9cf 0%, #ddeee8 40%, #f0ebe4 100%)',
-              position: 'relative', overflow: 'hidden',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            {/* 光暈 1 */}
-            <div style={{
-              position: 'absolute', top: -60, right: -60,
-              width: 240, height: 240, borderRadius: '50%',
-              background: 'rgba(127,181,160,0.38)',
-              filter: 'blur(70px)', pointerEvents: 'none',
-            }} />
-            {/* 光暈 2 */}
-            <div style={{
-              position: 'absolute', bottom: 50, left: -60,
-              width: 200, height: 200, borderRadius: '50%',
-              background: 'rgba(251,191,36,0.22)',
-              filter: 'blur(60px)', pointerEvents: 'none',
-            }} />
-
-            {/* 拍立得卡片本體 */}
-            <div style={{
-              background: '#fff', borderRadius: 3,
-              padding: '14px 14px 36px', width: 222,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.22)',
-              transform: 'rotate(-2deg)',
-              position: 'relative', zIndex: 1, flexShrink: 0,
-            }}>
-              {/* 1:1 照片區 */}
+          {/* 截圖目標的置中外框
+              overflow: visible → 卡片超出螢幕寬度也不裁切，html-to-image 才能完整截到 300px */}
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '24px 0',
+            overflow: 'visible',
+          }}>
+            {/* ── 截圖目標：純視覺區塊，ref 只綁這裡，絕對不含按鈕 ── */}
+            <div
+              ref={polaroidRef}
+              style={{
+                width: 300, height: 533,
+                minWidth: 300, minHeight: 533,   // 雙重鎖死，防任何父層壓縮
+                flexShrink: 0,
+                borderRadius: 16,
+                background: 'linear-gradient(145deg, #bdd9cf 0%, #ddeee8 40%, #f0ebe4 100%)',
+                position: 'relative', overflow: 'hidden',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              {/* 光暈 1 */}
               <div style={{
-                width: '100%', aspectRatio: '1 / 1',
-                borderRadius: 2, overflow: 'hidden', marginBottom: 14,
-                background: 'linear-gradient(135deg, #c8e6dc 0%, #f0e6d3 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'absolute', top: -60, right: -60,
+                width: 240, height: 240, borderRadius: '50%',
+                background: 'rgba(127,181,160,0.38)',
+                filter: 'blur(70px)', pointerEvents: 'none',
+              }} />
+              {/* 光暈 2 */}
+              <div style={{
+                position: 'absolute', bottom: 50, left: -60,
+                width: 200, height: 200, borderRadius: '50%',
+                background: 'rgba(251,191,36,0.22)',
+                filter: 'blur(60px)', pointerEvents: 'none',
+              }} />
+
+              {/* 拍立得卡片本體 */}
+              <div style={{
+                background: '#fff', borderRadius: 3,
+                padding: '14px 14px 36px', width: 222,
+                boxShadow: '0 20px 60px rgba(0,0,0,0.22)',
+                transform: 'rotate(-2deg)',
+                position: 'relative', zIndex: 1,
+                flexShrink: 0,
               }}>
-                {imageUrl ? (
-                  <img src={imageUrl} alt="成就圖片" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                ) : (
-                  <span style={{ fontSize: 52, userSelect: 'none' }}>✨</span>
-                )}
-              </div>
+                {/* 1:1 照片區 */}
+                <div style={{
+                  width: '100%', aspectRatio: '1 / 1',
+                  borderRadius: 2, overflow: 'hidden', marginBottom: 14,
+                  background: 'linear-gradient(135deg, #c8e6dc 0%, #f0e6d3 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {imageUrl ? (
+                    <img src={imageUrl} alt="成就圖片" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  ) : (
+                    <span style={{ fontSize: 52, userSelect: 'none' }}>✨</span>
+                  )}
+                </div>
 
-              {/* 文字區 */}
-              <div style={{ padding: '0 2px' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#2d3748', lineHeight: 1.6, margin: '0 0 6px', wordBreak: 'break-all' }}>
-                  {title || '你的成就文字'}
-                </p>
-                {standard && (
-                  <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 8px' }}>
-                    「{standard}」
+                {/* 文字區 */}
+                <div style={{ padding: '0 2px' }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#2d3748', lineHeight: 1.6, margin: '0 0 6px', wordBreak: 'break-all' }}>
+                    {title || '你的成就文字'}
                   </p>
-                )}
-                <p style={{ fontSize: 11, color: '#b5b0a8', margin: 0, letterSpacing: 1.2 }}>{dateStr}</p>
+                  {standard && (
+                    <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 8px' }}>
+                      「{standard}」
+                    </p>
+                  )}
+                  <p style={{ fontSize: 11, color: '#b5b0a8', margin: 0, letterSpacing: 1.2 }}>{dateStr}</p>
+                </div>
               </div>
-            </div>
 
-            {/* 浮水印 */}
-            <p style={{
-              position: 'absolute', bottom: 14,
-              left: 0, right: 0, textAlign: 'center',
-              fontSize: 10, letterSpacing: 2.5,
-              color: 'rgba(127,181,160,0.55)',
-              margin: 0, userSelect: 'none',
-            }}>
-              微光成長導航
-            </p>
+              {/* 浮水印 */}
+              <p style={{
+                position: 'absolute', bottom: 14,
+                left: 0, right: 0, textAlign: 'center',
+                fontSize: 10, letterSpacing: 2.5,
+                color: 'rgba(127,181,160,0.55)',
+                margin: 0, userSelect: 'none',
+              }}>
+                微光成長導航
+              </p>
+            </div>
+            {/* ── ref 在這裡關閉，以下絕對不在截圖範圍內 ── */}
           </div>
 
-          {/* 操作按鈕 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 300 }}>
+          {/* 操作按鈕 — 完全在 ref div 之外 */}
+          <div style={{
+            display: 'flex', justifyContent: 'center', gap: 12,
+            padding: '4px 16px 16px',
+          }}>
             <button
               onClick={handleExport}
               disabled={exporting}
               style={{
+                flex: 1, maxWidth: 180,
                 background: exporting ? '#5a9a87' : '#7fb5a0',
                 color: '#fff', border: 'none',
-                borderRadius: 12, padding: '12px',
+                borderRadius: 12, padding: '12px 8px',
                 fontSize: 14, fontWeight: 600,
                 cursor: exporting ? 'not-allowed' : 'pointer',
                 boxShadow: '0 4px 18px rgba(127,181,160,0.35)',
                 transition: 'background 0.2s',
               }}
             >
-              {exporting ? '生成中…' : '匯出為圖片 📥'}
+              {exporting ? '生成中…' : '匯出圖片 📥'}
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
               style={{
+                flex: 1, maxWidth: 180,
                 background: 'transparent',
                 border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#d1d5db'}`,
                 color: isDark ? 'rgba(255,255,255,0.65)' : '#6b7280',
-                borderRadius: 12, padding: '11px',
+                borderRadius: 12, padding: '11px 8px',
                 fontSize: 14, fontWeight: 500,
                 cursor: saving ? 'not-allowed' : 'pointer',
               }}
