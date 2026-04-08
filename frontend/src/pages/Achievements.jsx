@@ -19,8 +19,9 @@ export function AchievementNew() {
   const [exporting, setExporting]       = useState(false);
   const [imageUrl, setImageUrl]         = useState(null);   // Object URL
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const fileInputRef  = useRef(null);
-  const polaroidRef   = useRef(null);   // 截圖目標
+  const fileInputRef       = useRef(null);
+  const polaroidRef        = useRef(null);   // 截圖目標
+  const previewContainerRef = useRef(null);  // 手風琴外框（捲動錨點）
 
   const { lang, isDark } = useApp();
   const t = getT(lang);
@@ -58,10 +59,11 @@ export function AchievementNew() {
     if (!title.trim()) { setError(t.achievementRequired); return; }
     setError('');
     setIsPreviewOpen(true);
-    // 展開後捲動到預覽區塊
+    // 等 maxHeight 動畫開始後再捲動，block:'start' 讓手風琴頂部對齊視窗頂部，
+    // 卡片 + 按鈕自然落在可見範圍內
     setTimeout(() => {
-      polaroidRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 320);
+      previewContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   }
 
   async function handleExport() {
@@ -176,11 +178,14 @@ export function AchievementNew() {
       </div>
 
       {/* ── 手風琴展開區塊 ── */}
-      <div style={{
-        overflow: 'hidden',
-        maxHeight: isPreviewOpen ? '820px' : '0',
-        transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      }}>
+      <div
+        ref={previewContainerRef}
+        style={{
+          overflow: 'hidden',
+          maxHeight: isPreviewOpen ? '820px' : '0',
+          transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
         {/* 內容包裝 — padding 讓卡片有呼吸空間 */}
         <div style={{ paddingTop: 20, paddingBottom: 8 }}>
 
