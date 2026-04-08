@@ -466,31 +466,43 @@ function PolaroidCard({ achievement: a, idx, isDark, locale, t, onDelete, deleti
           <p style={{ ...styles.polaroidStandard, color: subColor }}>「{a.my_standard}」</p>
         )}
         <p style={{ ...styles.polaroidEncourage, color: '#7fb5a0' }}>{encourage}</p>
-        <button
-          data-small
-          onClick={() => setShowModal(true)}
-          style={{
-            marginTop: 8, width: '100%',
-            background: 'transparent',
-            border: `1px solid ${isDark ? 'rgba(127,181,160,0.3)' : '#b8d9cf'}`,
-            color: '#7fb5a0', borderRadius: 6,
-            padding: '4px 0', fontSize: 11,
-            cursor: 'pointer',
-          }}
-        >
-          📸 儲存圖片
-        </button>
+        {/* 底部操作列：儲存 + 刪除並排 */}
+        <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+          <button
+            data-small
+            onClick={() => setShowModal(true)}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: `1px solid ${isDark ? 'rgba(127,181,160,0.3)' : '#b8d9cf'}`,
+              color: '#7fb5a0', borderRadius: 6,
+              padding: '5px 0', fontSize: 11,
+              cursor: 'pointer',
+            }}
+          >
+            📸 儲存
+          </button>
+          <button
+            data-small
+            onClick={onDelete}
+            disabled={deleting}
+            style={{
+              flex: 1,
+              background: deleting
+                ? (isDark ? 'rgba(239,68,68,0.08)' : '#fee2e2')
+                : 'transparent',
+              border: `1px solid ${isDark ? 'rgba(239,68,68,0.35)' : '#fca5a5'}`,
+              color: '#ef4444',
+              borderRadius: 6,
+              padding: '5px 0', fontSize: 11,
+              cursor: deleting ? 'not-allowed' : 'pointer',
+              fontWeight: 500,
+            }}
+          >
+            {deleting ? '…' : '刪除'}
+          </button>
+        </div>
       </div>
-
-      {/* 刪除 */}
-      <button
-        data-small
-        style={{ ...styles.polaroidDelete, color: isDark ? '#78716c' : '#d1d5db' }}
-        onClick={onDelete}
-        disabled={deleting}
-      >
-        {deleting ? '...' : '×'}
-      </button>
     </div>
   );
 }
@@ -562,10 +574,4 @@ const styles = {
   polaroidTitle:    { fontSize: 13, fontWeight: 700, margin: '0 0 4px', lineHeight: 1.4 },
   polaroidStandard: { fontSize: 11, fontStyle: 'italic', margin: '0 0 6px', lineHeight: 1.4 },
   polaroidEncourage:{ fontSize: 11, fontWeight: 500, margin: 0 },
-  polaroidDelete: {
-    position: 'absolute', top: 6, right: 8,
-    background: 'none', border: 'none',
-    fontSize: 16, cursor: 'pointer',
-    padding: 0, lineHeight: 1, opacity: 0.5,
-  },
 };
