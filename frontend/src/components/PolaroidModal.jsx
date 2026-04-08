@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { toPng } from 'html-to-image';
 
 export default function PolaroidModal({ achievementText, standard, imageUrl, onClose, onSave }) {
@@ -32,7 +33,7 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
     await onSave();
   }
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 1200,
@@ -152,7 +153,8 @@ export default function PolaroidModal({ achievementText, standard, imageUrl, onC
           {exporting ? '生成中…' : '匯出圖片 📥'}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
