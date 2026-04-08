@@ -16,12 +16,14 @@ export function AchievementNew() {
   const [error, setError]               = useState('');
   const [done, setDone]                 = useState(false);
   const [saving, setSaving]             = useState(false);
-  const [exporting, setExporting]       = useState(false);
-  const [imageUrl, setImageUrl]         = useState(null);   // Object URL
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const fileInputRef       = useRef(null);
-  const polaroidRef        = useRef(null);   // 截圖目標
-  const previewContainerRef = useRef(null);  // 手風琴外框（捲動錨點）
+  const [exporting, setExporting]         = useState(false);
+  const [imageUrl, setImageUrl]           = useState(null);   // Object URL
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);  // 手機手風琴
+  const [isModalOpen, setIsModalOpen]     = useState(false);  // 桌機 Modal
+  const fileInputRef        = useRef(null);
+  const polaroidRef         = useRef(null);   // 截圖目標
+  const previewContainerRef = useRef(null);   // 手風琴外框（捲動錨點）
+  const formTopRef          = useRef(null);   // 表單頂部（匯出後捲回用）
 
   const { lang, isDark } = useApp();
   const t = getT(lang);
@@ -58,12 +60,15 @@ export function AchievementNew() {
   function handleOpenPreview() {
     if (!title.trim()) { setError(t.achievementRequired); return; }
     setError('');
-    setIsPreviewOpen(true);
-    // 等 maxHeight 動畫開始後再捲動，block:'start' 讓手風琴頂部對齊視窗頂部，
-    // 卡片 + 按鈕自然落在可見範圍內
-    setTimeout(() => {
-      previewContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
+    // 桌機（≥ 768px）用 Modal，手機用手風琴
+    if (window.innerWidth >= 768) {
+      setIsModalOpen(true);
+    } else {
+      setIsPreviewOpen(true);
+      setTimeout(() => {
+        previewContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
   }
 
   async function handleExport() {
@@ -75,6 +80,11 @@ export function AchievementNew() {
       a.href = dataUrl;
       a.download = `成就-${dateStr}.png`;
       a.click();
+      // 匯出成功：收合手風琴 + 平滑捲回表單頂部
+      setIsPreviewOpen(false);
+      setTimeout(() => {
+        formTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } catch (err) {
       console.error('圖片生成失敗', err);
     } finally {
@@ -112,7 +122,17 @@ export function AchievementNew() {
 
   // ── 表單畫面 ──
   return (
-    <div style={styles.page}>
+    <div ref={formTopRef} style={styles.page}>
+      {/* 桌機 Modal（手機時 isModalOpen 永遠不會被設為 true） */}
+      {isModalOpen && (
+        <PolaroidModal
+          achievementText={title}
+          standard={standard}
+          imageUrl={imageUrl}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+        />
+      )}
       <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
       <h2 style={{ ...styles.heading, color: c.text }}>{t.logSmallWinTitle}</h2>
 
