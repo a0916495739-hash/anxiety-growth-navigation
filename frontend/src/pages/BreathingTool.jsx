@@ -3,14 +3,43 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
 import { useApp } from '../context/AppContext';
 
+// ── Breathing patterns ──────────────────────────────────────────────────────
+const PATTERNS = [
+  {
+    id: '424',
+    label: '4-2-4',
+    descZh: '吸氣 4s · 憋氣 2s · 呼氣 4s',
+    descEn: 'Inhale 4s · Hold 2s · Exhale 4s',
+    nameZh: '舒緩呼吸',
+    nameEn: 'Calm',
+    inhale: 4, hold: 2, exhale: 4,
+  },
+  {
+    id: '478',
+    label: '4-7-8',
+    descZh: '吸氣 4s · 憋氣 7s · 呼氣 8s',
+    descEn: 'Inhale 4s · Hold 7s · Exhale 8s',
+    nameZh: '深度放鬆',
+    nameEn: 'Deep Rest',
+    inhale: 4, hold: 7, exhale: 8,
+  },
+  {
+    id: 'box',
+    label: '4-4-4',
+    descZh: '吸氣 4s · 憋氣 4s · 呼氣 4s',
+    descEn: 'Inhale 4s · Hold 4s · Exhale 4s',
+    nameZh: '箱式呼吸',
+    nameEn: 'Box',
+    inhale: 4, hold: 4, exhale: 4,
+  },
+];
+
+// ── Session durations ────────────────────────────────────────────────────────
 const DURATIONS = [
   { label: '1 分', labelEn: '1 min', seconds: 60 },
   { label: '3 分', labelEn: '3 min', seconds: 180 },
   { label: '5 分', labelEn: '5 min', seconds: 300 },
 ];
-
-const INHALE = 4; // seconds
-const EXHALE = 4; // seconds
 
 function fmt(s) {
   const m = Math.floor(s / 60);
@@ -18,51 +47,77 @@ function fmt(s) {
   return `${m}:${String(sec).padStart(2, '0')}`;
 }
 
+// ── Phase labels ─────────────────────────────────────────────────────────────
+const PHASE_LABEL = {
+  idle:   { zh: '準備好了嗎', en: 'Ready?' },
+  inhale: { zh: '吸　氣', en: 'Inhale' },
+  hold:   { zh: '憋　氣', en: 'Hold' },
+  exhale: { zh: '呼　氣', en: 'Exhale' },
+};
+
 export default function BreathingTool() {
   const { isDark, lang } = useApp();
   const navigate = useNavigate();
   const controls = useAnimationControls();
 
-  const [selected, setSelected] = useState(DURATIONS[1]); // default 3 min
-  const [playing, setPlaying] = useState(false);
+  const [pattern, setPattern]   = useState(PATTERNS[0]);
+  const [duration, setDuration] = useState(DURATIONS[1]);
+  const [playing, setPlaying]   = useState(false);
   const [timeLeft, setTimeLeft] = useState(DURATIONS[1].seconds);
-  const [phase, setPhase] = useState('in');
-  const [done, setDone] = useState(false);
+  const [phase, setPhase]       = useState('idle');
+  const [done, setDone]         = useState(false);
 
   const playingRef = useRef(false);
-
-  // keep ref in sync for use inside closures
   useEffect(() => { playingRef.current = playing; }, [playing]);
 
-  // --- breathing circle animation ---
+  // ── Breathing cycle ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!playing) {
       controls.stop();
       return;
     }
-    setPhase('in');
+
     let active = true;
 
     async function cycle() {
       while (active && playingRef.current) {
-        setPhase('in');
+        // Inhale: scale up
+        setPhase('inhale');
         await controls.start({
           scale: 1.55,
-          transition: { duration: INHALE, ease: 'easeInOut' },
+          transition: { duration: pattern.inhale, ease: 'easeInOut' },
         });
         if (!active || !playingRef.current) break;
-        setPhase('out');
+
+        // Hold: pause at peak
+        if (pattern.hold > 0) {
+          setPhase('hold');
+          await new Promise((res) => {
+            const t = setTimeout(res, pattern.hold * 1000);
+            // allow early break by checking ref each tick
+            const check = setInterval(() => {
+              if (!active || !playingRef.current) { clearTimeout(t); clearInterval(check); res(); }
+            }, 100);
+          });
+          if (!active || !playingRef.current) break;
+        }
+
+        // Exhale: scale down
+        setPhase('exhale');
         await controls.start({
           scale: 1,
-          transition: { duration: EXHALE, ease: 'easeInOut' },
+          transition: { duration: pattern.exhale, ease: 'easeInOut' },
         });
+        if (!active || !playingRef.current) break;
       }
     }
+
+    controls.set({ scale: 1 });
     cycle();
     return () => { active = false; };
-  }, [playing, controls]);
+  }, [playing, pattern, controls]);
 
-  // --- countdown ---
+  // ── Countdown ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!playing) return;
     const timer = setInterval(() => {
@@ -70,6 +125,7 @@ export default function BreathingTool() {
         if (t <= 1) {
           clearInterval(timer);
           setPlaying(false);
+          setPhase('idle');
           setDone(true);
           return 0;
         }
@@ -79,160 +135,176 @@ export default function BreathingTool() {
     return () => clearInterval(timer);
   }, [playing]);
 
+  // ── Actions ────────────────────────────────────────────────────────────────
+  function selectPattern(p) {
+    if (playing) return;
+    setPattern(p);
+  }
+
   function selectDuration(d) {
     if (playing) return;
-    setSelected(d);
+    setDuration(d);
     setTimeLeft(d.seconds);
     setDone(false);
   }
 
   function togglePlay() {
     if (done) return;
+    if (!playing) setPhase('inhale');
+    else setPhase('idle');
     setPlaying((p) => !p);
   }
 
   function restart() {
-    setPlaying(false);
-    setTimeLeft(selected.seconds);
-    setDone(false);
     controls.set({ scale: 1 });
+    setPlaying(false);
+    setPhase('idle');
+    setTimeLeft(duration.seconds);
+    setDone(false);
   }
 
-  const bg        = isDark ? 'linear-gradient(160deg,#1c1917,#231f1d)' : 'linear-gradient(160deg,#faf5f0,#f0ebe4)';
-  const text      = isDark ? '#e7e5e4' : '#2d3748';
-  const muted     = isDark ? '#78716c' : '#9ca3af';
-  const accent    = '#7fb5a0';
-  const btnBg     = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.6)';
-  const btnBdr    = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  // ── Colours ────────────────────────────────────────────────────────────────
+  const bg       = isDark ? 'linear-gradient(160deg,#1c1917,#231f1d)' : 'linear-gradient(160deg,#faf5f0,#f0ebe4)';
+  const text     = isDark ? '#e7e5e4' : '#2d3748';
+  const muted    = isDark ? '#78716c' : '#9ca3af';
+  const accent   = '#7fb5a0';
+  const btnBg    = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.65)';
+  const btnBdr   = isDark ? 'rgba(255,255,255,0.1)'  : 'rgba(0,0,0,0.07)';
 
-  const phaseText = phase === 'in'
-    ? (lang === 'zh' ? '吸氣' : 'Inhale')
-    : (lang === 'zh' ? '呼氣' : 'Exhale');
+  const phaseLabel = PHASE_LABEL[phase] ?? PHASE_LABEL.idle;
+  const phaseColor = phase === 'hold' ? '#f59e0b' : accent;
 
   return (
-    <div style={{
-      minHeight: '100dvh',
-      background: bg,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 24px 40px',
-      position: 'relative',
-    }}>
+    <div style={{ minHeight: '100dvh', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px 40px' }}>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <div style={{ width: '100%', maxWidth: 420, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 0' }}>
         <div>
-          <p style={{ margin: 0, fontSize: 12, color: muted, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-            {lang === 'zh' ? '深呼吸' : 'Deep Breathing'}
+          <p style={{ margin: 0, fontSize: 11, color: muted, letterSpacing: 1.8, textTransform: 'uppercase' }}>
+            {lang === 'zh' ? '深呼吸練習' : 'Breathing'}
           </p>
-          <h1 style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 600, color: text }}>
-            {lang === 'zh' ? '放鬆練習' : 'Relax & Breathe'}
+          <h1 style={{ margin: '3px 0 0', fontSize: 20, fontWeight: 600, color: text }}>
+            {lang === 'zh' ? pattern.nameZh : pattern.nameEn}
           </h1>
         </div>
         <button
           onClick={() => navigate(-1)}
-          style={{
-            width: 36, height: 36,
-            borderRadius: '50%',
-            background: btnBg,
-            border: `1px solid ${btnBdr}`,
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            color: muted,
-            fontSize: 18,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}
           aria-label="Close"
-        >
-          ×
-        </button>
+          style={{ width: 36, height: 36, borderRadius: '50%', background: btnBg, border: `1px solid ${btnBdr}`, backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: muted, fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+        >×</button>
       </div>
 
-      {/* Duration selector */}
-      <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
-        {DURATIONS.map((d) => {
-          const active = selected.seconds === d.seconds && !done;
-          return (
-            <button
-              key={d.seconds}
-              onClick={() => selectDuration(d)}
-              disabled={playing}
-              style={{
-                padding: '7px 20px',
-                borderRadius: 99,
-                border: `1.5px solid ${active ? accent : btnBdr}`,
-                background: active ? `${accent}22` : btnBg,
-                color: active ? accent : muted,
-                fontSize: 13,
-                fontWeight: active ? 600 : 400,
-                cursor: playing ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                opacity: playing && !active ? 0.5 : 1,
-              }}
-            >
-              {lang === 'zh' ? d.label : d.labelEn}
-            </button>
-          );
-        })}
+      {/* ── Pattern selector ── */}
+      <div style={{ width: '100%', maxWidth: 420, marginTop: 24 }}>
+        <p style={{ margin: '0 0 10px', fontSize: 12, color: muted, letterSpacing: 1 }}>
+          {lang === 'zh' ? '呼吸節奏' : 'PATTERN'}
+        </p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {PATTERNS.map((p) => {
+            const active = pattern.id === p.id && !playing;
+            const activeOrPlaying = pattern.id === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => selectPattern(p)}
+                disabled={playing}
+                style={{
+                  flex: 1, padding: '10px 6px', borderRadius: 14,
+                  border: `1.5px solid ${activeOrPlaying ? accent : btnBdr}`,
+                  background: activeOrPlaying ? `${accent}18` : btnBg,
+                  color: activeOrPlaying ? accent : muted,
+                  cursor: playing ? 'default' : 'pointer',
+                  opacity: playing && !activeOrPlaying ? 0.4 : 1,
+                  transition: 'all 0.2s',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  textAlign: 'center',
+                }}
+              >
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>{p.label}</p>
+                <p style={{ margin: '3px 0 0', fontSize: 10, opacity: 0.75 }}>
+                  {lang === 'zh' ? p.nameZh : p.nameEn}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+        <p style={{ margin: '8px 0 0', fontSize: 12, color: muted }}>
+          {lang === 'zh' ? pattern.descZh : pattern.descEn}
+        </p>
       </div>
 
-      {/* Breathing circle */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
+      {/* ── Duration selector ── */}
+      <div style={{ width: '100%', maxWidth: 420, marginTop: 16 }}>
+        <p style={{ margin: '0 0 10px', fontSize: 12, color: muted, letterSpacing: 1 }}>
+          {lang === 'zh' ? '練習時長' : 'DURATION'}
+        </p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {DURATIONS.map((d) => {
+            const active = duration.seconds === d.seconds;
+            return (
+              <button
+                key={d.seconds}
+                onClick={() => selectDuration(d)}
+                disabled={playing}
+                style={{
+                  flex: 1, padding: '8px 6px', borderRadius: 99,
+                  border: `1.5px solid ${active ? accent : btnBdr}`,
+                  background: active ? `${accent}18` : btnBg,
+                  color: active ? accent : muted,
+                  fontSize: 13, fontWeight: active ? 700 : 400,
+                  cursor: playing ? 'default' : 'pointer',
+                  opacity: playing && !active ? 0.5 : 1,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {lang === 'zh' ? d.label : d.labelEn}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Main area ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, marginTop: 16 }}>
         {done ? (
+          // Done screen
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            style={{ textAlign: 'center' }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+            style={{ textAlign: 'center', maxWidth: 320 }}
           >
             <div style={{ fontSize: 56, marginBottom: 16 }}>🌿</div>
             <h2 style={{ fontSize: 22, fontWeight: 600, color: text, margin: '0 0 8px' }}>
               {lang === 'zh' ? '練習完成' : 'Session complete'}
             </h2>
-            <p style={{ fontSize: 14, color: muted, margin: 0, lineHeight: 1.7 }}>
-              {lang === 'zh' ? '你給自己留了一段呼吸的空間。\n好好感受當下。' : 'You gave yourself a moment to breathe.\nStay with this feeling.'}
+            <p style={{ fontSize: 14, color: muted, margin: 0, lineHeight: 1.8 }}>
+              {lang === 'zh'
+                ? '你給自己留了一段呼吸的空間。\n好好感受當下這份平靜。'
+                : 'You gave yourself a moment to breathe.\nStay with this stillness.'}
             </p>
             <button
               onClick={restart}
-              style={{
-                marginTop: 28,
-                padding: '10px 28px',
-                borderRadius: 99,
-                background: accent,
-                border: 'none',
-                color: '#fff',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              style={{ marginTop: 28, padding: '10px 32px', borderRadius: 99, background: accent, border: 'none', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
             >
-              {lang === 'zh' ? '再來一次' : 'Try again'}
+              {lang === 'zh' ? '再練一次' : 'Try again'}
             </button>
           </motion.div>
         ) : (
           <>
             {/* Circle */}
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {/* Glow ring */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 220, height: 220 }}>
+              {/* Outer glow */}
               <motion.div
                 animate={controls}
                 initial={{ scale: 1 }}
                 style={{
-                  width: 200, height: 200,
-                  borderRadius: '50%',
+                  position: 'absolute', inset: -24, borderRadius: '50%',
                   background: isDark
-                    ? 'radial-gradient(circle, rgba(127,181,160,0.25) 0%, rgba(127,181,160,0.08) 60%, transparent 100%)'
-                    : 'radial-gradient(circle, rgba(127,181,160,0.35) 0%, rgba(127,181,160,0.12) 60%, transparent 100%)',
-                  position: 'absolute',
-                  inset: -30,
-                  width: 'calc(100% + 60px)',
-                  height: 'calc(100% + 60px)',
-                  borderRadius: '50%',
+                    ? `radial-gradient(circle, ${phaseColor}28 0%, transparent 70%)`
+                    : `radial-gradient(circle, ${phaseColor}38 0%, transparent 70%)`,
+                  transition: 'background 1s ease',
                 }}
               />
               {/* Main circle */}
@@ -240,34 +312,36 @@ export default function BreathingTool() {
                 animate={controls}
                 initial={{ scale: 1 }}
                 style={{
-                  width: 180, height: 180,
-                  borderRadius: '50%',
-                  background: `radial-gradient(circle at 38% 38%, rgba(168,208,196,0.9), ${accent})`,
+                  width: 180, height: 180, borderRadius: '50%',
+                  background: `radial-gradient(circle at 38% 35%, rgba(168,208,196,0.9), ${accent})`,
                   boxShadow: isDark
-                    ? `0 0 40px rgba(127,181,160,0.3), 0 0 0 1px rgba(127,181,160,0.15)`
-                    : `0 8px 32px rgba(127,181,160,0.35), 0 0 0 1px rgba(127,181,160,0.2)`,
+                    ? `0 0 40px ${phaseColor}44, 0 0 0 1px ${phaseColor}22`
+                    : `0 8px 36px ${phaseColor}55, 0 0 0 1px ${phaseColor}33`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'box-shadow 1s ease',
                 }}
               >
-                <span style={{ fontSize: 28, userSelect: 'none' }}>🌊</span>
+                <span style={{ fontSize: 30, userSelect: 'none' }}>
+                  {phase === 'inhale' ? '🌊' : phase === 'hold' ? '🌿' : phase === 'exhale' ? '☁️' : '✨'}
+                </span>
               </motion.div>
             </div>
 
-            {/* Phase label + timer */}
-            <div style={{ textAlign: 'center' }}>
+            {/* Phase label */}
+            <div style={{ textAlign: 'center', minHeight: 60 }}>
               <motion.p
                 key={phase}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: playing ? 1 : 0, y: 0 }}
-                transition={{ duration: 0.4 }}
-                style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 300, letterSpacing: 3, color: accent }}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 300, letterSpacing: 4, color: phaseColor }}
               >
-                {phaseText}
+                {lang === 'zh' ? phaseLabel.zh : phaseLabel.en}
               </motion.p>
-              <p style={{ margin: 0, fontSize: 32, fontWeight: 200, color: text, letterSpacing: 2, fontVariantNumeric: 'tabular-nums' }}>
+              <p style={{ margin: 0, fontSize: 36, fontWeight: 200, color: text, letterSpacing: 2, fontVariantNumeric: 'tabular-nums' }}>
                 {fmt(timeLeft)}
               </p>
-              {!playing && !done && timeLeft < selected.seconds && (
+              {!playing && !done && timeLeft < duration.seconds && (
                 <p style={{ margin: '6px 0 0', fontSize: 12, color: muted }}>
                   {lang === 'zh' ? '已暫停' : 'Paused'}
                 </p>
@@ -277,23 +351,19 @@ export default function BreathingTool() {
         )}
       </div>
 
-      {/* Play / Pause button */}
+      {/* ── Play / Pause ── */}
       {!done && (
         <motion.button
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.94 }}
           onClick={togglePlay}
           style={{
-            width: 72, height: 72,
-            borderRadius: '50%',
-            background: playing
-              ? (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)')
-              : accent,
+            width: 76, height: 76, borderRadius: '50%', fontSize: 24,
+            background: playing ? btnBg : accent,
             border: `2px solid ${playing ? btnBdr : 'transparent'}`,
             color: playing ? muted : '#fff',
-            fontSize: 22,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: playing ? 'none' : '0 8px 24px rgba(127,181,160,0.4)',
+            boxShadow: playing ? 'none' : `0 8px 28px ${accent}66`,
             transition: 'background 0.3s, box-shadow 0.3s',
           }}
           aria-label={playing ? 'Pause' : 'Play'}
