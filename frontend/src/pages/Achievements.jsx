@@ -5,103 +5,108 @@ import { IllustrationDone, IllustrationAchievement } from '../components/Illustr
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
 import PolaroidModal from '../components/PolaroidModal';
+import { toPng } from 'html-to-image';
 
 // ─────────────────────────────────────────────
-// 新增成就表單
+// 新增成就表單（手風琴式拍立得預覽）
 // ─────────────────────────────────────────────
 export function AchievementNew() {
-  const [title, setTitle]         = useState('');
-  const [standard, setStandard]   = useState('');
-  const [error, setError]         = useState('');
-  const [done, setDone]           = useState(false);
-  const [saving, setSaving]       = useState(false);
-  const [imageUrl, setImageUrl]   = useState(null);  // Object URL
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const fileInputRef = useRef(null);
+  const [title, setTitle]               = useState('');
+  const [standard, setStandard]         = useState('');
+  const [error, setError]               = useState('');
+  const [done, setDone]                 = useState(false);
+  const [saving, setSaving]             = useState(false);
+  const [exporting, setExporting]       = useState(false);
+  const [imageUrl, setImageUrl]         = useState(null);   // Object URL
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const fileInputRef  = useRef(null);
+  const polaroidRef   = useRef(null);   // 截圖目標
 
   const { lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
+
+  const today = new Date();
+  const dateStr = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('.');
 
   const c = isDark ? {
     text: '#e7e5e4', sub: '#a8a29e',
     input: 'rgba(28,25,23,0.6)', inputBorder: 'rgba(255,255,255,0.1)',
     uploadBtn: 'rgba(255,255,255,0.07)', uploadBdr: 'rgba(255,255,255,0.15)', uploadC: '#a8a29e',
     previewBdr: 'rgba(127,181,160,0.3)',
+    accordion: 'rgba(28,25,23,0.5)', accordionBdr: 'rgba(255,255,255,0.08)',
   } : {
     text: '#2d3748', sub: '#6b7280',
     input: '#faf8f3', inputBorder: '#e8e0d0',
     uploadBtn: '#f3f4f6', uploadBdr: '#d1d5db', uploadC: '#6b7280',
     previewBdr: '#b8d9cf',
+    accordion: '#f5f2ee', accordionBdr: '#e8e0d0',
   };
 
   function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    // 釋放舊的 Object URL
     if (imageUrl) URL.revokeObjectURL(imageUrl);
     setImageUrl(URL.createObjectURL(file));
   }
 
-  function handlePreview() {
+  function handleOpenPreview() {
     if (!title.trim()) { setError(t.achievementRequired); return; }
     setError('');
-    setIsModalOpen(true);
+    setIsPreviewOpen(true);
+    // 展開後捲動到預覽區塊
+    setTimeout(() => {
+      polaroidRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 320);
   }
 
-  // 從 Modal 內呼叫的儲存函式
+  async function handleExport() {
+    if (!polaroidRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const dataUrl = await toPng(polaroidRef.current, { pixelRatio: 3 });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `成就-${dateStr}.png`;
+      a.click();
+    } catch (err) {
+      console.error('圖片生成失敗', err);
+    } finally {
+      setExporting(false);
+    }
+  }
+
   async function handleSave() {
     if (saving) return;
     setSaving(true);
     try {
       await createAchievement({ title, my_standard: standard || undefined });
-      setIsModalOpen(false);
       setDone(true);
     } finally {
       setSaving(false);
     }
   }
 
-  // 完成畫面
+  // ── 完成畫面 ──
   if (done) return (
     <div style={styles.page}>
-      {isModalOpen && (
-        <PolaroidModal
-          achievementText={title}
-          standard={standard}
-          imageUrl={imageUrl}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <IllustrationDone width={140} />
       </div>
       <h2 style={{ ...styles.heading, textAlign: 'center', color: c.text }}>{t.wellDone}</h2>
       <p style={{ ...styles.sub, color: c.sub }}>{t.wellDoneDesc}</p>
-      <button
-        style={{ ...styles.btn, background: 'transparent', border: '1.5px solid #7fb5a0', color: '#7fb5a0', marginBottom: 10 }}
-        onClick={() => setIsModalOpen(true)}
-      >
-        儲存為拍立得 📸
-      </button>
       <button style={styles.btn} onClick={() => navigate('/achievements')}>{t.viewMyAchievements}</button>
       <button style={{ ...styles.ghost, color: c.sub }} onClick={() => navigate('/')}>{t.backHome}</button>
     </div>
   );
 
-  // 填寫表單畫面
+  // ── 表單畫面 ──
   return (
     <div style={styles.page}>
-      {isModalOpen && (
-        <PolaroidModal
-          achievementText={title}
-          standard={standard}
-          imageUrl={imageUrl}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSave}
-        />
-      )}
-
       <button style={styles.back} onClick={() => navigate(-1)}>{t.back}</button>
       <h2 style={{ ...styles.heading, color: c.text }}>{t.logSmallWinTitle}</h2>
 
@@ -134,7 +139,7 @@ export function AchievementNew() {
           style={{ display: 'none' }}
           onChange={handleFileChange}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -158,20 +163,145 @@ export function AchievementNew() {
               <button
                 type="button"
                 onClick={() => { URL.revokeObjectURL(imageUrl); setImageUrl(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: 16, cursor: 'pointer', padding: 0, lineHeight: 1 }}
+                style={{ background: 'none', border: 'none', color: '#9ca3af', fontSize: 16, cursor: 'pointer', padding: 0 }}
               >×</button>
             </div>
           )}
         </div>
 
-        {/* 預覽並匯出（取代原來的送出） */}
-        <button
-          type="button"
-          onClick={handlePreview}
-          style={styles.btn}
-        >
-          預覽並匯出 📸
+        {/* 預覽卡片按鈕 */}
+        <button type="button" onClick={handleOpenPreview} style={styles.btn}>
+          預覽卡片 📸
         </button>
+      </div>
+
+      {/* ── 手風琴展開區塊 ── */}
+      <div style={{
+        overflow: 'hidden',
+        maxHeight: isPreviewOpen ? '700px' : '0',
+        transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}>
+        <div style={{
+          marginTop: 20,
+          padding: '20px 16px 24px',
+          background: c.accordion,
+          border: `1px solid ${c.accordionBdr}`,
+          borderRadius: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 16,
+        }}>
+
+          {/* ── 截圖目標 9:16 (300 × 533) — flexShrink:0 防跑版 ── */}
+          <div
+            ref={polaroidRef}
+            style={{
+              width: 300, height: 533,
+              flexShrink: 0,          // 關鍵：不被 flex 擠壓
+              borderRadius: 16,
+              background: 'linear-gradient(145deg, #bdd9cf 0%, #ddeee8 40%, #f0ebe4 100%)',
+              position: 'relative', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            {/* 光暈 1 */}
+            <div style={{
+              position: 'absolute', top: -60, right: -60,
+              width: 240, height: 240, borderRadius: '50%',
+              background: 'rgba(127,181,160,0.38)',
+              filter: 'blur(70px)', pointerEvents: 'none',
+            }} />
+            {/* 光暈 2 */}
+            <div style={{
+              position: 'absolute', bottom: 50, left: -60,
+              width: 200, height: 200, borderRadius: '50%',
+              background: 'rgba(251,191,36,0.22)',
+              filter: 'blur(60px)', pointerEvents: 'none',
+            }} />
+
+            {/* 拍立得卡片本體 */}
+            <div style={{
+              background: '#fff', borderRadius: 3,
+              padding: '14px 14px 36px', width: 222,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.22)',
+              transform: 'rotate(-2deg)',
+              position: 'relative', zIndex: 1, flexShrink: 0,
+            }}>
+              {/* 1:1 照片區 */}
+              <div style={{
+                width: '100%', aspectRatio: '1 / 1',
+                borderRadius: 2, overflow: 'hidden', marginBottom: 14,
+                background: 'linear-gradient(135deg, #c8e6dc 0%, #f0e6d3 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {imageUrl ? (
+                  <img src={imageUrl} alt="成就圖片" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <span style={{ fontSize: 52, userSelect: 'none' }}>✨</span>
+                )}
+              </div>
+
+              {/* 文字區 */}
+              <div style={{ padding: '0 2px' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#2d3748', lineHeight: 1.6, margin: '0 0 6px', wordBreak: 'break-all' }}>
+                  {title || '你的成就文字'}
+                </p>
+                {standard && (
+                  <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 8px' }}>
+                    「{standard}」
+                  </p>
+                )}
+                <p style={{ fontSize: 11, color: '#b5b0a8', margin: 0, letterSpacing: 1.2 }}>{dateStr}</p>
+              </div>
+            </div>
+
+            {/* 浮水印 */}
+            <p style={{
+              position: 'absolute', bottom: 14,
+              left: 0, right: 0, textAlign: 'center',
+              fontSize: 10, letterSpacing: 2.5,
+              color: 'rgba(127,181,160,0.55)',
+              margin: 0, userSelect: 'none',
+            }}>
+              微光成長導航
+            </p>
+          </div>
+
+          {/* 操作按鈕 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 300 }}>
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              style={{
+                background: exporting ? '#5a9a87' : '#7fb5a0',
+                color: '#fff', border: 'none',
+                borderRadius: 12, padding: '12px',
+                fontSize: 14, fontWeight: 600,
+                cursor: exporting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 18px rgba(127,181,160,0.35)',
+                transition: 'background 0.2s',
+              }}
+            >
+              {exporting ? '生成中…' : '匯出為圖片 📥'}
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              style={{
+                background: 'transparent',
+                border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#d1d5db'}`,
+                color: isDark ? 'rgba(255,255,255,0.65)' : '#6b7280',
+                borderRadius: 12, padding: '11px',
+                fontSize: 14, fontWeight: 500,
+                cursor: saving ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {saving ? '儲存中…' : '儲存成就 ✓'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
