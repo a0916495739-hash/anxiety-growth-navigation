@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './components/Toast';
 import BottomTabBar from './components/BottomTabBar';
+import PageTransition from './components/PageTransition';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -21,26 +22,29 @@ function AppRoutes() {
       <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
     </div>
   );
+  const location = useLocation();
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/account" element={<Account />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/emotions" element={<EmotionRecorder />} />
-      <Route path="/emotions/history" element={<EmotionHistory />} />
-      <Route path="/achievements" element={<AchievementList />} />
-      <Route path="/achievements/new" element={<AchievementNew />} />
-      <Route path="/conflicts" element={<ConflictList />} />
-      <Route path="/conflicts/new" element={<ConflictNew />} />
-      <Route path="/conflicts/stats" element={<ConflictStats />} />
-    </Routes>
-    <BottomTabBar />
-  </>
+      <PageTransition>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/emotions" element={<EmotionRecorder />} />
+          <Route path="/emotions/history" element={<EmotionHistory />} />
+          <Route path="/achievements" element={<AchievementList />} />
+          <Route path="/achievements/new" element={<AchievementNew />} />
+          <Route path="/conflicts" element={<ConflictList />} />
+          <Route path="/conflicts/new" element={<ConflictNew />} />
+          <Route path="/conflicts/stats" element={<ConflictStats />} />
+        </Routes>
+      </PageTransition>
+      <BottomTabBar />
+    </>
   );
 }
 
