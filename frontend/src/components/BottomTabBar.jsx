@@ -53,31 +53,38 @@ export default function BottomTabBar() {
     return location.pathname.startsWith(path === '/account' ? '/account' : path);
   };
 
-  const bg     = isDark ? 'rgba(22,19,17,0.88)' : 'rgba(250,248,243,0.88)';
-  const border = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
-  const active = '#7fb5a0';
-  const inactive = isDark ? '#57534e' : '#b0aaa3';
+  const bg      = isDark ? 'rgba(28,24,22,0.85)' : 'rgba(255,253,250,0.82)';
+  const border  = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)';
+  const shadow  = isDark
+    ? '0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+    : '0 8px 30px rgba(0,0,0,0.11), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)';
+  const activeColor   = '#7fb5a0';
+  const inactiveColor = isDark ? '#6b6560' : '#b8b2ab';
 
   return (
     <nav
       className="bottom-tab-bar"
       style={{
         position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 'calc(60px + env(safe-area-inset-bottom, 0px))',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+        left: '50%',
+        /* translate3d for GPU compositing (iOS fix) + horizontal centering */
+        transform: 'translateX(-50%) translate3d(0,0,0)',
+        WebkitTransform: 'translateX(-50%) translate3d(0,0,0)',
+        width: 'min(340px, calc(100% - 32px))',
+        height: 60,
         background: bg,
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderTop: `1px solid ${border}`,
+        backdropFilter: 'blur(28px)',
+        WebkitBackdropFilter: 'blur(28px)',
+        border: `1px solid ${border}`,
+        borderRadius: 9999,
+        boxShadow: shadow,
         zIndex: 150,
-        transition: 'background 0.3s',
-        /* iOS GPU compositing — prevents tab bar from scrolling with page */
-        WebkitTransform: 'translate3d(0,0,0)',
-        transform: 'translate3d(0,0,0)',
+        transition: 'background 0.35s ease, box-shadow 0.35s ease',
         willChange: 'transform',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 8px',
       }}
     >
       {tabs.map(({ path, label, Icon }) => {
@@ -85,7 +92,6 @@ export default function BottomTabBar() {
         return (
           <button
             key={path}
-            data-small
             onClick={() => navigate(path)}
             style={{
               flex: 1,
@@ -93,30 +99,23 @@ export default function BottomTabBar() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 4,
+              gap: 3,
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: on ? active : inactive,
-              transition: 'color 0.2s',
-              paddingTop: 6,
-              position: 'relative',
+              color: on ? activeColor : inactiveColor,
+              transition: 'color 0.3s ease',
+              minHeight: 44,
+              padding: '6px 0',
             }}
           >
-            {on && (
-              <span style={{
-                position: 'absolute',
-                top: 0,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 32,
-                height: 3,
-                borderRadius: '0 0 3px 3px',
-                background: active,
-              }} />
-            )}
             <Icon active={on} />
-            <span style={{ fontSize: 10, fontWeight: on ? 600 : 400, letterSpacing: 0.3 }}>
+            <span style={{
+              fontSize: 10,
+              fontWeight: on ? 600 : 400,
+              letterSpacing: 0.3,
+              transition: 'font-weight 0.3s ease',
+            }}>
               {label}
             </span>
           </button>

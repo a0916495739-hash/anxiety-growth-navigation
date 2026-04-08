@@ -163,9 +163,9 @@ input, textarea { font-family: inherit; }
 @media (max-width: 480px) {
   body { font-size: 15px; }
 
-  /* Show tab bar + add bottom padding so content doesn't hide behind it */
+  /* Show tab bar + add bottom padding so content doesn't hide behind floating capsule */
   .bottom-tab-bar { display: flex !important; }
-  #root { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  #root { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 
   /* Ensure tap targets meet 44px minimum on mobile */
   button {
