@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useAnimationControls } from 'framer-motion';
 import { useApp } from '../context/AppContext';
+import { logBreathingSession, getBreathingSessions } from '../api/breathing';
+import { getT } from '../i18n';
 
 // ── Breathing patterns ──────────────────────────────────────────────────────
 const PATTERNS = [
@@ -66,9 +68,23 @@ export default function BreathingTool() {
   const [timeLeft, setTimeLeft] = useState(DURATIONS[1].seconds);
   const [phase, setPhase]       = useState('idle');
   const [done, setDone]         = useState(false);
+  const [sessions, setSessions] = useState([]);
+  const t = getT(lang);
 
   const playingRef = useRef(false);
   useEffect(() => { playingRef.current = playing; }, [playing]);
+
+  // Log session when done, fetch history
+  useEffect(() => {
+    getBreathingSessions().then((r) => setSessions(r.data)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!done) return;
+    logBreathingSession(pattern.id, duration.seconds)
+      .then(() => getBreathingSessions().then((r) => setSessions(r.data)).catch(() => {}))
+      .catch(() => {});
+  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Breathing cycle ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -290,6 +306,23 @@ export default function BreathingTool() {
             >
               {lang === 'zh' ? '再練一次' : 'Try again'}
             </button>
+
+            {/* Session history */}
+            {sessions.length > 0 && (
+              <div style={{ marginTop: 32, textAlign: 'left', width: '100%', maxWidth: 300 }}>
+                <p style={{ margin: '0 0 10px', fontSize: 12, color: muted, letterSpacing: 1, textTransform: 'uppercase' }}>
+                  {t.breathingHistory}
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {sessions.slice(0, 5).map((s) => (
+                    <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 12px', borderRadius: 10, background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }}>
+                      <span style={{ fontSize: 13, color: text }}>{s.pattern_id.toUpperCase()}</span>
+                      <span style={{ fontSize: 12, color: muted }}>{Math.round(s.duration_seconds / 60)} min · {new Date(s.completed_at).toLocaleDateString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         ) : (
           <>

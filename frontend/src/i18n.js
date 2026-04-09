@@ -254,6 +254,45 @@ const zh = {
   feelingTags: ['自由', '壓力', '期待', '委屈', '迷茫', '焦慮', '憤怒', '無奈', '不甘心'],
   shouldBadge: '應該',
   wantBadge: '想要',
+  // Daily quotes
+  dailyQuotes: [
+    '你不需要完美，你只需要真實。',
+    '慢慢來，比較快。',
+    '今天的一小步，是明天成長的基礎。',
+    '感受情緒，不被情緒淹沒。',
+    '你的努力，正在悄悄地開花。',
+    '不比較，只成長。',
+    '給自己一個擁抱，你已經很棒了。',
+    '呼吸，然後繼續前進。',
+    '今天，只做今天的事就好。',
+    '你的節奏，就是最好的節奏。',
+    '看見情緒，是改變的第一步。',
+    '小事，也值得被記錄。',
+    '你值得一個平靜的心。',
+    '接受不完美，才能繼續走下去。',
+    '每一天，都是重新開始的機會。',
+  ],
+  // Badges
+  badgesTitle: '我的徽章',
+  badges: {
+    FIRST_EMOTION:    { emoji: '🌱', name: '初次記錄',     desc: '第一次記錄情緒' },
+    EMOTION_10:       { emoji: '🌊', name: '情緒探索家',   desc: '記錄 10 次情緒' },
+    STREAK_7:         { emoji: '🔥', name: '七日連線',     desc: '連續 7 天記錄情緒' },
+    FIRST_ACHIEVEMENT:{ emoji: '✨', name: '成就達人',     desc: '第一次記錄成就' },
+    FIRST_CONFLICT:   { emoji: '⚖️', name: '自我覺察',     desc: '第一次記錄應該 vs 想要' },
+    FIRST_BREATHING:  { emoji: '🌬️', name: '深呼吸初學者', desc: '第一次完成深呼吸練習' },
+    BREATHING_5:      { emoji: '🧘', name: '練習者',       desc: '完成 5 次深呼吸' },
+  },
+  // Breathing history
+  breathingHistory: '練習記錄',
+  noBreathingHistory: '還沒有練習記錄',
+  // Conflict resolve
+  markResolved: '標記已解決',
+  resolving: '處理中...',
+  resolved: '✓ 已解決',
+  // Export
+  exportData: '匯出資料 (CSV)',
+  exporting: '匯出中...',
 };
 
 const en = {
@@ -512,6 +551,45 @@ const en = {
   feelingTags: ['Free', 'Pressured', 'Hopeful', 'Wronged', 'Lost', 'Anxious', 'Angry', 'Helpless', 'Reluctant'],
   shouldBadge: 'Should',
   wantBadge: 'Want',
+  // Daily quotes
+  dailyQuotes: [
+    "You don't need to be perfect — just real.",
+    'Slow down to move faster.',
+    "One small step today is the foundation for tomorrow's growth.",
+    "Feel your emotions — don't be swallowed by them.",
+    'Your efforts are quietly blooming.',
+    'No comparison, just growth.',
+    "Give yourself a hug — you're doing great.",
+    'Breathe, then keep going.',
+    "Today, just do today's things.",
+    'Your pace is the right pace.',
+    'Noticing emotions is the first step to change.',
+    'Small things are worth recording too.',
+    'You deserve a calm mind.',
+    'Accepting imperfection is how you keep going.',
+    'Every day is a chance to start fresh.',
+  ],
+  // Badges
+  badgesTitle: 'My Badges',
+  badges: {
+    FIRST_EMOTION:    { emoji: '🌱', name: 'First Log',          desc: 'Logged your first emotion' },
+    EMOTION_10:       { emoji: '🌊', name: 'Emotion Explorer',   desc: 'Logged 10 emotions' },
+    STREAK_7:         { emoji: '🔥', name: '7-Day Streak',       desc: '7 consecutive days of logging' },
+    FIRST_ACHIEVEMENT:{ emoji: '✨', name: 'Achiever',           desc: 'Logged your first achievement' },
+    FIRST_CONFLICT:   { emoji: '⚖️', name: 'Self-Aware',         desc: 'Logged your first conflict' },
+    FIRST_BREATHING:  { emoji: '🌬️', name: 'Breather',           desc: 'Completed your first breathing session' },
+    BREATHING_5:      { emoji: '🧘', name: 'Practitioner',       desc: 'Completed 5 breathing sessions' },
+  },
+  // Breathing history
+  breathingHistory: 'Session History',
+  noBreathingHistory: 'No sessions yet',
+  // Conflict resolve
+  markResolved: 'Mark Resolved',
+  resolving: 'Updating...',
+  resolved: '✓ Resolved',
+  // Export
+  exportData: 'Export Data (CSV)',
+  exporting: 'Exporting...',
 };
 
 export const translations = { zh, en };

@@ -86,6 +86,23 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// PUT /api/conflicts/:id/resolve
+router.put('/:id/resolve', auth, async (req, res) => {
+  try {
+    const userId = await resolveUserId(req, res);
+    if (!userId) return;
+    const result = await pool.query(
+      `UPDATE conflicts SET resolved_at = NOW() WHERE id = $1 AND user_id = $2 RETURNING id, resolved_at`,
+      [req.params.id, userId]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Record not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to resolve' });
+  }
+});
+
 // DELETE /api/conflicts/:id
 router.delete('/:id', auth, async (req, res) => {
   try {

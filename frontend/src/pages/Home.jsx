@@ -6,6 +6,8 @@ import { getWeeklyStats, getHeatmap } from '../api/stats';
 import Onboarding, { useOnboarding } from '../components/Onboarding';
 import { getT } from '../i18n';
 import CommunityWall from '../components/CommunityWall';
+import DailyQuote from '../components/DailyQuote';
+import BadgeRow from '../components/BadgeRow';
 
 export default function Home() {
   const { isLoggedIn, displayName, lang, setLang, isDark } = useApp();
@@ -186,6 +188,9 @@ export default function Home() {
         )}
       </section>
 
+      {/* Daily Quote */}
+      <DailyQuote isDark={isDark} lang={lang} />
+
       {/* Weekly Stats */}
       {weekStats && (weekStats.emotions > 0 || weekStats.achievements > 0 || weekStats.conflicts > 0) && (
         <section style={{ ...s.statsBar, background: card_bg_d, borderColor: card_bdr }}>
@@ -233,6 +238,9 @@ export default function Home() {
           </div>
         ))}
       </section>
+
+      {/* Badges */}
+      <BadgeRow isDark={isDark} lang={lang} isLoggedIn={isLoggedIn} />
 
       {/* Community Wall */}
       <CommunityWall isDark={isDark} lang={lang} />

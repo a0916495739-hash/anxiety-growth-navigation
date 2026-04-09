@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { createConflict, getConflicts, getConflictStats, deleteConflict } from '../api/conflicts';
+import { createConflict, getConflicts, getConflictStats, deleteConflict, resolveConflict } from '../api/conflicts';
 import { getCorrelation } from '../api/stats';
 import TagSelector from '../components/TagSelector';
 import { IllustrationDone, IllustrationEmptyConflict } from '../components/Illustrations';
@@ -116,6 +116,7 @@ export function ConflictNew() {
 export function ConflictList() {
   const [conflicts, setConflicts] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [resolvingId, setResolvingId] = useState(null);
   const { lang } = useApp();
   const t = getT(lang);
   const locale = lang === 'en' ? 'en-US' : 'zh-TW';
@@ -133,6 +134,16 @@ export function ConflictList() {
       setConflicts((prev) => prev.filter((c) => c.id !== id));
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  async function handleResolve(id) {
+    setResolvingId(id);
+    try {
+      const r = await resolveConflict(id);
+      setConflicts((prev) => prev.map((c) => c.id === id ? { ...c, resolved_at: r.data.resolved_at } : c));
+    } finally {
+      setResolvingId(null);
     }
   }
 
@@ -157,7 +168,19 @@ export function ConflictList() {
       {conflicts?.map((c) => (
         <div key={c.id} style={styles.card}>
           <div style={styles.cardHeader}>
-            <p style={styles.date}>{new Date(c.created_at).toLocaleDateString(locale)}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <p style={styles.date}>{new Date(c.created_at).toLocaleDateString(locale)}</p>
+              {c.resolved_at
+                ? <span style={{ fontSize: 11, color: '#7fb5a0', fontWeight: 600 }}>{t.resolved}</span>
+                : <button
+                    style={{ ...styles.resolveBtn, opacity: resolvingId === c.id ? 0.6 : 1 }}
+                    onClick={() => handleResolve(c.id)}
+                    disabled={resolvingId === c.id}
+                  >
+                    {resolvingId === c.id ? t.resolving : t.markResolved}
+                  </button>
+              }
+            </div>
             <button style={styles.deleteBtn} onClick={() => handleDelete(c.id)} disabled={deletingId === c.id}>
               {deletingId === c.id ? '...' : t.delete}
             </button>
@@ -326,6 +349,7 @@ const styles = {
   cardHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   date: { color: '#9ca3af', fontSize: 13, margin: 0 },
   deleteBtn: { background: 'none', border: '1px solid #fca5a5', color: '#ef4444', borderRadius: 6, padding: '2px 8px', fontSize: 12, cursor: 'pointer' },
+  resolveBtn: { background: 'none', border: '1px solid #7fb5a0', color: '#7fb5a0', borderRadius: 6, padding: '2px 8px', fontSize: 11, cursor: 'pointer' },
   versus: { display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 },
   should: { fontSize: 14, color: '#374151' },
   want: { fontSize: 14, color: '#374151' },

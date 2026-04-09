@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import EmotionCalendar from '../components/EmotionCalendar';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { createEmotion, getEmotionTrend, deleteEmotion } from '../api/emotions';
@@ -331,6 +332,7 @@ export function EmotionHistory() {
   const [records, setRecords] = useState(null);
   const [trend, setTrend] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
+  const [view, setView] = useState('list');   // 'list' | 'calendar'
   const { lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
@@ -366,7 +368,28 @@ export function EmotionHistory() {
       <BackButton onClick={() => navigate('/')} label={t.back} />
       <h2 style={styles.heading}>{t.emotionHistoryTitle}</h2>
 
-      {trendData.length >= 2 && (
+      {/* ── 列表 / 日曆 切換 ── */}
+      {records?.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+          {['list', 'calendar'].map((v) => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              style={{
+                flex: 1, padding: '8px', borderRadius: 10, fontSize: 13, fontWeight: 500,
+                cursor: 'pointer', transition: 'all 0.2s',
+                background: view === v ? '#7fb5a0' : 'transparent',
+                color:      view === v ? '#fff' : (isDark ? '#a8a29e' : '#6b7280'),
+                border: `1.5px solid ${view === v ? '#7fb5a0' : (isDark ? 'rgba(255,255,255,0.12)' : '#e5e7eb')}`,
+              }}
+            >
+              {v === 'list' ? '📋 列表' : '📅 日曆'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {trendData.length >= 2 && view === 'list' && (
         <div style={styles.trendCard}>
           <p style={styles.trendTitle}>{t.trendTitle}</p>
           <ResponsiveContainer width="100%" height={160}>
@@ -400,7 +423,20 @@ export function EmotionHistory() {
         </div>
       )}
 
-      {records?.map((r) => (
+      {/* ── 日曆視圖 ── */}
+      {view === 'calendar' && records?.length > 0 && (
+        <EmotionCalendar
+          records={records}
+          isDark={isDark}
+          locale={locale}
+          onDelete={handleDelete}
+          deletingId={deletingId}
+          t={t}
+        />
+      )}
+
+      {/* ── 列表視圖 ── */}
+      {view === 'list' && records?.map((r) => (
         <div key={r.id} style={styles.record}>
           <div style={styles.recordMeta}>
             <span style={styles.date}>{new Date(r.created_at).toLocaleDateString(locale, { month: 'long', day: 'numeric', weekday: 'short' })}</span>

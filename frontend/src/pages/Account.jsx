@@ -52,9 +52,10 @@ export default function Account() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const avatarInputRef = useRef(null);
 
-  const { handleLogout, displayName, setDisplayName, avatarUrl, setAvatarUrl, lang, setLang, theme, setTheme, isDark } = useApp();
+  const { handleLogout, isLoggedIn, displayName, setDisplayName, avatarUrl, setAvatarUrl, lang, setLang, theme, setTheme, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
 
@@ -133,6 +134,30 @@ export default function Account() {
       setAvatarUploading(false);
       // reset so selecting the same file again still fires onChange
       e.target.value = '';
+    }
+  }
+
+  async function handleExportCSV() {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      const res = await fetch(`${baseURL}/export/csv`, {
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `anxiety-navigator-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('匯出失敗', err);
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -319,6 +344,20 @@ export default function Account() {
           <button type="submit" style={{ ...s.submitBtn, background: c.submitBg, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }} disabled={feedbackLoading || !feedbackText.trim()}>{feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}</button>
         </form>
       </div>
+
+      {/* Export */}
+      {isLoggedIn && (
+        <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+          <p style={{ ...s.sectionLabel, color: c.label }}>{t.exportData.replace(' (CSV)', '')}</p>
+          <button
+            onClick={handleExportCSV}
+            disabled={exporting}
+            style={{ ...s.submitBtn, background: exporting ? '#5a9a87' : c.submitBg, opacity: exporting ? 0.7 : 1 }}
+          >
+            {exporting ? t.exporting : t.exportData}
+          </button>
+        </div>
+      )}
 
       {/* Logout */}
       <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
