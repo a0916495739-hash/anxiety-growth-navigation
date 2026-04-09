@@ -5,6 +5,7 @@ import { IllustrationHero } from '../components/Illustrations';
 import { getWeeklyStats, getHeatmap } from '../api/stats';
 import Onboarding, { useOnboarding } from '../components/Onboarding';
 import { getT } from '../i18n';
+import CommunityWall from '../components/CommunityWall';
 
 export default function Home() {
   const { isLoggedIn, displayName, lang, setLang, isDark } = useApp();
@@ -232,6 +233,9 @@ export default function Home() {
           </div>
         ))}
       </section>
+
+      {/* Community Wall */}
+      <CommunityWall isDark={isDark} lang={lang} />
 
       {/* Quick links */}
       <section style={s.quick}>
