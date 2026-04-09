@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function SunIcon() {
   return (
@@ -25,10 +25,19 @@ function MonitorIcon() {
   );
 }
 import { useNavigate } from 'react-router-dom';
-import { getMe, changePassword, updateProfile } from '../api/auth';
+import { getMe, changePassword, updateProfile, updateAvatar } from '../api/auth';
 import { submitFeedback } from '../api/feedback';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Account() {
   const [email, setEmail] = useState('');
@@ -42,8 +51,10 @@ export default function Account() {
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef(null);
 
-  const { handleLogout, displayName, setDisplayName, lang, setLang, theme, setTheme, isDark } = useApp();
+  const { handleLogout, displayName, setDisplayName, avatarUrl, setAvatarUrl, lang, setLang, theme, setTheme, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
 
@@ -105,6 +116,23 @@ export default function Account() {
       setFeedbackMsg({ type: 'error', text: t.feedbackError });
     } finally {
       setFeedbackLoading(false);
+    }
+  }
+
+  async function handleAvatarChange(e) {
+    const file = e.target.files?.[0];
+    if (!file || avatarUploading) return;
+    setAvatarUploading(true);
+    try {
+      const base64 = await toBase64(file);
+      await updateAvatar(base64);
+      setAvatarUrl(base64);
+    } catch (err) {
+      console.error('頭貼上傳失敗', err);
+    } finally {
+      setAvatarUploading(false);
+      // reset so selecting the same file again still fires onChange
+      e.target.value = '';
     }
   }
 
@@ -171,8 +199,42 @@ export default function Account() {
       <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
         <p style={{ ...s.sectionLabel, color: c.label }}>{t.profile}</p>
         <div style={s.avatar}>
-          <div style={s.avatarCircle}>
-            {displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?'}
+          {/* Hidden file input */}
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleAvatarChange}
+          />
+          {/* Clickable avatar circle with camera badge */}
+          <div
+            style={{ position: 'relative', flexShrink: 0, cursor: 'pointer' }}
+            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+            title="點擊更換頭貼"
+          >
+            <div style={{ ...s.avatarCircle, overflow: 'hidden' }}>
+              {avatarUrl
+                ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                : (displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?')
+              }
+            </div>
+            {/* Camera badge */}
+            <div style={{
+              position: 'absolute', bottom: 0, right: 0,
+              width: 20, height: 20, borderRadius: '50%',
+              background: '#7fb5a0',
+              border: `2px solid ${c.card}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {avatarUploading
+                ? <div style={{ width: 8, height: 8, borderRadius: '50%', border: '1.5px solid #fff', borderTopColor: 'transparent', animation: 'spin 0.7s linear infinite' }} />
+                : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+              }
+            </div>
           </div>
           <div>
             <p style={{ ...s.avatarName, color: c.text }}>{displayName || t.noDisplayName}</p>

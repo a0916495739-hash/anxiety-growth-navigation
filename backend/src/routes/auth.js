@@ -147,7 +147,7 @@ router.get('/me', async (req, res) => {
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const result = await pool.query(
-      'SELECT id, email, display_name FROM users WHERE id = $1',
+      'SELECT id, email, display_name, avatar_data FROM users WHERE id = $1',
       [payload.userId]
     );
     if (result.rows.length === 0) return res.status(401).json({ error: 'User not found' });
@@ -155,7 +155,28 @@ router.get('/me', async (req, res) => {
       userId: payload.userId,
       email: result.rows[0].email,
       displayName: result.rows[0].display_name || null,
+      avatarData: result.rows[0].avatar_data || null,
     });
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// PUT /api/auth/avatar
+router.put('/avatar', async (req, res) => {
+  const token = req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  if (!token) return res.status(401).json({ error: 'Not logged in' });
+  const { avatar_data } = req.body;
+  if (!avatar_data) {
+    return res.status(422).json({ error: 'avatar_data 為必填' });
+  }
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    await pool.query(
+      'UPDATE users SET avatar_data = $1 WHERE id = $2',
+      [avatar_data, payload.userId]
+    );
+    res.json({ avatarData: avatar_data });
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });
   }

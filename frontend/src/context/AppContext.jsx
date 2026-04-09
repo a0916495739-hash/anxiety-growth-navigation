@@ -8,6 +8,7 @@ export function AppProvider({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
   const [displayName, setDisplayName] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'zh');
   const [theme, setThemeState] = useState(() => localStorage.getItem('theme') || 'system');
   const [isDark, setIsDark] = useState(false);
@@ -55,6 +56,7 @@ export function AppProvider({ children }) {
       .then((r) => {
         setIsLoggedIn(true);
         setDisplayName(r.data.displayName || null);
+        setAvatarUrl(r.data.avatarData || null);
         setAuthChecked(true);
       })
       .catch(() => {
@@ -93,6 +95,7 @@ export function AppProvider({ children }) {
     try {
       const r = await getMe();
       setDisplayName(r.data.displayName || null);
+      setAvatarUrl(r.data.avatarData || null);
     } catch (_) {}
   }, []);
 
@@ -103,6 +106,7 @@ export function AppProvider({ children }) {
     localStorage.removeItem('auth_token');
     setIsLoggedIn(false);
     setDisplayName(null);
+    setAvatarUrl(null);
     // Re-initialize guest session after logout
     createGuestSession()
       .then((res) => {
@@ -120,6 +124,8 @@ export function AppProvider({ children }) {
       guestToken,
       displayName,
       setDisplayName,
+      avatarUrl,
+      setAvatarUrl,
       todayCount,
       incrementTodayCount,
       onLoginSuccess,

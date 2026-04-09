@@ -23,6 +23,8 @@ export const changePassword = (currentPassword, newPassword) =>
   client.put('/auth/password', { currentPassword, newPassword });
 export const updateProfile = (displayName) =>
   client.put('/auth/profile', { display_name: displayName });
+export const updateAvatar = (avatarData) =>
+  client.put('/auth/avatar', { avatar_data: avatarData });
 export const forgotPassword = (email) =>
   client.post('/auth/forgot-password', { email });
 export const resetPassword = (token, newPassword) =>
