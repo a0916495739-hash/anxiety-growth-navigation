@@ -428,22 +428,24 @@ export default function Account() {
             </div>
 
             {/* CTA */}
-            {isPro ? (
-              <button
-                style={{ ...s.submitBtn, background: 'transparent', color: '#7fb5a0', border: '1.5px solid rgba(127,181,160,0.4)' }}
-                onClick={() => window.open(stripeMonthly || '#', '_blank')}
-              >
-                {t.manageBtn}
-              </button>
-            ) : (
-              <button
-                style={{ ...s.submitBtn, background: upgradeLink ? '#7fb5a0' : '#a8c8be', cursor: upgradeLink ? 'pointer' : 'default' }}
-                onClick={() => upgradeLink && window.open(upgradeLink, '_blank')}
-                title={!upgradeLink ? '請設定 VITE_STRIPE_MONTHLY_LINK / VITE_STRIPE_YEARLY_LINK' : undefined}
-              >
-                {upgradeLink ? t.upgradeBtn : `${t.upgradeBtn} (即將開放)`}
-              </button>
-            )}
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              {isPro ? (
+                <button
+                  style={{ ...s.submitBtn, background: 'transparent', color: '#7fb5a0', border: '1.5px solid rgba(127,181,160,0.4)', padding: '12px 32px', width: 'auto' }}
+                  onClick={() => window.open(stripeMonthly || '#', '_blank')}
+                >
+                  {t.manageBtn}
+                </button>
+              ) : (
+                <button
+                  style={{ ...s.submitBtn, background: upgradeLink ? '#7fb5a0' : '#a8c8be', cursor: upgradeLink ? 'pointer' : 'default', padding: '12px 36px', width: 'auto' }}
+                  onClick={() => upgradeLink && window.open(upgradeLink, '_blank')}
+                  title={!upgradeLink ? '請設定 VITE_STRIPE_MONTHLY_LINK / VITE_STRIPE_YEARLY_LINK' : undefined}
+                >
+                  {upgradeLink ? t.upgradeBtn : `${t.upgradeBtn} (即將開放)`}
+                </button>
+              )}
+            </div>
           </div>
         );
       })()}
