@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
   const [guestToken, setGuestToken] = useState(null);
   const [displayName, setDisplayName] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [subscriptionPlan, setSubscriptionPlan] = useState('free');
   const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'zh');
   const [theme, setThemeState] = useState(() => localStorage.getItem('theme') || 'system');
   const [isDark, setIsDark] = useState(false);
@@ -57,6 +58,7 @@ export function AppProvider({ children }) {
         setIsLoggedIn(true);
         setDisplayName(r.data.displayName || null);
         setAvatarUrl(r.data.avatarData || null);
+        setSubscriptionPlan(r.data.subscriptionPlan || 'free');
         setAuthChecked(true);
       })
       .catch(() => {
@@ -96,6 +98,7 @@ export function AppProvider({ children }) {
       const r = await getMe();
       setDisplayName(r.data.displayName || null);
       setAvatarUrl(r.data.avatarData || null);
+      setSubscriptionPlan(r.data.subscriptionPlan || 'free');
     } catch (_) {}
   }, []);
 
@@ -107,6 +110,7 @@ export function AppProvider({ children }) {
     setIsLoggedIn(false);
     setDisplayName(null);
     setAvatarUrl(null);
+    setSubscriptionPlan('free');
     // Re-initialize guest session after logout
     createGuestSession()
       .then((res) => {
@@ -126,6 +130,8 @@ export function AppProvider({ children }) {
       setDisplayName,
       avatarUrl,
       setAvatarUrl,
+      subscriptionPlan,
+      setSubscriptionPlan,
       todayCount,
       incrementTodayCount,
       onLoginSuccess,

@@ -293,6 +293,35 @@ const zh = {
   // Export
   exportData: '匯出資料 (CSV)',
   exporting: '匯出中...',
+  // Subscription
+  subscriptionLabel: '訂閱方案',
+  planFree: '免費版',
+  planPro: 'Pro',
+  billingMonthly: '月繳',
+  billingYearly: '年繳',
+  yearlyDiscount: '省 44%',
+  priceMonthly: 'NT$99 / 月',
+  priceYearly: 'NT$660 / 年',
+  currentPlan: '目前方案',
+  upgradeBtn: '升級到 Pro',
+  manageBtn: '管理訂閱',
+  proExpires: (date) => `有效至 ${date}`,
+  freeFeatures: [
+    '情緒記錄（最近 90 天）',
+    '微小成就（無限）',
+    '應該 vs 想要（最近 30 筆）',
+    '深呼吸練習（3 種節奏）',
+    '基礎徽章 7 枚',
+    '樹洞牆',
+  ],
+  proFeatures: [
+    '無限歷史存取',
+    '資料匯出 CSV',
+    '每月情緒週報',
+    '深呼吸自訂時長',
+    'Pro 專屬徽章 3 枚',
+    '優先客服',
+  ],
 };
 
 const en = {
@@ -590,6 +619,35 @@ const en = {
   // Export
   exportData: 'Export Data (CSV)',
   exporting: 'Exporting...',
+  // Subscription
+  subscriptionLabel: 'Subscription',
+  planFree: 'Free',
+  planPro: 'Pro',
+  billingMonthly: 'Monthly',
+  billingYearly: 'Yearly',
+  yearlyDiscount: 'Save 44%',
+  priceMonthly: 'NT$99 / mo',
+  priceYearly: 'NT$660 / yr',
+  currentPlan: 'Current Plan',
+  upgradeBtn: 'Upgrade to Pro',
+  manageBtn: 'Manage Subscription',
+  proExpires: (date) => `Active until ${date}`,
+  freeFeatures: [
+    'Emotion logs (last 90 days)',
+    'Achievements (unlimited)',
+    'Should vs Want (last 30)',
+    'Breathing (3 patterns)',
+    '7 basic badges',
+    'Community Wall',
+  ],
+  proFeatures: [
+    'Unlimited history',
+    'CSV data export',
+    'Monthly emotion report',
+    'Custom breathing duration',
+    '3 Pro-exclusive badges',
+    'Priority support',
+  ],
 };
 
 export const translations = { zh, en };

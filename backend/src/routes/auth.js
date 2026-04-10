@@ -147,15 +147,22 @@ router.get('/me', async (req, res) => {
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const result = await pool.query(
-      'SELECT id, email, display_name, avatar_data FROM users WHERE id = $1',
+      'SELECT id, email, display_name, avatar_data, subscription_plan, subscription_expires_at FROM users WHERE id = $1',
       [payload.userId]
     );
     if (result.rows.length === 0) return res.status(401).json({ error: 'User not found' });
+    const row = result.rows[0];
+    const isPro =
+      row.subscription_plan === 'pro' &&
+      (row.subscription_expires_at === null || new Date(row.subscription_expires_at) > new Date());
+
     res.json({
       userId: payload.userId,
-      email: result.rows[0].email,
-      displayName: result.rows[0].display_name || null,
-      avatarData: result.rows[0].avatar_data || null,
+      email: row.email,
+      displayName: row.display_name || null,
+      avatarData: row.avatar_data || null,
+      subscriptionPlan: isPro ? 'pro' : 'free',
+      subscriptionExpiresAt: row.subscription_expires_at || null,
     });
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });

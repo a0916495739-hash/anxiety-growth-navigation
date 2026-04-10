@@ -14,6 +14,7 @@ const communityRoutes = require('./routes/community');
 const badgesRoutes = require('./routes/badges');
 const breathingRoutes = require('./routes/breathing');
 const exportRoutes = require('./routes/export');
+const subscriptionRoutes = require('./routes/subscription');
 
 if (!process.env.JWT_SECRET) {
   console.error('FATAL: JWT_SECRET environment variable is not set');
@@ -48,6 +49,7 @@ app.use('/api/community', communityRoutes);
 app.use('/api/badges', badgesRoutes);
 app.use('/api/breathing', breathingRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 

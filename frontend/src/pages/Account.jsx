@@ -53,9 +53,10 @@ export default function Account() {
   const [feedbackMsg, setFeedbackMsg] = useState(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [billing, setBilling] = useState('monthly'); // 'monthly' | 'yearly'
   const avatarInputRef = useRef(null);
 
-  const { handleLogout, isLoggedIn, displayName, setDisplayName, avatarUrl, setAvatarUrl, lang, setLang, theme, setTheme, isDark } = useApp();
+  const { handleLogout, isLoggedIn, displayName, setDisplayName, avatarUrl, setAvatarUrl, subscriptionPlan, lang, setLang, theme, setTheme, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
 
@@ -344,6 +345,108 @@ export default function Account() {
           <button type="submit" style={{ ...s.submitBtn, background: c.submitBg, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }} disabled={feedbackLoading || !feedbackText.trim()}>{feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}</button>
         </form>
       </div>
+
+      {/* Subscription */}
+      {isLoggedIn && (() => {
+        const isPro = subscriptionPlan === 'pro';
+        const stripeMonthly = import.meta.env.VITE_STRIPE_MONTHLY_LINK;
+        const stripeYearly  = import.meta.env.VITE_STRIPE_YEARLY_LINK;
+        const upgradeLink   = billing === 'yearly' ? stripeYearly : stripeMonthly;
+
+        return (
+          <div style={{ ...s.section, background: c.card, border: isPro ? '1.5px solid rgba(127,181,160,0.5)' : c.cardBorder }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <p style={{ ...s.sectionLabel, color: c.label, marginBottom: 0 }}>{t.subscriptionLabel}</p>
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99,
+                background: isPro ? 'rgba(127,181,160,0.15)' : (isDark ? 'rgba(255,255,255,0.07)' : '#f3f4f6'),
+                color: isPro ? '#7fb5a0' : c.textMid,
+                border: isPro ? '1px solid rgba(127,181,160,0.3)' : `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}`,
+              }}>
+                {isPro ? `✨ ${t.planPro}` : t.planFree}
+              </span>
+            </div>
+
+            {!isPro && (
+              /* Billing toggle */
+              <div style={{ display: 'flex', background: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6', borderRadius: 10, padding: 3, marginBottom: 16 }}>
+                {['monthly', 'yearly'].map((b) => (
+                  <button key={b} onClick={() => setBilling(b)} style={{
+                    flex: 1, border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13,
+                    fontWeight: billing === b ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit',
+                    background: billing === b ? (isDark ? 'rgba(127,181,160,0.2)' : '#fff') : 'transparent',
+                    color: billing === b ? '#7fb5a0' : c.textMid,
+                    boxShadow: billing === b ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.2s',
+                  }}>
+                    {b === 'monthly' ? t.billingMonthly : `${t.billingYearly} · ${t.yearlyDiscount}`}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Price */}
+            {!isPro && (
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <span style={{ fontSize: 28, fontWeight: 700, color: '#7fb5a0' }}>
+                  {billing === 'monthly' ? 'NT$99' : 'NT$660'}
+                </span>
+                <span style={{ fontSize: 13, color: c.textMid, marginLeft: 4 }}>
+                  {billing === 'monthly' ? '/ 月' : '/ 年'}
+                </span>
+              </div>
+            )}
+
+            {/* Feature lists side by side */}
+            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+              {/* Free column */}
+              <div style={{ flex: 1, background: isDark ? 'rgba(255,255,255,0.04)' : '#faf8f3', borderRadius: 12, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: c.textMid, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t.planFree}</p>
+                {t.freeFeatures.map((f) => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
+                    <span style={{ color: '#7fb5a0', fontSize: 12, marginTop: 1 }}>✓</span>
+                    <span style={{ fontSize: 12, color: c.text, lineHeight: 1.4 }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pro column */}
+              <div style={{
+                flex: 1, borderRadius: 12, padding: '12px 14px',
+                background: isPro ? 'rgba(127,181,160,0.08)' : (isDark ? 'rgba(127,181,160,0.07)' : '#f0f9f6'),
+                border: isPro ? '1px solid rgba(127,181,160,0.25)' : '1px solid rgba(127,181,160,0.15)',
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#7fb5a0', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>✨ {t.planPro}</p>
+                {t.proFeatures.map((f) => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
+                    <span style={{ color: '#7fb5a0', fontSize: 12, marginTop: 1 }}>✓</span>
+                    <span style={{ fontSize: 12, color: c.text, lineHeight: 1.4 }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA */}
+            {isPro ? (
+              <button
+                style={{ ...s.submitBtn, background: 'transparent', color: '#7fb5a0', border: '1.5px solid rgba(127,181,160,0.4)' }}
+                onClick={() => window.open(stripeMonthly || '#', '_blank')}
+              >
+                {t.manageBtn}
+              </button>
+            ) : (
+              <button
+                style={{ ...s.submitBtn, background: upgradeLink ? '#7fb5a0' : '#a8c8be', cursor: upgradeLink ? 'pointer' : 'default' }}
+                onClick={() => upgradeLink && window.open(upgradeLink, '_blank')}
+                title={!upgradeLink ? '請設定 VITE_STRIPE_MONTHLY_LINK / VITE_STRIPE_YEARLY_LINK' : undefined}
+              >
+                {upgradeLink ? t.upgradeBtn : `${t.upgradeBtn} (即將開放)`}
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Export */}
       {isLoggedIn && (

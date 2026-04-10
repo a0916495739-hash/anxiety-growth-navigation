@@ -12,7 +12,8 @@
       "Bash(npm run:*)",
       "Bash(xargs kill:*)",
       "Bash(curl -s -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"testtest\"}')",
-      "Bash(curl -s -X POST http://localhost:3001/api/auth/guest)"
+      "Bash(curl -s -X POST http://localhost:3001/api/auth/guest)",
+      "Bash(open -a Docker)"
     ]
   }
 }

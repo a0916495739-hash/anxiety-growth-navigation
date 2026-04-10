@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI 元件對照表 — 抗焦慮成長導航</title>
+  <link rel="stylesheet" href="component-guide.css" />
+</head>
+<body>
+
+  <!-- Sidebar TOC -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">🌿 元件對照表</div>
+    <nav class="toc">
+      <a href="#nav">導覽列</a>
+      <a href="#daily-quote">每日一句</a>
+      <a href="#stats">本週統計</a>
+      <a href="#feature-cards">功能卡片</a>
+      <a href="#heatmap">心情足跡</a>
+      <a href="#badges">成就徽章</a>
+      <a href="#community">樹洞牆</a>
+      <a href="#emotion-card">情緒記錄卡</a>
+      <a href="#achievement-card">成就卡（寶麗來）</a>
+      <a href="#conflict-card">衝突記錄卡</a>
+      <a href="#breathing">深呼吸工具</a>
+      <a href="#calendar">情緒日曆</a>
+      <a href="#profile">個人檔案</a>
+      <a href="#atoms">基礎元件</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <!-- ── Section: Nav ── -->
+    <section class="section" id="nav">
+      <div class="section-header">
+        <h2>導覽列 <code>Nav</code></h2>
+        <p>頂部固定，毛玻璃效果，含 Logo、語言切換、通知鈴鐺。手機版隱藏文字按鈕，改由底部 Tab Bar 接管。</p>
+      </div>
+      <div class="demo demo-dark-bg">
+        <nav class="c-nav">
+          <div class="c-nav__logo">
+            <span class="c-nav__mark">🌿</span>
+            <span class="c-nav__text">抗焦慮成長導航</span>
+          </div>
+          <div class="c-nav__actions">
+            <button class="c-ghost-btn">EN</button>
+            <span class="c-greeting">Hi, 小明</span>
+            <button class="c-ghost-btn">設定</button>
+            <button class="c-bell-btn">
+              🔔
+              <span class="c-red-dot"></span>
+            </button>
+          </div>
+        </nav>
+      </div>
+      <div class="spec-row">
+        <span class="spec">背景：rgba(255,255,255,0.35) + backdrop-filter blur(20px)</span>
+        <span class="spec">邊框：1px solid #e8e0d0</span>
+        <span class="spec">高度：約 60px</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Daily Quote ── -->
+    <section class="section" id="daily-quote">
+      <div class="section-header">
+        <h2>每日一句 <code>DailyQuote</code></h2>
+        <p>每天依日期選一句正向提示，可 × 關閉（localStorage 記錄，隔天重置）。放在 Hero 區下方。</p>
+      </div>
+      <div class="demo">
+        <div class="c-daily-quote">
+          <span class="c-daily-quote__icon">🌿</span>
+          <p class="c-daily-quote__text">你不需要完美，你只需要真實。</p>
+          <button class="c-daily-quote__dismiss">×</button>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">背景：rgba(127,181,160,0.08)</span>
+        <span class="spec">邊框：1px solid rgba(127,181,160,0.2)</span>
+        <span class="spec">文字：#3d6b5e · italic · 14px</span>
+        <span class="spec">動畫：fadeSlideIn 0.4s</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Stats ── -->
+    <section class="section" id="stats">
+      <div class="section-header">
+        <h2>本週統計 <code>StatsBar</code></h2>
+        <p>只在有資料時顯示。毛玻璃卡片，三格數字。</p>
+      </div>
+      <div class="demo">
+        <div class="c-stats-bar">
+          <p class="c-stats-bar__label">本週你做到了</p>
+          <div class="c-stats-bar__row">
+            <div class="c-stat-item">
+              <span class="c-stat-num">5</span>
+              <span class="c-stat-desc">次情緒記錄</span>
+            </div>
+            <div class="c-stat-item">
+              <span class="c-stat-num">2</span>
+              <span class="c-stat-desc">個小成就</span>
+            </div>
+            <div class="c-stat-item">
+              <span class="c-stat-num">1</span>
+              <span class="c-stat-desc">次衝突釐清</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">背景：rgba(245,241,237,0.7) + blur(12px)</span>
+        <span class="spec">數字：24px bold #2d3748</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Feature Cards ── -->
+    <section class="section" id="feature-cards">
+      <div class="section-header">
+        <h2>功能卡片 <code>FeatureCard</code></h2>
+        <p>首頁三個主要入口，點擊導航至對應頁面。色調各異，深色模式統一用半透明暗底。</p>
+      </div>
+      <div class="demo">
+        <div class="c-cards">
+          <div class="c-card c-card--blue">
+            <div class="c-card__icon c-card__icon--blue">🌊</div>
+            <div class="c-card__body">
+              <h3 class="c-card__title c-card__title--blue">情緒除噪器</h3>
+              <p class="c-card__desc">記錄並轉化你的負面情緒，找到它想保護你的事</p>
+            </div>
+            <span class="c-card__arrow c-card__arrow--blue">→</span>
+          </div>
+          <div class="c-card c-card--green">
+            <div class="c-card__icon c-card__icon--green">✨</div>
+            <div class="c-card__body">
+              <h3 class="c-card__title c-card__title--green">微小成就系統</h3>
+              <p class="c-card__desc">記錄生活中的小事，累積屬於你的成就感</p>
+            </div>
+            <span class="c-card__arrow c-card__arrow--green">→</span>
+          </div>
+          <div class="c-card c-card--orange">
+            <div class="c-card__icon c-card__icon--orange">⚖️</div>
+            <div class="c-card__body">
+              <h3 class="c-card__title c-card__title--orange">應該 vs 想要</h3>
+              <p class="c-card__desc">釐清外在期望與內心渴望的差異</p>
+            </div>
+            <span class="c-card__arrow c-card__arrow--orange">→</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">藍：#e8f4fb / #a8c8e8 / #5a9fc0</span>
+        <span class="spec">綠：#e8f4f0 / #7fb5a0 / #4a9580</span>
+        <span class="spec">橘：#fdf3ee / #f0b8a0 / #c87050</span>
+        <span class="spec">圓角 16px · 有 hover 位移</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Heatmap ── -->
+    <section class="section" id="heatmap">
+      <div class="section-header">
+        <h2>心情足跡 <code>HeatmapGrid</code></h2>
+        <p>過去 12 週每日情緒記錄次數，Github 貢獻圖風格。顏色 4 階深淺。</p>
+      </div>
+      <div class="demo">
+        <div class="c-heatmap-wrap">
+          <div class="c-heatmap-header">
+            <span class="c-section-eyebrow">心情足跡</span>
+            <span class="c-heatmap-sub">過去 12 週的記錄熱度</span>
+          </div>
+          <div class="c-heatmap-card">
+            <div class="c-heatmap-grid" id="heatmap-grid"></div>
+            <div class="c-heatmap-legend">
+              <span class="c-heatmap-legend__label">少</span>
+              <div class="c-heatmap-dot" style="background:#ede8e3"></div>
+              <div class="c-heatmap-dot" style="background:#fad5c8"></div>
+              <div class="c-heatmap-dot" style="background:#f4a898"></div>
+              <div class="c-heatmap-dot" style="background:#e8836c"></div>
+              <span class="c-heatmap-legend__label">多</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">格子：12×12px · 圓角 3px · gap 4px</span>
+        <span class="spec">0次：#ede8e3 / 1次：#fad5c8 / 2次：#f4a898 / 3+：#e8836c</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Badges ── -->
+    <section class="section" id="badges">
+      <div class="section-header">
+        <h2>成就徽章 <code>BadgeRow</code></h2>
+        <p>登入後顯示，7 枚徽章。已解鎖：綠色光暈；未解鎖：灰色 + grayscale filter。橫向可滾動。</p>
+      </div>
+      <div class="demo">
+        <p class="c-section-eyebrow">我的徽章</p>
+        <div class="c-badge-row">
+          <div class="c-badge c-badge--earned" title="初次記錄 — 第一次記錄情緒">
+            <div class="c-badge__circle c-badge__circle--earned">🌱</div>
+            <span class="c-badge__name c-badge__name--earned">初次記錄</span>
+          </div>
+          <div class="c-badge c-badge--earned" title="情緒探索家 — 記錄 10 次情緒">
+            <div class="c-badge__circle c-badge__circle--earned">🌊</div>
+            <span class="c-badge__name c-badge__name--earned">情緒探索家</span>
+          </div>
+          <div class="c-badge c-badge--locked" title="七日連線 — 連續 7 天記錄情緒">
+            <div class="c-badge__circle">🔥</div>
+            <span class="c-badge__name">七日連線</span>
+          </div>
+          <div class="c-badge c-badge--earned" title="成就達人 — 第一次記錄成就">
+            <div class="c-badge__circle c-badge__circle--earned">✨</div>
+            <span class="c-badge__name c-badge__name--earned">成就達人</span>
+          </div>
+          <div class="c-badge c-badge--locked" title="自我覺察 — 第一次記錄應該 vs 想要">
+            <div class="c-badge__circle">⚖️</div>
+            <span class="c-badge__name">自我覺察</span>
+          </div>
+          <div class="c-badge c-badge--locked" title="深呼吸初學者 — 第一次完成深呼吸練習">
+            <div class="c-badge__circle">🌬️</div>
+            <span class="c-badge__name">深呼吸初學者</span>
+          </div>
+          <div class="c-badge c-badge--locked" title="練習者 — 完成 5 次深呼吸">
+            <div class="c-badge__circle">🧘</div>
+            <span class="c-badge__name">練習者</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">圓圈：48px · 已解鎖綠框 + shadow rgba(127,181,160,0.3)</span>
+        <span class="spec">未解鎖：opacity 0.35 + filter grayscale(1)</span>
+        <span class="spec">名稱：10px bold</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Community ── -->
+    <section class="section" id="community">
+      <div class="section-header">
+        <h2>樹洞牆 <code>CommunityWall</code></h2>
+        <p>匿名投稿，需手動審核（approved=false 預設）。擁抱按鈕 🫂 累加，點擊後 ID 存 localStorage 防重複。</p>
+      </div>
+      <div class="demo">
+        <div class="c-section-eyebrow-row">
+          <span class="c-section-eyebrow">樹洞牆</span>
+          <span class="c-section-sub">匿名 · 溫暖 · 真實</span>
+        </div>
+        <div class="c-community">
+          <div class="c-community__post">
+            <p class="c-community__content">今天終於跟媽媽說出心裡的話了，雖然她還是不完全理解，但說出來真的輕鬆很多。</p>
+            <div class="c-community__hug">
+              <button class="c-hug-btn">🫂</button>
+              <span class="c-hug-count">12</span>
+            </div>
+          </div>
+          <div class="c-community__post">
+            <p class="c-community__content">失敗了，但沒關係，我還在。</p>
+            <div class="c-community__hug">
+              <button class="c-hug-btn c-hug-btn--used">🫂</button>
+              <span class="c-hug-count">7</span>
+            </div>
+          </div>
+          <div class="c-community__post">
+            <p class="c-community__content">第一次記錄情緒，感覺比想像中有用！</p>
+            <div class="c-community__hug">
+              <button class="c-hug-btn">🫂</button>
+              <span class="c-hug-count">3</span>
+            </div>
+          </div>
+          <div class="c-community__form">
+            <input class="c-community__input" placeholder="分享一句話，讓別人知道你不孤單…" maxlength="100" />
+            <button class="c-community__submit">投稿</button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">卡片：#fff · 圓角 12px · border #f0ede8</span>
+        <span class="spec">擁抱按鈕：已按 opacity 0.5 + scale(1.15) disabled</span>
+        <span class="spec">字數上限：100</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Emotion Card ── -->
+    <section class="section" id="emotion-card">
+      <div class="section-header">
+        <h2>情緒記錄卡 <code>EmotionRecord</code></h2>
+        <p>情緒歷史列表的每一筆。顯示強度（圓點）、標籤、觸發事件摘要、日期。</p>
+      </div>
+      <div class="demo">
+        <div class="c-emotion-card">
+          <div class="c-emotion-card__header">
+            <div class="c-emotion-card__dots">
+              <span class="c-intensity-dot c-intensity-dot--filled"></span>
+              <span class="c-intensity-dot c-intensity-dot--filled"></span>
+              <span class="c-intensity-dot c-intensity-dot--filled"></span>
+              <span class="c-intensity-dot"></span>
+              <span class="c-intensity-dot"></span>
+            </div>
+            <span class="c-emotion-card__date">2026/04/10</span>
+          </div>
+          <div class="c-emotion-card__tags">
+            <span class="c-tag">焦慮</span>
+            <span class="c-tag">壓力</span>
+            <span class="c-tag">委屈</span>
+          </div>
+          <p class="c-emotion-card__text">被主管當眾批評，感覺很受傷但說不清楚為什麼…</p>
+          <button class="c-emotion-card__delete">刪除</button>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">強度圓點：10px · 5個 · 填色 #7fb5a0 / 空白 #e8e0d0</span>
+        <span class="spec">標籤：背景 rgba(127,181,160,0.15) · 圓角 99px · 12px</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Achievement Card ── -->
+    <section class="section" id="achievement-card">
+      <div class="section-header">
+        <h2>成就卡（寶麗來）<code>PolaroidCard / PolaroidModal</code></h2>
+        <p>9:16 比例白底卡片，含頂部圖片區、成就文字、標準說明、日期。可截圖匯出（html-to-image toPng pixelRatio:3）。</p>
+      </div>
+      <div class="demo demo-gray-bg">
+        <div class="c-polaroid">
+          <div class="c-polaroid__photo">
+            <span class="c-polaroid__photo-placeholder">📷</span>
+          </div>
+          <div class="c-polaroid__body">
+            <p class="c-polaroid__eyebrow">✨ 我做到了</p>
+            <h3 class="c-polaroid__title">今天主動問了不懂的問題</h3>
+            <p class="c-polaroid__standard">我的標準：敢開口，就是進步</p>
+            <p class="c-polaroid__date">2026.04.10</p>
+            <p class="c-polaroid__brand">🌿 抗焦慮成長導航</p>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">比例：300×533px (ref div 320×568)</span>
+        <span class="spec">背景：#fff · 陰影 0 8px 32px rgba(0,0,0,0.18)</span>
+        <span class="spec">截圖：toPng pixelRatio:3（實際 960×1704px）</span>
+        <span class="spec">Modal 用 createPortal 掛到 document.body（繞過 backdropFilter 堆疊限制）</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Conflict Card ── -->
+    <section class="section" id="conflict-card">
+      <div class="section-header">
+        <h2>衝突記錄卡 <code>ConflictCard</code></h2>
+        <p>應該 vs 想要兩欄對比，來源標籤，選擇結果，後續追蹤解決狀態。</p>
+      </div>
+      <div class="demo">
+        <div class="c-conflict-card">
+          <div class="c-conflict-card__header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="c-conflict-card__date">2026/04/08</span>
+              <button class="c-resolve-btn">標記已解決</button>
+            </div>
+            <button class="c-delete-btn">刪除</button>
+          </div>
+          <div class="c-conflict-card__versus">
+            <div class="c-conflict-card__side">
+              <span class="c-badge-should">應該</span>
+              找一份穩定的工作，照顧好家人
+            </div>
+            <div class="c-conflict-card__side">
+              <span class="c-badge-want">想要</span>
+              出國進修，探索更多可能性
+            </div>
+          </div>
+          <div class="c-conflict-card__meta">
+            <span class="c-tag c-tag--muted">家人</span>
+            <span class="c-tag c-tag--muted">還沒決定</span>
+          </div>
+        </div>
+
+        <div class="c-conflict-card c-conflict-card--resolved">
+          <div class="c-conflict-card__header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="c-conflict-card__date">2026/04/03</span>
+              <span class="c-resolved-label">✓ 已解決</span>
+            </div>
+            <button class="c-delete-btn">刪除</button>
+          </div>
+          <div class="c-conflict-card__versus">
+            <div class="c-conflict-card__side">
+              <span class="c-badge-should">應該</span>
+              週末陪家人
+            </div>
+            <div class="c-conflict-card__side">
+              <span class="c-badge-want">想要</span>
+              一個人休息充電
+            </div>
+          </div>
+          <div class="c-conflict-card__meta">
+            <span class="c-tag c-tag--muted">家人</span>
+            <span class="c-tag c-tag--muted">選了「想要」</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">解決按鈕：border #7fb5a0 · color #7fb5a0 · 11px</span>
+        <span class="spec">已解決標籤：#7fb5a0 bold 11px</span>
+        <span class="spec">刪除按鈕：border #fca5a5 · color #ef4444</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Breathing ── -->
+    <section class="section" id="breathing">
+      <div class="section-header">
+        <h2>深呼吸工具 <code>BreathingTool</code></h2>
+        <p>圓形動畫脈動（framer-motion scale 1→1.55→1），phase 四階段。完成後自動記錄 breathing_sessions，並顯示最近 5 筆歷史。</p>
+      </div>
+      <div class="demo demo-dark-bg demo-centered">
+        <div class="c-breathing">
+          <div class="c-breathing__glow"></div>
+          <div class="c-breathing__circle">
+            <span class="c-breathing__emoji">🌊</span>
+          </div>
+        </div>
+        <div class="c-breathing__phase">吸　氣</div>
+        <div class="c-breathing__timer">2:47</div>
+        <div class="c-breathing__patterns">
+          <div class="c-pattern-btn c-pattern-btn--active">
+            <span class="c-pattern-btn__label">4-2-4</span>
+            <span class="c-pattern-btn__name">舒緩呼吸</span>
+          </div>
+          <div class="c-pattern-btn">
+            <span class="c-pattern-btn__label">4-7-8</span>
+            <span class="c-pattern-btn__name">深度放鬆</span>
+          </div>
+          <div class="c-pattern-btn">
+            <span class="c-pattern-btn__label">4-4-4</span>
+            <span class="c-pattern-btn__name">箱式呼吸</span>
+          </div>
+        </div>
+        <div class="c-breathing__session-history">
+          <p class="c-breathing__history-label">練習記錄</p>
+          <div class="c-breathing__session-item">
+            <span>424</span>
+            <span class="c-breathing__session-meta">3 min · 2026/04/10</span>
+          </div>
+          <div class="c-breathing__session-item">
+            <span>478</span>
+            <span class="c-breathing__session-meta">5 min · 2026/04/09</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">圓圈：180px · radial-gradient #a8d0c4→#7fb5a0</span>
+        <span class="spec">Phase 顏色：吸氣/呼氣 #7fb5a0 · 憋氣 #f59e0b</span>
+        <span class="spec">Session 記錄：POST /api/breathing · 完成時自動送出</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Calendar ── -->
+    <section class="section" id="calendar">
+      <div class="section-header">
+        <h2>情緒日曆 <code>EmotionCalendar</code></h2>
+        <p>月曆顯示每日情緒，點擊日期展開當日記錄。強度轉換為 5 色圓點，與折線圖互相切換（📋/📅 toggle）。</p>
+      </div>
+      <div class="demo">
+        <div class="c-calendar">
+          <div class="c-calendar__nav">
+            <button class="c-calendar__nav-btn">‹</button>
+            <span class="c-calendar__month">2026 年 4 月</span>
+            <button class="c-calendar__nav-btn">›</button>
+          </div>
+          <div class="c-calendar__weekdays">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+          </div>
+          <div class="c-calendar__grid" id="cal-grid"></div>
+        </div>
+        <div class="c-calendar__legend">
+          <div class="c-cal-dot" style="background:#86efac"></div><span>1</span>
+          <div class="c-cal-dot" style="background:#4ade80"></div><span>2</span>
+          <div class="c-cal-dot" style="background:#fbbf24"></div><span>3</span>
+          <div class="c-cal-dot" style="background:#f97316"></div><span>4</span>
+          <div class="c-cal-dot" style="background:#ef4444"></div><span>5</span>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">7 欄格線 · 圓點顏色按強度平均值</span>
+        <span class="spec">強度 1:#86efac / 2:#4ade80 / 3:#fbbf24 / 4:#f97316 / 5:#ef4444</span>
+        <span class="spec">點擊展開：當日所有記錄列表</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Profile ── -->
+    <section class="section" id="profile">
+      <div class="section-header">
+        <h2>個人檔案 <code>Account</code></h2>
+        <p>頭貼可點擊上傳（Base64 存 DB），顯示大頭貼或首字母。右下角相機徽章。</p>
+      </div>
+      <div class="demo">
+        <div class="c-profile-card">
+          <div class="c-avatar-wrap">
+            <div class="c-avatar">W</div>
+            <div class="c-avatar__badge">📷</div>
+          </div>
+          <div>
+            <p class="c-profile-name">Wei</p>
+            <p class="c-profile-email">wei@example.com</p>
+          </div>
+        </div>
+        <div class="c-profile-card" style="margin-top:12px">
+          <div class="c-avatar-wrap">
+            <div class="c-avatar c-avatar--photo">
+              <div class="c-avatar__photo-placeholder">🖼</div>
+            </div>
+            <div class="c-avatar__badge">📷</div>
+          </div>
+          <div>
+            <p class="c-profile-name">已上傳頭貼</p>
+            <p class="c-profile-email">Base64 存於 users.avatar_data</p>
+          </div>
+        </div>
+      </div>
+      <div class="spec-row">
+        <span class="spec">頭貼圓圈：52×52px · gradient #7fb5a0→#5a9fc0</span>
+        <span class="spec">相機徽章：20×20px · 圓形 · 背景 #7fb5a0 · 右下角絕對定位</span>
+        <span class="spec">上傳：FileReader.readAsDataURL → PUT /api/auth/avatar</span>
+      </div>
+    </section>
+
+    <!-- ── Section: Atoms ── -->
+    <section class="section" id="atoms">
+      <div class="section-header">
+        <h2>基礎元件 <code>Atoms</code></h2>
+        <p>按鈕、輸入框、標籤、訊息方塊的完整規格。</p>
+      </div>
+      <div class="demo">
+
+        <div class="atom-group">
+          <p class="atom-group__label">按鈕</p>
+          <div class="atom-row">
+            <button class="c-btn-primary">儲存</button>
+            <button class="c-btn-primary" disabled>儲存中…</button>
+            <button class="c-btn-ghost">取消</button>
+            <button class="c-btn-danger">刪除</button>
+            <button class="c-btn-resolve">標記已解決</button>
+          </div>
+        </div>
+
+        <div class="atom-group">
+          <p class="atom-group__label">輸入框</p>
+          <div class="atom-col">
+            <input class="c-input" placeholder="顯示名稱" value="Wei" />
+            <input class="c-input" type="password" placeholder="••••••••" />
+            <textarea class="c-textarea" rows="3" placeholder="有任何建議…"></textarea>
+          </div>
+        </div>
+
+        <div class="atom-group">
+          <p class="atom-group__label">標籤 Tag</p>
+          <div class="atom-row">
+            <span class="c-tag">焦慮</span>
+            <span class="c-tag">壓力</span>
+            <span class="c-tag c-tag--active">委屈 ×</span>
+            <span class="c-tag c-tag--muted">家人</span>
+            <span class="c-tag c-tag--muted">還沒決定</span>
+          </div>
+        </div>
+
+        <div class="atom-group">
+          <p class="atom-group__label">訊息方塊</p>
+          <div class="atom-col">
+            <div class="c-msg c-msg--success">✓ 名稱更新成功</div>
+            <div class="c-msg c-msg--error">✗ 密碼不正確，請再試一次</div>
+          </div>
+        </div>
+
+        <div class="atom-group">
+          <p class="atom-group__label">色票</p>
+          <div class="atom-row">
+            <div class="c-swatch" style="background:#7fb5a0"><span>#7fb5a0</span></div>
+            <div class="c-swatch" style="background:#5a9fc0"><span>#5a9fc0</span></div>
+            <div class="c-swatch" style="background:#c87050"><span>#c87050</span></div>
+            <div class="c-swatch" style="background:#f59e0b"><span>#f59e0b</span></div>
+            <div class="c-swatch" style="background:#ef4444"><span>#ef4444</span></div>
+            <div class="c-swatch" style="background:#faf8f3;border:1px solid #e8e0d0;color:#374151"><span>#faf8f3</span></div>
+            <div class="c-swatch" style="background:#2d3748"><span>#2d3748</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Generate heatmap grid
+    const grid = document.getElementById('heatmap-grid');
+    const mockData = {};
+    ['2026-04-01','2026-04-02','2026-04-03','2026-04-05','2026-04-07','2026-04-08','2026-04-09','2026-04-10'].forEach((d,i) => { mockData[d] = [1,2,3,1,2,1,3,2][i]; });
+    for (let w = 0; w < 12; w++) {
+      const col = document.createElement('div');
+      col.className = 'c-heatmap-col';
+      for (let d = 0; d < 7; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'c-heatmap-cell';
+        const count = Math.random() > 0.65 ? Math.ceil(Math.random()*3) : 0;
+        cell.style.background = count === 0 ? '#ede8e3' : count === 1 ? '#fad5c8' : count === 2 ? '#f4a898' : '#e8836c';
+        col.appendChild(cell);
+      }
+      grid.appendChild(col);
+    }
+
+    // Generate calendar
+    const calGrid = document.getElementById('cal-grid');
+    const intensityColors = ['','#86efac','#4ade80','#fbbf24','#f97316','#ef4444'];
+    const firstDay = new Date(2026, 3, 1).getDay(); // April 2026
+    const daysInMonth = 30;
+    for (let i = 0; i < firstDay; i++) {
+      const blank = document.createElement('div');
+      blank.className = 'c-calendar__cell c-calendar__cell--blank';
+      calGrid.appendChild(blank);
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'c-calendar__cell';
+      const hasData = Math.random() > 0.5;
+      const intensity = hasData ? Math.ceil(Math.random()*5) : 0;
+      cell.innerHTML = `<span class="c-calendar__day">${day}</span>${hasData ? `<div class="c-cal-dot" style="background:${intensityColors[intensity]};width:6px;height:6px;margin:2px auto 0"></div>` : ''}`;
+      if (day === 10) cell.classList.add('c-calendar__cell--today');
+      calGrid.appendChild(cell);
+    }
+  </script>
+
+</body>
+</html>
