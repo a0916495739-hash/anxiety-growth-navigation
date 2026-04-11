@@ -355,6 +355,17 @@ const zh = {
   cognitiveStep2Short: '自動想法',
   cognitiveStep3Short: '反駁證據',
   cognitiveStep4Short: '平衡想法',
+
+  // Weekly Report
+  weeklyReportLabel: '本週情緒週報',
+  weeklyReportDesc: 'AI 分析你這週的記錄，生成個人化洞察',
+  weeklyReportBtn: '生成本週週報',
+  weeklyReportGenerating: '分析中，請稍候...',
+  weeklyReportCached: '本週週報（已生成）',
+  weeklyReportNoData: '這週還沒有情緒記錄，先去記錄幾次再來這裡吧',
+  weeklyReportError: '生成失敗，請稍後再試',
+  weeklyReportRegenerateHint: '週報每週固定更新，下週一可重新生成',
+  viewWeeklyReport: '查看本週週報',
 };
 
 const en = {
@@ -714,6 +725,17 @@ const en = {
   cognitiveStep2Short: 'Auto-thought',
   cognitiveStep3Short: 'Evidence',
   cognitiveStep4Short: 'Balanced view',
+
+  // Weekly Report
+  weeklyReportLabel: 'Weekly Emotion Report',
+  weeklyReportDesc: 'AI analyzes your week and generates personalized insights',
+  weeklyReportBtn: 'Generate This Week\'s Report',
+  weeklyReportGenerating: 'Analyzing, please wait...',
+  weeklyReportCached: 'This Week\'s Report',
+  weeklyReportNoData: 'No emotion records this week yet — log a few first',
+  weeklyReportError: 'Generation failed, please try again later',
+  weeklyReportRegenerateHint: 'Reports refresh weekly. Come back next Monday for a new one.',
+  viewWeeklyReport: 'View Weekly Report',
 };
 
 export const translations = { zh, en };

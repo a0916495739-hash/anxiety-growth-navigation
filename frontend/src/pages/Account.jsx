@@ -453,6 +453,16 @@ export default function Account() {
       {/* Export */}
       {isLoggedIn && (
         <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
+          <p style={{ ...s.sectionLabel, color: c.label }}>{t.weeklyReportLabel}</p>
+          <p style={{ fontSize: 13, color: c.label, marginBottom: 12, lineHeight: 1.6 }}>{t.weeklyReportDesc}</p>
+          <button onClick={() => navigate('/report')} style={{ ...s.submitBtn, background: c.submitBg }}>
+            {t.viewWeeklyReport}
+          </button>
+        </div>
+      )}
+
+      {isLoggedIn && (
+        <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
           <p style={{ ...s.sectionLabel, color: c.label }}>{t.exportData.replace(' (CSV)', '')}</p>
           <button
             onClick={handleExportCSV}

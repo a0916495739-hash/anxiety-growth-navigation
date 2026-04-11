@@ -16,6 +16,7 @@ import { AchievementNew, AchievementList } from './pages/Achievements';
 import { ConflictNew, ConflictList, ConflictStats } from './pages/Conflicts';
 import BreathingTool from './pages/BreathingTool';
 import { CognitiveReframeNew, CognitiveReframeList } from './pages/CognitiveReframe';
+import WeeklyReport from './pages/WeeklyReport';
 
 function AppRoutes() {
   const { authChecked } = useApp();
@@ -46,6 +47,7 @@ function AppRoutes() {
           <Route path="/breathing" element={<BreathingTool />} />
           <Route path="/cognitive/new" element={<CognitiveReframeNew />} />
           <Route path="/cognitive/history" element={<CognitiveReframeList />} />
+          <Route path="/report" element={<WeeklyReport />} />
         </Routes>
       </PageTransition>
       <BottomTabBar />
