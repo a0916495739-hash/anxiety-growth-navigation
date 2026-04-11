@@ -3,6 +3,7 @@ import EmotionCalendar from '../components/EmotionCalendar';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { createEmotion, getEmotionTrend, deleteEmotion } from '../api/emotions';
+import { getAIEmotionFeedback } from '../api/ai';
 import { useApp } from '../context/AppContext';
 import TagSelector from '../components/TagSelector';
 import PromptCard from '../components/PromptCard';
@@ -261,7 +262,7 @@ function Confetti() {
 }
 
 // Completion screen
-function CompletionScreen({ todayCount, t, isDark }) {
+function CompletionScreen({ todayCount, t, isDark, emotionText, lang }) {
   const navigate = useNavigate();
   const styles = getStyles(isDark);
   const [showAchievementPrompt, setShowAchievementPrompt] = useState(todayCount >= 3);
@@ -269,6 +270,16 @@ function CompletionScreen({ todayCount, t, isDark }) {
   const [message] = useState(
     () => t.surpriseMessages[Math.floor(Math.random() * t.surpriseMessages.length)]
   );
+  const [aiMessage, setAiMessage] = useState(null);   // null = loading, '' = disabled/failed
+  const [aiLoading, setAiLoading] = useState(!!emotionText);
+
+  useEffect(() => {
+    if (!emotionText) { setAiLoading(false); return; }
+    getAIEmotionFeedback(emotionText, lang)
+      .then((r) => setAiMessage(r.data.enabled ? r.data.message : ''))
+      .catch(() => setAiMessage(''))
+      .finally(() => setAiLoading(false));
+  }, []);
 
   return (
     <div style={{ ...styles.page, animation: 'completionEnter 0.4s ease both' }}>
@@ -278,6 +289,27 @@ function CompletionScreen({ todayCount, t, isDark }) {
       </div>
       <h2 style={{ ...styles.heading, textAlign: 'center', animation: 'popIn 0.5s 0.15s both' }}>{t.recordDone}</h2>
       <p style={{ ...styles.sub, textAlign: 'center', animation: 'popIn 0.5s 0.25s both' }}>{message}</p>
+
+      {/* AI 個人化回應 */}
+      {aiLoading && (
+        <div style={{ textAlign: 'center', padding: '12px 0', animation: 'popIn 0.4s 0.3s both', opacity: 0 }}>
+          <span style={{ fontSize: 13, color: isDark ? '#a8a29e' : '#9ca3af' }}>💭 AI 正在回應...</span>
+        </div>
+      )}
+      {!aiLoading && aiMessage && (
+        <div style={{
+          margin: '12px 0 4px',
+          padding: '14px 18px',
+          background: isDark ? 'rgba(127,181,160,0.12)' : 'rgba(127,181,160,0.1)',
+          border: `1px solid ${isDark ? 'rgba(127,181,160,0.25)' : 'rgba(127,181,160,0.3)'}`,
+          borderRadius: 14,
+          animation: 'fadeSlideIn 0.5s ease both',
+        }}>
+          <p style={{ fontSize: 14, color: isDark ? '#a8d5c2' : '#3d8b72', lineHeight: 1.75, margin: 0 }}>
+            {aiMessage}
+          </p>
+        </div>
+      )}
 
       {showAchievementPrompt && (
         <PromptCard
@@ -306,6 +338,7 @@ export default function EmotionRecorder() {
   const [mode, setMode] = useState(null);
   const [done, setDone] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const [emotionText, setEmotionText] = useState('');
   const { todayCount, incrementTodayCount, lang, isDark } = useApp();
   const t = getT(lang);
   const [finalCount, setFinalCount] = useState(todayCount);
@@ -313,6 +346,10 @@ export default function EmotionRecorder() {
 
   async function handleSubmit(data) {
     setExiting(true);
+    // 收集有意義的文字內容供 AI 使用
+    const text = [data.raw_emotion, data.trigger_event, data.protection]
+      .filter(Boolean).join(' ').trim();
+    setEmotionText(text);
     await createEmotion(data);
     incrementTodayCount();
     setFinalCount(todayCount + 1);
@@ -321,7 +358,7 @@ export default function EmotionRecorder() {
   }
 
   const exitStyle = exiting ? { animation: 'formExit 0.32s ease forwards', pointerEvents: 'none' } : {};
-  if (done) return <CompletionScreen todayCount={finalCount} t={t} isDark={isDark} />;
+  if (done) return <CompletionScreen todayCount={finalCount} t={t} isDark={isDark} emotionText={emotionText} lang={lang} />;
   if (!mode) return <div style={exitStyle}><ModeSelect onSelect={setMode} onBack={() => navigate('/')} t={t} isDark={isDark} /></div>;
   if (mode === 'guided') return <div style={exitStyle}><GuidedForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} isDark={isDark} /></div>;
   return <div style={exitStyle}><FreeForm onSubmit={handleSubmit} onBack={() => setMode(null)} t={t} isDark={isDark} /></div>;
