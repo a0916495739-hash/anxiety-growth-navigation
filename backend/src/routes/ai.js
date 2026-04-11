@@ -3,8 +3,14 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
-const AI_ENABLED = process.env.AI_ENABLED === 'true';
-const AI_MODEL   = process.env.AI_MODEL || 'claude'; // 'claude' | 'openai' | 'gemini'
+const AI_ENABLED  = process.env.AI_ENABLED === 'true';
+const AI_PREVIEW  = process.env.AI_PREVIEW === 'true';
+const AI_MODEL    = process.env.AI_MODEL || 'claude'; // 'claude' | 'openai' | 'gemini'
+
+const PREVIEW_MESSAGES = {
+  zh: '你願意把這些說出來，已經很不容易了。不管今天發生什麼，你還在這裡，這本身就很重要。好好休息，明天的事明天再說。',
+  en: "The fact that you wrote this down says a lot about your self-awareness. Whatever today brought, you showed up — and that matters. Be gentle with yourself tonight.",
+};
 
 function buildPrompt(lang) {
   const isZh = lang !== 'en';
@@ -69,7 +75,18 @@ const callers = {
 
 // POST /api/ai/emotion-feedback
 router.post('/emotion-feedback', auth, async (req, res) => {
+  const { text, lang } = req.body;
+
+  // 預覽模式：回傳假資料，不呼叫任何 API
+  if (AI_PREVIEW) {
+    if (!req.userId) return res.json({ enabled: false });
+    return res.json({ enabled: true, message: PREVIEW_MESSAGES[lang] || PREVIEW_MESSAGES.zh, model: 'preview' });
+  }
+
   if (!AI_ENABLED) return res.json({ enabled: false });
+
+  // 只允許登入用戶，訪客不消耗 AI 額度
+  if (!req.userId) return res.json({ enabled: false });
 
   const caller = callers[AI_MODEL];
   if (!caller) {
@@ -81,7 +98,6 @@ router.post('/emotion-feedback', auth, async (req, res) => {
     return res.json({ enabled: false });
   }
 
-  const { text, lang } = req.body;
   if (!text?.trim()) return res.status(422).json({ error: 'text is required' });
 
   try {
