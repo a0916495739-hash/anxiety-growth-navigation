@@ -1,8 +1,18 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const auth = require('../middleware/auth');
 const pool = require('../db/pool');
 
 const router = express.Router();
+
+// 每個 IP 每小時最多呼叫 AI 20 次（preview 模式也算，防爬）
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'AI 使用次數已達上限，請一小時後再試' },
+});
 
 const AI_ENABLED  = process.env.AI_ENABLED === 'true';
 const AI_PREVIEW  = process.env.AI_PREVIEW === 'true';
@@ -94,7 +104,7 @@ const callers = {
 };
 
 // POST /api/ai/emotion-feedback
-router.post('/emotion-feedback', auth, async (req, res) => {
+router.post('/emotion-feedback', aiLimiter, auth, async (req, res) => {
   const { text, lang } = req.body;
 
   // 預覽模式：回傳假資料，不呼叫任何 API
@@ -149,7 +159,7 @@ router.get('/weekly-report', auth, async (req, res) => {
 });
 
 // POST /api/ai/weekly-report — 生成本週週報（一週一次）
-router.post('/weekly-report', auth, async (req, res) => {
+router.post('/weekly-report', aiLimiter, auth, async (req, res) => {
   if (!req.userId) return res.json({ enabled: false });
 
   const { lang } = req.body;

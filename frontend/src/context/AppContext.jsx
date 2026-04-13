@@ -106,7 +106,6 @@ export function AppProvider({ children }) {
     try {
       await apiLogout();
     } catch (_) {}
-    localStorage.removeItem('auth_token');
     setIsLoggedIn(false);
     setDisplayName(null);
     setAvatarUrl(null);

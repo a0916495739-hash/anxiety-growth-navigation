@@ -10,12 +10,8 @@ const client = axios.create({
   withCredentials: true,
 });
 
-// Attach auth token + guest token on every request
+// Attach guest token on every request (auth uses httpOnly cookie automatically)
 client.interceptors.request.use((config) => {
-  const authToken = localStorage.getItem('auth_token');
-  if (authToken) {
-    config.headers['Authorization'] = `Bearer ${authToken}`;
-  }
   const guestToken = localStorage.getItem('guest_token');
   if (guestToken) {
     config.headers['x-guest-token'] = guestToken;

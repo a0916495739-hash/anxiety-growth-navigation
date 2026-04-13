@@ -1,7 +1,26 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const pool = require('../db/pool');
 
 const router = express.Router();
+
+// 每個 IP 每分鐘最多 30 次 hug（防連點刷數）
+const hugLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: '操作太頻繁，請稍後再試' },
+});
+
+// 每個 IP 每小時最多發 5 篇貼文
+const postLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: '發文次數已達上限，請一小時後再試' },
+});
 
 // GET /api/community — approved posts (newest first, max 30)
 router.get('/', async (req, res) => {
@@ -21,7 +40,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/community — submit a new post (pending approval)
-router.post('/', async (req, res) => {
+router.post('/', postLimiter, async (req, res) => {
   const { content } = req.body;
   if (!content || !content.trim()) {
     return res.status(422).json({ error: '內容不能為空' });
@@ -42,7 +61,7 @@ router.post('/', async (req, res) => {
 });
 
 // POST /api/community/:id/hug — add a hug
-router.post('/:id/hug', async (req, res) => {
+router.post('/:id/hug', hugLimiter, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(

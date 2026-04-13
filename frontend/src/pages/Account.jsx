@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 function SunIcon() {
   return (
@@ -54,7 +54,12 @@ export default function Account() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [billing, setBilling] = useState('monthly'); // 'monthly' | 'yearly'
+  const [coverUrl, setCoverUrl] = useState(() => localStorage.getItem('cover_url') || null);
+  const [growthGoal, setGrowthGoal] = useState(() => localStorage.getItem('growth_goal') || '');
+  const [goalEditing, setGoalEditing] = useState(false);
   const avatarInputRef = useRef(null);
+  const coverInputRef = useRef(null);
+  const goalInputRef = useRef(null);
 
   const { handleLogout, isLoggedIn, displayName, setDisplayName, avatarUrl, setAvatarUrl, subscriptionPlan, lang, setLang, theme, setTheme, isDark } = useApp();
   const t = getT(lang);
@@ -138,15 +143,34 @@ export default function Account() {
     }
   }
 
+  function handleCoverChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    // 清除舊的 object URL 避免記憶體洩漏
+    if (coverUrl?.startsWith('blob:')) URL.revokeObjectURL(coverUrl);
+    setCoverUrl(objectUrl);
+    localStorage.setItem('cover_url', objectUrl);
+    e.target.value = '';
+  }
+
+  function handleGoalBlur() {
+    setGoalEditing(false);
+    localStorage.setItem('growth_goal', growthGoal);
+  }
+
+  function handleGoalKeyDown(e) {
+    if (e.key === 'Enter') goalInputRef.current?.blur();
+    if (e.key === 'Escape') { setGoalEditing(false); }
+  }
+
   async function handleExportCSV() {
     if (exporting) return;
     setExporting(true);
     try {
-      const token = localStorage.getItem('auth_token');
       const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       const res = await fetch(`${baseURL}/export/csv`, {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -222,10 +246,52 @@ export default function Account() {
       <h2 style={{ ...s.heading, color: c.heading }}>{t.accountSettings}</h2>
 
       {/* Profile */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.profile}</p>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder, padding: 0, overflow: 'hidden' }}>
+
+        {/* ── Cover Photo ── */}
+        <div style={{ position: 'relative', width: '100%', height: 120 }}>
+          {/* Background */}
+          <div style={{
+            width: '100%', height: '100%',
+            background: coverUrl
+              ? `url(${coverUrl}) center/cover no-repeat`
+              : 'linear-gradient(135deg, #c8dfd8 0%, #e8f4f0 40%, #fdf3ee 100%)',
+            transition: 'background 0.4s ease',
+          }} />
+          {/* Hidden cover input */}
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleCoverChange}
+          />
+          {/* Camera button — bottom right */}
+          <button
+            onClick={() => coverInputRef.current?.click()}
+            title="更換封面圖"
+            style={{
+              position: 'absolute', bottom: 10, right: 12,
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(6px)',
+              border: '1.5px solid rgba(255,255,255,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Section label + avatar row */}
+        <div style={{ padding: '16px 20px 0' }}>
+        <p style={{ ...s.sectionLabel, color: c.label, marginBottom: 12 }}>{t.profile}</p>
         <div style={s.avatar}>
-          {/* Hidden file input */}
+          {/* Hidden avatar file input */}
           <input
             ref={avatarInputRef}
             type="file"
@@ -267,6 +333,58 @@ export default function Account() {
             <p style={{ ...s.avatarEmail, color: c.textMid }}>{email}</p>
           </div>
         </div>
+
+        {/* ── Growth Goal (Notion-style editable) ── */}
+        <div style={{ margin: '4px 0 16px', position: 'relative' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: c.label, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 }}>
+            我目前的成長目標是...
+          </p>
+          {goalEditing ? (
+            <input
+              ref={goalInputRef}
+              autoFocus
+              value={growthGoal}
+              onChange={(e) => setGrowthGoal(e.target.value)}
+              onBlur={handleGoalBlur}
+              onKeyDown={handleGoalKeyDown}
+              maxLength={80}
+              placeholder="寫下你的目標，例如：每天記錄一次情緒"
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: `1.5px solid ${isDark ? 'rgba(127,181,160,0.5)' : '#7fb5a0'}`,
+                outline: 'none',
+                fontSize: 15,
+                color: isDark ? '#d6d3d1' : '#4a5568',
+                padding: '4px 0',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.2s',
+              }}
+            />
+          ) : (
+            <p
+              onClick={() => { setGoalEditing(true); setTimeout(() => goalInputRef.current?.focus(), 0); }}
+              style={{
+                fontSize: 15,
+                color: growthGoal
+                  ? (isDark ? '#c4b8ae' : '#6b7280')
+                  : (isDark ? '#6b6560' : '#b8b2ab'),
+                fontStyle: growthGoal ? 'normal' : 'italic',
+                cursor: 'text',
+                padding: '4px 0',
+                borderBottom: '1.5px solid transparent',
+                transition: 'border-color 0.2s',
+                minHeight: 28,
+              }}
+            >
+              {growthGoal || '點擊輸入你的成長目標...'}
+            </p>
+          )}
+        </div>
+
+        </div>{/* end padding wrapper */}
+        <div style={{ padding: '0 20px 20px' }}>
         <form onSubmit={handleSaveName} style={s.form}>
           <div style={s.field}>
             <label style={{ ...s.label, color: c.text }}>{t.displayName}</label>
@@ -275,7 +393,8 @@ export default function Account() {
           {nameMsg && <div style={{ ...s.msgBox, background: nameMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${nameMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: nameMsg.type === 'success' ? c.successText : c.errorText }}>{nameMsg.text}</div>}
           <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={nameSaving || !nameInput.trim()}>{nameSaving ? t.savingName : t.saveName}</button>
         </form>
-      </div>
+        </div>{/* end form wrapper */}
+      </div>{/* end profile section */}
 
       {/* Password */}
       <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>

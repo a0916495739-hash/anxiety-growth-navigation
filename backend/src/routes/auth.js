@@ -75,7 +75,7 @@ router.post('/register', authLimiter, async (req, res) => {
       return res.status(409).json({ error: 'Email already in use' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 12);
     const userResult = await client.query(
       'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id',
       [email, passwordHash]
@@ -99,7 +99,7 @@ router.post('/register', authLimiter, async (req, res) => {
 
     await client.query('COMMIT');
 
-    const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn: '14d' });
     res.cookie('token', token, cookieOptions);
     res.status(201).json({ message: 'Account created successfully', token });
   } catch (err) {
@@ -131,7 +131,7 @@ router.post('/login', authLimiter, async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '14d' });
     res.cookie('token', token, cookieOptions);
     res.json({ message: 'Logged in successfully', token });
   } catch (err) {
@@ -229,7 +229,7 @@ router.put('/password', async (req, res) => {
     if (result.rows.length === 0) return res.status(401).json({ error: 'User not found' });
     const valid = await bcrypt.compare(currentPassword, result.rows[0].password_hash);
     if (!valid) return res.status(401).json({ error: '目前密碼不正確' });
-    const newHash = await bcrypt.hash(newPassword, 10);
+    const newHash = await bcrypt.hash(newPassword, 12);
     await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, payload.userId]);
     res.json({ message: 'Password updated' });
   } catch {
@@ -313,7 +313,7 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: '連結已失效或不正確，請重新申請' });
     }
 
-    const newHash = await bcrypt.hash(newPassword, 10);
+    const newHash = await bcrypt.hash(newPassword, 12);
     await pool.query(
       'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
       [newHash, result.rows[0].id]
