@@ -34,8 +34,8 @@ export default function ThreadsBottomNav({ active = 'home', onChange }) {
             <Icon
               size={26}
               strokeWidth={isActive ? 2.5 : 1.75}
-              color={isActive ? '#000000' : '#9ca3af'}
-              style={{ display: 'block', transition: 'color 0.15s, stroke-width 0.15s' }}
+              color={isActive ? '#7fb5a0' : '#b8b2ab'}
+              style={{ display: 'block', transition: 'color 0.2s, stroke-width 0.2s' }}
             />
           </button>
         );
@@ -47,18 +47,25 @@ export default function ThreadsBottomNav({ active = 'home', onChange }) {
 const s = {
   nav: {
     position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+    left: 16,
+    right: 16,
+    margin: '0 auto',
+    maxWidth: 400,
     height: 60,
-    paddingBottom: 'env(safe-area-inset-bottom)',
-    background: '#ffffff',
-    borderTop: '1px solid #f0f0f0',
-    boxShadow: '0 -1px 0 rgba(0,0,0,0.04)',
+    background: 'rgba(255,253,250,0.82)',
+    backdropFilter: 'blur(28px)',
+    WebkitBackdropFilter: 'blur(28px)',
+    border: '1px solid rgba(0,0,0,0.06)',
+    borderRadius: 9999,
+    boxShadow: '0 8px 30px rgba(0,0,0,0.11), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around',
+    padding: '0 12px',
     zIndex: 9999,
+    WebkitTransform: 'translate3d(0,0,0)',
+    transform: 'translate3d(0,0,0)',
   },
   btn: {
     background: 'none',
