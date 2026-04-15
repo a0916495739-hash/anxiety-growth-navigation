@@ -35,10 +35,10 @@ export default function Home() {
   const text_sub = isDark ? '#a8a29e'                 : '#6b7280';
 
   const features = [
-    { label: t.emotionFeatureLabel,    desc: t.emotionFeatureDesc,    path: '/emotions',       emoji: '🌊', color: '#e8f4fb', border: '#a8c8e8', accent: '#5a9fc0' },
-    { label: t.achievementFeatureLabel,desc: t.achievementFeatureDesc, path: '/achievements',   emoji: '✨', color: '#e8f4f0', border: '#7fb5a0', accent: '#4a9580' },
-    { label: t.conflictFeatureLabel,   desc: t.conflictFeatureDesc,   path: '/conflicts',      emoji: '⚖️', color: '#fdf3ee', border: '#f0b8a0', accent: '#c87050' },
-    { label: t.cognitiveFeatureLabel,  desc: t.cognitiveFeatureDesc,  path: '/cognitive/new',  emoji: '🧠', color: '#f3f0fb', border: '#b8a8e8', accent: '#7060c8' },
+    { label: t.emotionFeatureLabel,   desc: t.emotionFeatureDesc,   path: '/emotions',      emoji: '🌊', color: '#e8f4fb', border: '#a8c8e8', accent: '#5a9fc0' },
+    { label: t.conflictFeatureLabel,  desc: t.conflictFeatureDesc,  path: '/conflicts',     emoji: '⚖️', color: '#fdf3ee', border: '#f0b8a0', accent: '#c87050' },
+    { label: t.cognitiveFeatureLabel, desc: t.cognitiveFeatureDesc, path: '/cognitive/new', emoji: '🧠', color: '#f3f0fb', border: '#b8a8e8', accent: '#7060c8' },
+    { label: t.weeklyReportLabel,     desc: t.weeklyReportDesc,     path: '/report',        emoji: '📊', color: '#f0f4ff', border: '#a8b8e8', accent: '#5060c8' },
   ];
 
   useEffect(() => {
