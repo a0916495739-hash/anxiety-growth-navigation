@@ -181,14 +181,9 @@ input, textarea { font-family: inherit; }
   .nav-hamburger { display: flex !important; }
 }
 
-/* ── Desktop (769px–1099px) — sidebar only, no right panel ── */
+/* ── Desktop (>768px) ── */
 @media (min-width: 769px) {
+  /* 桌面：顯示桌面導覽，隱藏漢堡 */
   .nav-desktop-only { display: flex !important; }
   .nav-hamburger { display: none !important; }
-  .right-panel { display: none !important; }
-}
-
-/* ── Wide desktop (≥1100px) — full three-column ── */
-@media (min-width: 1100px) {
-  .right-panel { display: flex !important; }
 }
