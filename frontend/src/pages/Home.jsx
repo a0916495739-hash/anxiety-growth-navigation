@@ -73,7 +73,6 @@ export default function Home() {
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       {/* Nav */}
       <nav style={{ ...s.nav, borderBottomColor: isDark ? '#3d3530' : '#e8e0d0' }}>
-        <div style={{ flex: 1 }} />
         <div style={s.logo}>
           <span style={s.logoMark}>🌿</span>
           <span style={{ ...s.logoText, color: text_head, fontSize: lang === 'en' ? 14 : 17 }}>{t.appName}</span>
@@ -501,8 +500,6 @@ const s = {
     alignItems: 'center',
     flexWrap: 'nowrap',
     flexShrink: 0,
-    flex: 1,
-    justifyContent: 'flex-end',
   },
   desktopButtons: {
     display: 'flex',
