@@ -34,7 +34,7 @@ function AppRoutes() {
   const isAuth = AUTH_PAGES.includes(location.pathname);
 
   return (
-    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh', maxWidth: 1080, margin: '0 auto', width: '100%' }}>
       {!isAuth && <LeftSidebar />}
       <main style={{ flex: 1, minWidth: 0, padding: '0 32px' }}>
         <PageTransition>
@@ -62,7 +62,7 @@ function AppRoutes() {
           </Routes>
         </PageTransition>
       </main>
-      {!isAuth && <RightPanel />}
+      {!isAuth && <RightPanel className="right-panel" />}
       <BottomTabBar />
     </div>
   );

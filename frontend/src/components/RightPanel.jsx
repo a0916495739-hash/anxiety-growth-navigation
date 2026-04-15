@@ -8,7 +8,7 @@ function pickQuote(quotes) {
   return quotes[dayOfYear % quotes.length];
 }
 
-export default function RightPanel() {
+export default function RightPanel({ className }) {
   const { lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function RightPanel() {
   const sub    = isDark ? '#a8a29e' : '#6b7280';
 
   return (
-    <aside style={{
+    <aside className={className} style={{
       position: 'sticky',
       top: 0,
       height: '100vh',
