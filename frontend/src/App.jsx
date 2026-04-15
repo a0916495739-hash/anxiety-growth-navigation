@@ -4,6 +4,7 @@ import { ToastProvider } from './components/Toast';
 import BottomTabBar from './components/BottomTabBar';
 import LeftSidebar from './components/LeftSidebar';
 import PageTransition from './components/PageTransition';
+import useSwipeNav from './hooks/useSwipeNav';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -22,8 +23,9 @@ import Settings from './pages/Settings';
 import ThreadsNavDemo from './pages/ThreadsNavDemo';
 
 function AppRoutes() {
-  const { authChecked } = useApp();
+  const { authChecked, isLoggedIn } = useApp();
   const location = useLocation();
+  useSwipeNav(isLoggedIn);
   if (!authChecked) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#faf8f3' }}>
       <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
