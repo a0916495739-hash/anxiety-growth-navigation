@@ -156,9 +156,8 @@ export default function LeftSidebar() {
         {menuOpen && (
           <div style={{
             position: 'absolute',
-            bottom: 'calc(100% + 8px)',
-            left: '50%',
-            transform: 'translateX(-50%)',
+            bottom: 0,
+            left: 'calc(100% + 8px)',
             minWidth: 180,
             background: isDark ? 'rgba(28,25,23,0.97)' : 'rgba(255,255,255,0.97)',
             backdropFilter: 'blur(20px)',
