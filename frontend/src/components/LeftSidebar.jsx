@@ -89,44 +89,57 @@ export default function LeftSidebar() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: 24,
       paddingBottom: 24,
-      gap: 8,
-      justifyContent: 'center',
       background: bg,
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       borderRight: `1px solid ${border}`,
       flexShrink: 0,
     }}>
-      {/* Logo mark */}
-      <div style={{ fontSize: 24, marginBottom: 16 }}>🌿</div>
+      {/* Logo — 頂部，點擊回首頁 */}
+      <button
+        onClick={() => navigate('/')}
+        title="首頁"
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: 24,
+          padding: '20px 0 16px',
+          flexShrink: 0,
+        }}
+      >
+        🌿
+      </button>
 
-      {tabs.map(({ path, label, Icon }) => {
-        const on = isActive(path);
-        return (
-          <button
-            key={path}
-            onClick={() => navigate(path)}
-            title={label}
-            style={{
-              width: 48,
-              height: 48,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: on ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(0,0,0,0.06)') : 'none',
-              border: 'none',
-              borderRadius: 14,
-              cursor: 'pointer',
-              color: on ? activeColor : inactiveColor,
-              transition: 'color 0.2s ease, background 0.2s ease',
-            }}
-          >
-            <Icon active={on} />
-          </button>
-        );
-      })}
+      {/* 置中 icon 群 */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        {tabs.map(({ path, label, Icon }) => {
+          const on = isActive(path);
+          return (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              title={label}
+              style={{
+                width: 48,
+                height: 48,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: on ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(0,0,0,0.06)') : 'none',
+                border: 'none',
+                borderRadius: 14,
+                cursor: 'pointer',
+                color: on ? activeColor : inactiveColor,
+                transition: 'color 0.2s ease, background 0.2s ease',
+              }}
+            >
+              <Icon active={on} />
+            </button>
+          );
+        })}
+      </div>
     </aside>
   );
 }
