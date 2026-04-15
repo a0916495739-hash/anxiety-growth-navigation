@@ -17,6 +17,7 @@ import { ConflictNew, ConflictList, ConflictStats } from './pages/Conflicts';
 import BreathingTool from './pages/BreathingTool';
 import { CognitiveReframeNew, CognitiveReframeList } from './pages/CognitiveReframe';
 import WeeklyReport from './pages/WeeklyReport';
+import Settings from './pages/Settings';
 import ThreadsNavDemo from './pages/ThreadsNavDemo';
 
 function AppRoutes() {
@@ -35,6 +36,7 @@ function AppRoutes() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />

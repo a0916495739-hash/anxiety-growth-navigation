@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sprout } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { getMe, updateProfile, updateAvatar } from '../api/auth';
+import { useApp } from '../context/AppContext';
+import { getT } from '../i18n';
 
 // ── Growth Level System ──────────────────────────────────────────────────────
 const LEVELS = [
@@ -16,7 +20,6 @@ const LEVELS = [
 ];
 
 function getGrowthLevel() {
-  // 以首次使用日期計算成長天數
   let firstUse = localStorage.getItem('first_use_date');
   if (!firstUse) {
     firstUse = new Date().toISOString();
@@ -33,67 +36,31 @@ function getGrowthLevel() {
 
 function GrowthAvatarCard({ isDark }) {
   const { lv, title, days, progress } = getGrowthLevel();
-  const bg     = isDark ? '#1e2d27' : '#f0faf5';
-  const border = isDark ? '2px solid rgba(127,181,160,0.5)' : '2px solid #2d6a4f';
-  const shadow = '4px 4px 0px 0px rgba(45,106,79,0.25)';
+  const bg         = isDark ? '#1e2d27' : '#f0faf5';
+  const border     = isDark ? '2px solid rgba(127,181,160,0.5)' : '2px solid #2d6a4f';
+  const shadow     = '4px 4px 0px 0px rgba(45,106,79,0.25)';
   const textPrimary = isDark ? '#c8e6c9' : '#1b4332';
   const textSub     = isDark ? '#81c995' : '#40916c';
   const barBg       = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(45,106,79,0.12)';
 
   return (
-    <div style={{
-      background: bg,
-      border,
-      borderRadius: 16,
-      boxShadow: shadow,
-      padding: '18px 20px',
-      marginBottom: 16,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 18,
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Pixel-feel decorative dots */}
+    <div style={{ background: bg, border, borderRadius: 16, boxShadow: shadow, padding: '18px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 18, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: 8, right: 12, display: 'flex', gap: 4 }}>
         {[0,1,2].map((i) => (
           <div key={i} style={{ width: 6, height: 6, borderRadius: 1, background: textSub, opacity: 0.4 - i * 0.1 }} />
         ))}
       </div>
-
-      {/* Icon box */}
-      <div style={{
-        width: 64, height: 64, flexShrink: 0,
-        background: isDark ? 'rgba(127,181,160,0.15)' : 'rgba(45,106,79,0.08)',
-        border: `2px solid ${isDark ? 'rgba(127,181,160,0.4)' : '#2d6a4f'}`,
-        borderRadius: 12,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        imageRendering: 'pixelated',
-        boxShadow: '2px 2px 0px 0px rgba(45,106,79,0.3)',
-      }}>
+      <div style={{ width: 64, height: 64, flexShrink: 0, background: isDark ? 'rgba(127,181,160,0.15)' : 'rgba(45,106,79,0.08)', border: `2px solid ${isDark ? 'rgba(127,181,160,0.4)' : '#2d6a4f'}`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '2px 2px 0px 0px rgba(45,106,79,0.3)' }}>
         <Sprout size={34} color={isDark ? '#81c995' : '#2d6a4f'} strokeWidth={1.8} />
       </div>
-
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: textSub, letterSpacing: 1.2, textTransform: 'uppercase', margin: '0 0 4px' }}>
-          我的成長化身
-        </p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: textSub, letterSpacing: 1.2, textTransform: 'uppercase', margin: '0 0 4px' }}>我的成長化身</p>
         <p style={{ fontSize: 20, fontWeight: 800, color: textPrimary, margin: '0 0 2px', letterSpacing: -0.3 }}>
           Lv.{lv} <span style={{ fontWeight: 600, fontSize: 16 }}>{title}</span>
         </p>
-        <p style={{ fontSize: 12, color: textSub, margin: '0 0 10px' }}>
-          已陪伴 {days} 天
-        </p>
-        {/* Progress bar */}
+        <p style={{ fontSize: 12, color: textSub, margin: '0 0 10px' }}>已陪伴 {days} 天</p>
         <div style={{ background: barBg, borderRadius: 4, height: 6, overflow: 'hidden', border: `1px solid ${isDark ? 'rgba(127,181,160,0.2)' : 'rgba(45,106,79,0.15)'}` }}>
-          <div style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: isDark ? 'linear-gradient(90deg,#52b788,#95d5b2)' : 'linear-gradient(90deg,#2d6a4f,#52b788)',
-            borderRadius: 4,
-            transition: 'width 0.6s ease',
-          }} />
+          <div style={{ height: '100%', width: `${progress}%`, background: isDark ? 'linear-gradient(90deg,#52b788,#95d5b2)' : 'linear-gradient(90deg,#2d6a4f,#52b788)', borderRadius: 4, transition: 'width 0.6s ease' }} />
         </div>
         <p style={{ fontSize: 10, color: textSub, margin: '4px 0 0', opacity: 0.8 }}>
           {progress < 100 ? `距離下一等級 ${progress}%` : '已達最高等級 ✦'}
@@ -102,36 +69,6 @@ function GrowthAvatarCard({ isDark }) {
     </div>
   );
 }
-
-function SunIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-  );
-}
-function MoonIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-    </svg>
-  );
-}
-function MonitorIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-    </svg>
-  );
-}
-import { useNavigate } from 'react-router-dom';
-import { getMe, changePassword, updateProfile, updateAvatar } from '../api/auth';
-import { submitFeedback } from '../api/feedback';
-import { useApp } from '../context/AppContext';
-import { getT } from '../i18n';
 
 function toBase64(file) {
   return new Promise((resolve, reject) => {
@@ -147,16 +84,7 @@ export default function Account() {
   const [nameInput, setNameInput] = useState('');
   const [nameMsg, setNameMsg] = useState(null);
   const [nameSaving, setNameSaving] = useState(false);
-  const [currentPw, setCurrentPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [pwMsg, setPwMsg] = useState(null);
-  const [pwLoading, setPwLoading] = useState(false);
-  const [feedbackText, setFeedbackText] = useState('');
-  const [feedbackLoading, setFeedbackLoading] = useState(false);
-  const [feedbackMsg, setFeedbackMsg] = useState(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [billing, setBilling] = useState('monthly'); // 'monthly' | 'yearly'
   const [coverUrl, setCoverUrl] = useState(() => localStorage.getItem('cover_url') || null);
   const [growthGoal, setGrowthGoal] = useState(() => localStorage.getItem('growth_goal') || '');
   const [goalEditing, setGoalEditing] = useState(false);
@@ -164,7 +92,7 @@ export default function Account() {
   const coverInputRef = useRef(null);
   const goalInputRef = useRef(null);
 
-  const { handleLogout, isLoggedIn, displayName, setDisplayName, avatarUrl, setAvatarUrl, subscriptionPlan, lang, setLang, theme, setTheme, isDark } = useApp();
+  const { displayName, setDisplayName, avatarUrl, setAvatarUrl, lang, isDark } = useApp();
   const t = getT(lang);
   const navigate = useNavigate();
 
@@ -175,7 +103,6 @@ export default function Account() {
         setNameInput(r.data.displayName || '');
       })
       .catch((err) => {
-        // 只有 401 未登入才導回首頁，其餘錯誤（網路抖動等）不跳轉
         if (err?.response?.status === 401) navigate('/');
       });
   }, [navigate]);
@@ -196,39 +123,6 @@ export default function Account() {
     }
   }
 
-  async function handleChangePassword(e) {
-    e.preventDefault();
-    if (pwLoading) return;
-    setPwMsg(null);
-    setPwLoading(true);
-    try {
-      await changePassword(currentPw, newPw);
-      setPwMsg({ type: 'success', text: t.passwordUpdated });
-      setCurrentPw('');
-      setNewPw('');
-    } catch (err) {
-      setPwMsg({ type: 'error', text: err.response?.data?.error || t.updateFailed });
-    } finally {
-      setPwLoading(false);
-    }
-  }
-
-  async function handleSubmitFeedback(e) {
-    e.preventDefault();
-    if (feedbackLoading || !feedbackText.trim()) return;
-    setFeedbackMsg(null);
-    setFeedbackLoading(true);
-    try {
-      await submitFeedback(feedbackText.trim());
-      setFeedbackMsg({ type: 'success', text: t.feedbackSuccess });
-      setFeedbackText('');
-    } catch {
-      setFeedbackMsg({ type: 'error', text: t.feedbackError });
-    } finally {
-      setFeedbackLoading(false);
-    }
-  }
-
   async function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (!file || avatarUploading) return;
@@ -241,7 +135,6 @@ export default function Account() {
       console.error('頭貼上傳失敗', err);
     } finally {
       setAvatarUploading(false);
-      // reset so selecting the same file again still fires onChange
       e.target.value = '';
     }
   }
@@ -250,7 +143,6 @@ export default function Account() {
     const file = e.target.files?.[0];
     if (!file) return;
     const objectUrl = URL.createObjectURL(file);
-    // 清除舊的 object URL 避免記憶體洩漏
     if (coverUrl?.startsWith('blob:')) URL.revokeObjectURL(coverUrl);
     setCoverUrl(objectUrl);
     localStorage.setItem('cover_url', objectUrl);
@@ -264,130 +156,41 @@ export default function Account() {
 
   function handleGoalKeyDown(e) {
     if (e.key === 'Enter') goalInputRef.current?.blur();
-    if (e.key === 'Escape') { setGoalEditing(false); }
+    if (e.key === 'Escape') setGoalEditing(false);
   }
 
-  async function handleExportCSV() {
-    if (exporting) return;
-    setExporting(true);
-    try {
-      const token = localStorage.getItem('auth_token');
-      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-      const res = await fetch(`${baseURL}/export/csv`, {
-        credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `anxiety-navigator-${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('匯出失敗', err);
-    } finally {
-      setExporting(false);
-    }
-  }
-
-  async function handleLogoutClick() {
-    await handleLogout();
-    navigate('/login');
-  }
-
-  // Dynamic colour palette based on dark mode
   const c = isDark ? {
-    page:        'transparent',
-    card:        'rgba(41,37,36,0.85)',
-    cardBorder:  '1.5px solid rgba(255,255,255,0.08)',
-    heading:     '#f5f5f4',
-    label:       '#a8a29e',
-    text:        '#e7e5e4',
-    textMid:     '#78716c',
-    input:       'rgba(28,25,23,0.6)',
-    inputBorder: '1.5px solid rgba(255,255,255,0.1)',
-    successBg:   '#14532d22',
-    successBorder:'#166534',
-    successText: '#4ade80',
-    errorBg:     '#7f1d1d22',
-    errorBorder: '#991b1b',
-    errorText:   '#f87171',
-    submitBg:    '#7fb5a0',
-    logoutBg:    'rgba(239,68,68,0.12)',
-    logoutBorder:'rgba(239,68,68,0.3)',
-    logoutText:  '#f87171',
-    langBtn:     'rgba(255,255,255,0.06)',
-    langBorder:  'rgba(255,255,255,0.1)',
-    langText:    '#a8a29e',
+    card: 'rgba(41,37,36,0.85)', cardBorder: '1.5px solid rgba(255,255,255,0.08)',
+    heading: '#f5f5f4', label: '#a8a29e', text: '#e7e5e4', textMid: '#78716c',
+    input: 'rgba(28,25,23,0.6)', inputBorder: '1.5px solid rgba(255,255,255,0.1)',
+    successBg: '#14532d22', successBorder: '#166534', successText: '#4ade80',
+    errorBg: '#7f1d1d22', errorBorder: '#991b1b', errorText: '#f87171',
+    submitBg: '#7fb5a0',
   } : {
-    page:        'transparent',
-    card:        '#fff',
-    cardBorder:  '1.5px solid #e8e0d0',
-    heading:     '#2d3748',
-    label:       '#9ca3af',
-    text:        '#374151',
-    textMid:     '#6b7280',
-    input:       '#faf8f3',
-    inputBorder: '1.5px solid #e8e0d0',
-    successBg:   '#f0fdf4',
-    successBorder:'#bbf7d0',
-    successText: '#16a34a',
-    errorBg:     '#fef2f2',
-    errorBorder: '#fecaca',
-    errorText:   '#dc2626',
-    submitBg:    '#7fb5a0',
-    logoutBg:    '#fef2f2',
-    logoutBorder:'#fecaca',
-    logoutText:  '#dc2626',
-    langBtn:     '#f5f3f0',
-    langBorder:  '#e8e0d0',
-    langText:    '#6b7280',
+    card: '#fff', cardBorder: '1.5px solid #e8e0d0',
+    heading: '#2d3748', label: '#9ca3af', text: '#374151', textMid: '#6b7280',
+    input: '#faf8f3', inputBorder: '1.5px solid #e8e0d0',
+    successBg: '#f0fdf4', successBorder: '#bbf7d0', successText: '#16a34a',
+    errorBg: '#fef2f2', errorBorder: '#fecaca', errorText: '#dc2626',
+    submitBg: '#7fb5a0',
   };
 
   return (
-    <div style={{ ...s.page }}>
+    <div style={s.page}>
       <button style={{ ...s.back, color: '#7fb5a0' }} onClick={() => navigate('/')}>{t.backToHome}</button>
-      <h2 style={{ ...s.heading, color: c.heading }}>{t.accountSettings}</h2>
+      <h2 style={{ ...s.heading, color: c.heading }}>我的</h2>
 
-      {/* ── Growth Avatar ── */}
+      {/* Growth Avatar */}
       <GrowthAvatarCard isDark={isDark} />
 
-      {/* Profile */}
+      {/* Profile card */}
       <div style={{ ...s.section, background: c.card, border: c.cardBorder, padding: 0, overflow: 'hidden' }}>
 
-        {/* ── Cover Photo ── */}
+        {/* Cover Photo */}
         <div style={{ position: 'relative', width: '100%', height: 120 }}>
-          {/* Background */}
-          <div style={{
-            width: '100%', height: '100%',
-            background: coverUrl
-              ? `url(${coverUrl}) center/cover no-repeat`
-              : 'linear-gradient(135deg, #c8dfd8 0%, #e8f4f0 40%, #fdf3ee 100%)',
-            transition: 'background 0.4s ease',
-          }} />
-          {/* Hidden cover input */}
-          <input
-            ref={coverInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleCoverChange}
-          />
-          {/* Camera button — bottom right */}
-          <button
-            onClick={() => coverInputRef.current?.click()}
-            title="更換封面圖"
-            style={{
-              position: 'absolute', bottom: 10, right: 12,
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(6px)',
-              border: '1.5px solid rgba(255,255,255,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
+          <div style={{ width: '100%', height: '100%', background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : 'linear-gradient(135deg, #c8dfd8 0%, #e8f4f0 40%, #fdf3ee 100%)', transition: 'background 0.4s ease' }} />
+          <input ref={coverInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleCoverChange} />
+          <button onClick={() => coverInputRef.current?.click()} title="更換封面圖" style={{ position: 'absolute', bottom: 10, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)', border: '1.5px solid rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
@@ -395,413 +198,130 @@ export default function Account() {
           </button>
         </div>
 
-        {/* ── Retro Profile Card ── */}
+        {/* Retro avatar card */}
         <div style={{ padding: '16px 20px 0' }}>
-        {/* Hidden avatar file input */}
-        <input
-          ref={avatarInputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={handleAvatarChange}
-        />
+          <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
 
-        {/* Retro card */}
-        <div style={{
-          background: isDark ? '#1e1a17' : '#f8f5f0',
-          border: isDark ? '2px solid rgba(255,255,255,0.15)' : '2px solid #1a1a1a',
-          borderRadius: 12,
-          boxShadow: isDark
-            ? '4px 4px 0px 0px rgba(0,0,0,0.5)'
-            : '4px 4px 0px 0px rgba(0,0,0,0.10)',
-          padding: '14px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 16,
-          marginBottom: 16,
-        }}>
-          {/* Pixel avatar */}
-          <div
-            style={{ position: 'relative', flexShrink: 0, cursor: 'pointer' }}
-            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
-            title="點擊更換頭貼"
-          >
-            <div style={{
-              width: 64, height: 64,
-              border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid #1a1a1a',
-              borderRadius: 8,
-              imageRendering: 'pixelated',
-              overflow: 'hidden',
-              background: isDark ? '#2a2520' : '#e8e4df',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: isDark ? '2px 2px 0 rgba(255,255,255,0.1)' : '2px 2px 0 rgba(0,0,0,0.15)',
-            }}>
-              {avatarUrl
-                ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', imageRendering: 'pixelated' }} />
-                : (
-                  /* Pixel-art person SVG */
-                  <svg width="36" height="36" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="6" y="1" width="4" height="4" fill={isDark ? '#c8b8a8' : '#6b5c4e'} />
-                    <rect x="5" y="5" width="6" height="5" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
-                    <rect x="3" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
-                    <rect x="11" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
-                    <rect x="5" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
-                    <rect x="9" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
-                    <rect x="7" y="1" width="2" height="1" fill={isDark ? '#8b7060' : '#4a3828'} />
-                  </svg>
-                )
-              }
-            </div>
-            {/* Uploading indicator */}
-            {avatarUploading && (
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: 8,
-                background: 'rgba(0,0,0,0.4)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <div style={{ width: 16, height: 16, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+          <div style={{ background: isDark ? '#1e1a17' : '#f8f5f0', border: isDark ? '2px solid rgba(255,255,255,0.15)' : '2px solid #1a1a1a', borderRadius: 12, boxShadow: isDark ? '4px 4px 0px 0px rgba(0,0,0,0.5)' : '4px 4px 0px 0px rgba(0,0,0,0.10)', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+            {/* Pixel avatar */}
+            <div style={{ position: 'relative', flexShrink: 0, cursor: 'pointer' }} onClick={() => !avatarUploading && avatarInputRef.current?.click()} title="點擊更換頭貼">
+              <div style={{ width: 64, height: 64, border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid #1a1a1a', borderRadius: 8, imageRendering: 'pixelated', overflow: 'hidden', background: isDark ? '#2a2520' : '#e8e4df', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: isDark ? '2px 2px 0 rgba(255,255,255,0.1)' : '2px 2px 0 rgba(0,0,0,0.15)' }}>
+                {avatarUrl
+                  ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', imageRendering: 'pixelated' }} />
+                  : (
+                    <svg width="36" height="36" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="6" y="1" width="4" height="4" fill={isDark ? '#c8b8a8' : '#6b5c4e'} />
+                      <rect x="5" y="5" width="6" height="5" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                      <rect x="3" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                      <rect x="11" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                      <rect x="5" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
+                      <rect x="9" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
+                      <rect x="7" y="1" width="2" height="1" fill={isDark ? '#8b7060' : '#4a3828'} />
+                    </svg>
+                  )
+                }
               </div>
-            )}
-            {/* Camera badge */}
-            <div style={{
-              position: 'absolute', bottom: -6, right: -6,
-              width: 20, height: 20,
-              background: '#7fb5a0',
-              border: '2px solid #1a1a1a',
-              borderRadius: 4,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 15, fontWeight: 700, color: isDark ? '#e7e5e4' : '#1a1a1a', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {displayName || t.noDisplayName}
-            </p>
-            <p style={{ fontSize: 11, color: isDark ? '#78716c' : '#9ca3af', margin: '0 0 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {email}
-            </p>
-            {/* Retro stat rows */}
-            {(() => {
-              const { lv, title, days } = getGrowthLevel();
-              return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>LVL</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(lv).padStart(2, '0')}</span>
-                    <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{title}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>DAY</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(days).padStart(3, '0')}</span>
-                    <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{lang === 'zh' ? '天陪伴' : 'days'}</span>
-                  </div>
+              {avatarUploading && (
+                <div style={{ position: 'absolute', inset: 0, borderRadius: 8, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 16, height: 16, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                 </div>
-              );
-            })()}
-          </div>
-        </div>
-
-        {/* ── Growth Goal (Notion-style editable) ── */}
-        <div style={{ margin: '4px 0 16px', position: 'relative' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: c.label, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 }}>
-            我目前的成長目標是...
-          </p>
-          {goalEditing ? (
-            <input
-              ref={goalInputRef}
-              autoFocus
-              value={growthGoal}
-              onChange={(e) => setGrowthGoal(e.target.value)}
-              onBlur={handleGoalBlur}
-              onKeyDown={handleGoalKeyDown}
-              maxLength={80}
-              placeholder="寫下你的目標，例如：每天記錄一次情緒"
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                background: 'transparent',
-                border: 'none',
-                borderBottom: `1.5px solid ${isDark ? 'rgba(127,181,160,0.5)' : '#7fb5a0'}`,
-                outline: 'none',
-                fontSize: 15,
-                color: isDark ? '#d6d3d1' : '#4a5568',
-                padding: '4px 0',
-                fontFamily: 'inherit',
-                transition: 'border-color 0.2s',
-              }}
-            />
-          ) : (
-            <p
-              onClick={() => { setGoalEditing(true); setTimeout(() => goalInputRef.current?.focus(), 0); }}
-              style={{
-                fontSize: 15,
-                color: growthGoal
-                  ? (isDark ? '#c4b8ae' : '#6b7280')
-                  : (isDark ? '#6b6560' : '#b8b2ab'),
-                fontStyle: growthGoal ? 'normal' : 'italic',
-                cursor: 'text',
-                padding: '4px 0',
-                borderBottom: '1.5px solid transparent',
-                transition: 'border-color 0.2s',
-                minHeight: 28,
-              }}
-            >
-              {growthGoal || '點擊輸入你的成長目標...'}
-            </p>
-          )}
-        </div>
-
-        </div>{/* end padding wrapper */}
-        <div style={{ padding: '0 20px 20px' }}>
-        <form onSubmit={handleSaveName} style={s.form}>
-          <div style={s.field}>
-            <label style={{ ...s.label, color: c.text }}>{t.displayName}</label>
-            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder={t.displayNamePlaceholder} maxLength={30} autoComplete="nickname" />
-          </div>
-          {nameMsg && <div style={{ ...s.msgBox, background: nameMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${nameMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: nameMsg.type === 'success' ? c.successText : c.errorText }}>{nameMsg.text}</div>}
-          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={nameSaving || !nameInput.trim()}>{nameSaving ? t.savingName : t.saveName}</button>
-        </form>
-        </div>{/* end form wrapper */}
-      </div>{/* end profile section */}
-
-      {/* Password */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.changePassword}</p>
-        <form onSubmit={handleChangePassword} style={s.form}>
-          <div style={s.field}>
-            <label style={{ ...s.label, color: c.text }}>{t.currentPassword}</label>
-            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder={t.currentPasswordPlaceholder} autoComplete="current-password" />
-          </div>
-          <div style={s.field}>
-            <label style={{ ...s.label, color: c.text }}>{t.newPassword}</label>
-            <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder={t.atLeast8} autoComplete="new-password" />
-          </div>
-          {pwMsg && <div style={{ ...s.msgBox, background: pwMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${pwMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: pwMsg.type === 'success' ? c.successText : c.errorText }}>{pwMsg.text}</div>}
-          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={pwLoading}>{pwLoading ? t.updating : t.updatePassword}</button>
-        </form>
-      </div>
-
-      {/* Language */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.language}</p>
-        <div style={s.langRow}>
-          {['zh', 'en'].map((l) => (
-            <button key={l} onClick={() => setLang(l)} style={lang === l ? { ...s.langBtnActive } : { ...s.langBtn, background: c.langBtn, border: `1.5px solid ${c.langBorder}`, color: c.langText }}>
-              {l === 'zh' ? '中文' : 'English'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Appearance / Theme */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.themeLabel}</p>
-        <div style={s.themeRow}>
-          {[
-            { key: 'light', label: t.themeLight, icon: <SunIcon /> },
-            { key: 'dark',  label: t.themeDark,  icon: <MoonIcon /> },
-            { key: 'system',label: t.themeSystem,icon: <MonitorIcon /> },
-          ].map(({ key, label, icon }) => {
-            const active = theme === key;
-            return (
-              <button
-                key={key}
-                onClick={() => setTheme(key)}
-                style={{
-                  ...s.themeBtn,
-                  background: active ? '#7fb5a0' : c.langBtn,
-                  border: `1.5px solid ${active ? '#7fb5a0' : c.langBorder}`,
-                  color: active ? '#fff' : c.langText,
-                  boxShadow: active ? '0 2px 8px rgba(127,181,160,0.35)' : 'none',
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: active ? 1 : 0.7 }}>{icon}</span>
-                <span style={{ fontSize: 12, fontWeight: active ? 600 : 500 }}>{label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Feedback */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.feedbackLabel}</p>
-        <form onSubmit={handleSubmitFeedback} style={s.form}>
-          <textarea style={{ ...s.textarea, background: c.input, border: c.inputBorder, color: c.text }} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} placeholder={t.feedbackPlaceholder} rows={4} maxLength={1000} />
-          {feedbackMsg && <div style={{ ...s.msgBox, background: feedbackMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${feedbackMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: feedbackMsg.type === 'success' ? c.successText : c.errorText }}>{feedbackMsg.text}</div>}
-          <button type="submit" style={{ ...s.submitBtn, background: c.submitBg, opacity: feedbackLoading || !feedbackText.trim() ? 0.6 : 1 }} disabled={feedbackLoading || !feedbackText.trim()}>{feedbackLoading ? t.feedbackSubmitting : t.feedbackSubmit}</button>
-        </form>
-      </div>
-
-      {/* Subscription */}
-      {isLoggedIn && (() => {
-        const isPro = subscriptionPlan === 'pro';
-        const stripeMonthly = import.meta.env.VITE_STRIPE_MONTHLY_LINK;
-        const stripeYearly  = import.meta.env.VITE_STRIPE_YEARLY_LINK;
-        const upgradeLink   = billing === 'yearly' ? stripeYearly : stripeMonthly;
-
-        return (
-          <div style={{ ...s.section, background: c.card, border: isPro ? '1.5px solid rgba(127,181,160,0.5)' : c.cardBorder }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <p style={{ ...s.sectionLabel, color: c.label, marginBottom: 0 }}>{t.subscriptionLabel}</p>
-              <span style={{
-                fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99,
-                background: isPro ? 'rgba(127,181,160,0.15)' : (isDark ? 'rgba(255,255,255,0.07)' : '#f3f4f6'),
-                color: isPro ? '#7fb5a0' : c.textMid,
-                border: isPro ? '1px solid rgba(127,181,160,0.3)' : `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}`,
-              }}>
-                {isPro ? `✨ ${t.planPro}` : t.planFree}
-              </span>
-            </div>
-
-            {!isPro && (
-              /* Billing toggle */
-              <div style={{ display: 'flex', background: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6', borderRadius: 10, padding: 3, marginBottom: 16 }}>
-                {['monthly', 'yearly'].map((b) => (
-                  <button key={b} onClick={() => setBilling(b)} style={{
-                    flex: 1, border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 13,
-                    fontWeight: billing === b ? 600 : 400, cursor: 'pointer', fontFamily: 'inherit',
-                    background: billing === b ? (isDark ? 'rgba(127,181,160,0.2)' : '#fff') : 'transparent',
-                    color: billing === b ? '#7fb5a0' : c.textMid,
-                    boxShadow: billing === b ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                    transition: 'all 0.2s',
-                  }}>
-                    {b === 'monthly' ? t.billingMonthly : `${t.billingYearly} · ${t.yearlyDiscount}`}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Price */}
-            {!isPro && (
-              <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                <span style={{ fontSize: 28, fontWeight: 700, color: '#7fb5a0' }}>
-                  {billing === 'monthly' ? 'NT$99' : 'NT$660'}
-                </span>
-                <span style={{ fontSize: 13, color: c.textMid, marginLeft: 4 }}>
-                  {billing === 'monthly' ? '/ 月' : '/ 年'}
-                </span>
-              </div>
-            )}
-
-            {/* Feature lists side by side */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-              {/* Free column */}
-              <div style={{ flex: 1, background: isDark ? 'rgba(255,255,255,0.04)' : '#faf8f3', borderRadius: 12, padding: '12px 14px' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: c.textMid, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t.planFree}</p>
-                {t.freeFeatures.map((f) => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
-                    <span style={{ color: '#7fb5a0', fontSize: 12, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 12, color: c.text, lineHeight: 1.4 }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pro column */}
-              <div style={{
-                flex: 1, borderRadius: 12, padding: '12px 14px',
-                background: isPro ? 'rgba(127,181,160,0.08)' : (isDark ? 'rgba(127,181,160,0.07)' : '#f0f9f6'),
-                border: isPro ? '1px solid rgba(127,181,160,0.25)' : '1px solid rgba(127,181,160,0.15)',
-              }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#7fb5a0', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>✨ {t.planPro}</p>
-                {t.proFeatures.map((f) => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
-                    <span style={{ color: '#7fb5a0', fontSize: 12, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 12, color: c.text, lineHeight: 1.4 }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              {isPro ? (
-                <button
-                  style={{ ...s.submitBtn, background: 'transparent', color: '#7fb5a0', border: '1.5px solid rgba(127,181,160,0.4)', padding: '12px 32px', width: 'auto' }}
-                  onClick={() => window.open(stripeMonthly || '#', '_blank')}
-                >
-                  {t.manageBtn}
-                </button>
-              ) : (
-                <button
-                  style={{ ...s.submitBtn, background: upgradeLink ? '#7fb5a0' : '#a8c8be', cursor: upgradeLink ? 'pointer' : 'default', padding: '12px 36px', width: 'auto' }}
-                  onClick={() => upgradeLink && window.open(upgradeLink, '_blank')}
-                  title={!upgradeLink ? '請設定 VITE_STRIPE_MONTHLY_LINK / VITE_STRIPE_YEARLY_LINK' : undefined}
-                >
-                  {upgradeLink ? t.upgradeBtn : `${t.upgradeBtn} (即將開放)`}
-                </button>
               )}
+              <div style={{ position: 'absolute', bottom: -6, right: -6, width: 20, height: 20, background: '#7fb5a0', border: '2px solid #1a1a1a', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: isDark ? '#e7e5e4' : '#1a1a1a', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName || t.noDisplayName}</p>
+              <p style={{ fontSize: 11, color: isDark ? '#78716c' : '#9ca3af', margin: '0 0 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</p>
+              {(() => {
+                const { lv, title, days } = getGrowthLevel();
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>LVL</span>
+                      <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(lv).padStart(2, '0')}</span>
+                      <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{title}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>DAY</span>
+                      <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(days).padStart(3, '0')}</span>
+                      <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{lang === 'zh' ? '天陪伴' : 'days'}</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
-        );
-      })()}
 
-      {/* Export */}
-      {isLoggedIn && (
-        <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-          <p style={{ ...s.sectionLabel, color: c.label }}>{t.weeklyReportLabel}</p>
-          <p style={{ fontSize: 13, color: c.label, marginBottom: 12, lineHeight: 1.6 }}>{t.weeklyReportDesc}</p>
-          <button onClick={() => navigate('/report')} style={{ ...s.submitBtn, background: c.submitBg }}>
-            {t.viewWeeklyReport}
-          </button>
+          {/* Growth Goal */}
+          <div style={{ margin: '4px 0 16px' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: c.label, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 }}>我目前的成長目標是...</p>
+            {goalEditing ? (
+              <input ref={goalInputRef} autoFocus value={growthGoal} onChange={(e) => setGrowthGoal(e.target.value)} onBlur={handleGoalBlur} onKeyDown={handleGoalKeyDown} maxLength={80} placeholder="寫下你的目標，例如：每天記錄一次情緒" style={{ width: '100%', boxSizing: 'border-box', background: 'transparent', border: 'none', borderBottom: `1.5px solid ${isDark ? 'rgba(127,181,160,0.5)' : '#7fb5a0'}`, outline: 'none', fontSize: 15, color: isDark ? '#d6d3d1' : '#4a5568', padding: '4px 0', fontFamily: 'inherit' }} />
+            ) : (
+              <p onClick={() => { setGoalEditing(true); setTimeout(() => goalInputRef.current?.focus(), 0); }} style={{ fontSize: 15, color: growthGoal ? (isDark ? '#c4b8ae' : '#6b7280') : (isDark ? '#6b6560' : '#b8b2ab'), fontStyle: growthGoal ? 'normal' : 'italic', cursor: 'text', padding: '4px 0', borderBottom: '1.5px solid transparent', minHeight: 28 }}>
+                {growthGoal || '點擊輸入你的成長目標...'}
+              </p>
+            )}
+          </div>
         </div>
-      )}
 
-      {isLoggedIn && (
-        <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-          <p style={{ ...s.sectionLabel, color: c.label }}>{t.exportData.replace(' (CSV)', '')}</p>
-          <button
-            onClick={handleExportCSV}
-            disabled={exporting}
-            style={{ ...s.submitBtn, background: exporting ? '#5a9a87' : c.submitBg, opacity: exporting ? 0.7 : 1 }}
-          >
-            {exporting ? t.exporting : t.exportData}
-          </button>
+        {/* Display name form */}
+        <div style={{ padding: '0 20px 20px' }}>
+          <form onSubmit={handleSaveName} style={s.form}>
+            <div style={s.field}>
+              <label style={{ ...s.label, color: c.text }}>{t.displayName}</label>
+              <input style={{ ...s.input, background: c.input, border: c.inputBorder, color: c.text }} type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder={t.displayNamePlaceholder} maxLength={30} autoComplete="nickname" />
+            </div>
+            {nameMsg && <div style={{ ...s.msgBox, background: nameMsg.type === 'success' ? c.successBg : c.errorBg, border: `1px solid ${nameMsg.type === 'success' ? c.successBorder : c.errorBorder}`, color: nameMsg.type === 'success' ? c.successText : c.errorText }}>{nameMsg.text}</div>}
+            <button type="submit" style={{ ...s.submitBtn, background: c.submitBg }} disabled={nameSaving || !nameInput.trim()}>{nameSaving ? t.savingName : t.saveName}</button>
+          </form>
         </div>
-      )}
-
-      {/* Logout */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder }}>
-        <p style={{ ...s.sectionLabel, color: c.label }}>{t.accountActions}</p>
-        <button style={{ ...s.logoutBtn, background: c.logoutBg, border: `1.5px solid ${c.logoutBorder}`, color: c.logoutText }} onClick={handleLogoutClick}>{t.signOut}</button>
       </div>
+
+      {/* Settings entry */}
+      <button
+        onClick={() => navigate('/settings')}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: c.card, border: c.cardBorder, borderRadius: 14,
+          padding: '18px 20px', cursor: 'pointer', marginBottom: 16,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: isDark ? 'rgba(127,181,160,0.15)' : '#f0faf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fb5a0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: c.text, margin: 0 }}>帳號設定</p>
+            <p style={{ fontSize: 12, color: c.label, margin: 0 }}>密碼、語言、主題、訂閱</p>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c.label} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
     </div>
   );
 }
 
 const s = {
-  page: { maxWidth: 480, margin: '0 auto', padding: '24px 20px 60px' },
-  back: { background: 'none', border: 'none', color: '#7fb5a0', cursor: 'pointer', fontSize: 14, fontWeight: 500, padding: '0 0 20px', display: 'block' },
+  page: { maxWidth: 480, margin: '0 auto', padding: '24px 20px 100px' },
+  back: { background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, padding: '0 0 20px', display: 'block' },
   heading: { fontSize: 22, marginBottom: 28 },
-  section: { background: '#fff', border: '1.5px solid #e8e0d0', borderRadius: 14, padding: '20px', marginBottom: 16 },
-  sectionLabel: { fontSize: 12, fontWeight: 600, color: '#9ca3af', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 14 },
-  avatar: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 },
-  avatarCircle: {
-    width: 52, height: 52, borderRadius: '50%',
-    background: 'linear-gradient(135deg, #7fb5a0, #5a9fc0)',
-    color: '#fff', fontSize: 22, fontWeight: 700,
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    flexShrink: 0,
-  },
-  avatarName: { fontWeight: 600, fontSize: 16, color: '#2d3748', margin: '0 0 2px' },
-  avatarEmail: { fontSize: 13, color: '#9ca3af', margin: 0 },
+  section: { borderRadius: 14, marginBottom: 16 },
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { fontSize: 13, fontWeight: 600, color: '#374151' },
+  label: { fontSize: 13, fontWeight: 600 },
   input: { borderRadius: 10, padding: '10px 14px', fontSize: 15, outline: 'none', transition: 'background 0.3s, border-color 0.3s' },
-  textarea: { borderRadius: 10, padding: '10px 14px', fontSize: 15, outline: 'none', resize: 'vertical', lineHeight: 1.6, transition: 'background 0.3s, border-color 0.3s' },
   msgBox: { borderRadius: 8, padding: '10px 14px', fontSize: 14 },
-  submitBtn: { border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4, transition: 'opacity 0.2s, background 0.3s' },
-  langRow: { display: 'flex', gap: 10 },
-  langBtn: { flex: 1, borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 500, cursor: 'pointer', transition: 'background 0.2s, color 0.2s' },
-  langBtnActive: { flex: 1, background: '#7fb5a0', border: '1.5px solid #7fb5a0', borderRadius: 10, padding: '10px', fontSize: 14, fontWeight: 600, color: '#fff', cursor: 'pointer' },
-  logoutBtn: { borderRadius: 10, padding: '11px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', width: '100%', transition: 'background 0.2s' },
-  themeRow: { display: 'flex', gap: 10 },
-  themeBtn: { flex: 1, borderRadius: 12, padding: '12px 8px', fontSize: 13, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, transition: 'background 0.25s, color 0.25s, box-shadow 0.25s' },
+  submitBtn: { border: 'none', color: '#fff', borderRadius: 10, padding: '12px', fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4, transition: 'opacity 0.2s, background 0.3s', width: '100%' },
 };

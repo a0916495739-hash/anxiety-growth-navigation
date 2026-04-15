@@ -71,7 +71,9 @@ export default function BottomTabBar() {
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
-    if (path === '/account' || path === '/login') return location.pathname.startsWith('/account');
+    if (path === '/account' || path === '/login') {
+      return location.pathname.startsWith('/account') || location.pathname.startsWith('/settings');
+    }
     return location.pathname.startsWith(path);
   };
 
