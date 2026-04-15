@@ -17,6 +17,7 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(useOnboarding);
   const [notifOpen, setNotifOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [heatmapData, setHeatmapData] = useState([]);
   const [notifications, setNotifications] = useState([
     { id: 1, text: lang === 'zh' ? '歡迎回來！記得今天也記錄一下情緒 🌊' : 'Welcome back! Remember to log your emotions today 🌊', time: lang === 'zh' ? '剛才' : 'Just now', read: false },
@@ -53,6 +54,15 @@ export default function Home() {
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, [notifOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => {
+      if (!e.target.closest('[data-menu]')) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
 
   return (
     <div style={s.page}>
@@ -113,19 +123,94 @@ export default function Home() {
             );
           })()}
 
-          {/* 手機版語言切換（只顯示地球圖示，不需漢堡） */}
-          <button
-            className="nav-hamburger"
-            style={{ ...s.hamburgerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text, padding: '7px 10px' }}
-            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-            aria-label="Language"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </button>
+          {/* 手機版漢堡選單 */}
+          <div data-menu="1" className="nav-hamburger" style={{ position: 'relative' }}>
+            <button
+              style={{ ...s.hamburgerBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text, padding: '8px 11px' }}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Menu"
+            >
+              {/* 漢堡三條線 */}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6"  x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+
+            {menuOpen && (
+              <div data-menu="1" style={{
+                position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                minWidth: 180,
+                background: isDark ? 'rgba(28,25,23,0.95)' : 'rgba(255,255,255,0.95)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: `1px solid ${nav_bdr}`,
+                borderRadius: 14,
+                padding: '6px',
+                boxShadow: isDark
+                  ? '0 12px 40px rgba(0,0,0,0.5)'
+                  : '0 8px 32px rgba(0,0,0,0.12)',
+                zIndex: 200,
+              }}>
+                {/* 語言切換 */}
+                <button
+                  style={{ ...s.menuItem, color: nav_text, width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}
+                  onClick={() => { setLang(lang === 'zh' ? 'en' : 'zh'); setMenuOpen(false); }}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  {lang === 'zh' ? 'Switch to English' : '切換中文'}
+                </button>
+
+                {/* 分隔線 */}
+                <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', margin: '4px 6px' }} />
+
+                {/* 帳號 / 登入登出 */}
+                {isLoggedIn ? (
+                  <button
+                    style={{ ...s.menuItem, color: nav_text, width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}
+                    onClick={() => { navigate('/account'); setMenuOpen(false); }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    {t.settings}
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      style={{ ...s.menuItem, color: nav_text, width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}
+                      onClick={() => { navigate('/login'); setMenuOpen(false); }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                      </svg>
+                      {t.signIn}
+                    </button>
+                    <button
+                      style={{ ...s.menuItem, color: '#7fb5a0', fontWeight: 600, width: '100%', display: 'flex', alignItems: 'center', gap: 10 }}
+                      onClick={() => { navigate('/register'); setMenuOpen(false); }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <line x1="19" y1="8" x2="19" y2="14"/>
+                        <line x1="22" y1="11" x2="16" y2="11"/>
+                      </svg>
+                      {t.createAccount}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 手機版下拉選單已移除 — 導覽改由底部 Tab Bar 處理 */}
