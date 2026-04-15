@@ -256,12 +256,18 @@ export default function Home() {
         <div style={s.heroIllus}>
           <IllustrationHero width={240} />
         </div>
-        <p style={s.heroEyebrow}>{t.homeEyebrow}</p>
-        <h1 style={{ ...s.heroTitle, color: text_head }}>
-          {t.homeTitle1}<br />
-          {t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
-        </h1>
-        <p style={{ ...s.heroSub, color: text_sub }}>{t.homeSub}</p>
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          textAlign: 'center', width: '100%', maxWidth: 420,
+          margin: '0 auto', gap: 12,
+        }}>
+          <p style={s.heroEyebrow}>{t.homeEyebrow}</p>
+          <h1 style={{ ...s.heroTitle, color: text_head }}>
+            {t.homeTitle1}<br />
+            {t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
+          </h1>
+          <p style={{ ...s.heroSub, color: text_sub }}>{t.homeSub}</p>
+        </div>
 
         {!isLoggedIn && (
           <div style={{ ...s.guestBanner, background: isDark ? 'rgba(120,100,50,0.2)' : '#fefce8', borderColor: isDark ? 'rgba(251,191,36,0.25)' : '#fde68a', color: isDark ? '#d4a84b' : '#78600a' }}>
