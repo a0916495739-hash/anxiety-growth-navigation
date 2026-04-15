@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
+import AuthPixelPanel, { PixelBoard } from '../components/AuthPixelPanel';
 
 function EyeIcon({ open }) {
   return open ? (
@@ -13,62 +14,6 @@ function EyeIcon({ open }) {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
       <line x1="1" y1="1" x2="23" y2="23"/>
-    </svg>
-  );
-}
-
-// 像素風植物場景
-function PixelScene() {
-  const P = 6; // pixel size
-  const c = (x, y, w, h, fill) => (
-    <rect key={`${x}-${y}-${fill}`} x={x*P} y={y*P} width={w*P} height={h*P} fill={fill} />
-  );
-  return (
-    <svg width="100%" viewBox="0 0 252 216" style={{ imageRendering: 'pixelated', maxWidth: 320 }}>
-      {/* 地面 */}
-      {c(0,34,42,1,'#52b788')}{c(0,35,42,1,'#40916c')}
-
-      {/* 大樹幹 */}
-      {c(17,22,3,13,'#6b4226')}{c(18,22,1,13,'#8a5a36')}
-
-      {/* 樹冠 — 深 */}
-      {c(13,12,10,4,'#2d6a4f')}
-      {c(11,14,14,4,'#2d6a4f')}
-      {c(12,18,10,4,'#2d6a4f')}
-
-      {/* 樹冠 — 亮 */}
-      {c(15,11,6,3,'#52b788')}
-      {c(13,13,8,3,'#52b788')}
-      {c(14,16,8,3,'#52b788')}
-      {c(16,19,4,3,'#52b788')}
-
-      {/* 小草 */}
-      {c(3,33,1,2,'#52b788')}{c(5,32,1,3,'#40916c')}{c(7,33,1,2,'#52b788')}
-      {c(32,33,1,2,'#52b788')}{c(35,32,1,3,'#40916c')}{c(38,33,1,2,'#52b788')}
-
-      {/* 人物身體 */}
-      {c(26,25,4,1,'#ffd6a5')}{/* 頭 */}
-      {c(25,26,6,1,'#ffd6a5')}
-      {c(25,27,6,1,'#ffd6a5')}
-      {c(26,28,4,1,'#ffd6a5')}
-      {/* 眼睛 */}
-      {c(26,27,1,1,'#2d3748')}{c(29,27,1,1,'#2d3748')}
-      {/* 嘴巴 */}
-      {c(27,28,2,1,'#e07070')}
-      {/* 身體 */}
-      {c(26,29,4,4,'#7fb5a0')}
-      {/* 手 */}
-      {c(24,29,2,3,'#ffd6a5')}{c(30,29,2,3,'#ffd6a5')}
-      {/* 腳 */}
-      {c(26,33,2,2,'#6b4226')}{c(29,33,2,2,'#6b4226')}
-
-      {/* 星星 */}
-      {c(2,2,2,2,'#fbbf24')}{c(38,5,2,2,'#fbbf24')}{c(20,1,2,2,'#fbbf24')}
-      {c(7,8,1,1,'#fde68a')}{c(35,10,1,1,'#fde68a')}{c(14,4,1,1,'#fde68a')}
-
-      {/* 小花 */}
-      {c(1,30,1,1,'#f472b6')}{c(2,29,1,1,'#f472b6')}{c(2,31,1,1,'#f472b6')}{c(3,30,1,1,'#fbbf24')}
-      {c(39,30,1,1,'#fb923c')}{c(40,29,1,1,'#fb923c')}{c(40,31,1,1,'#fb923c')}{c(41,30,1,1,'#fbbf24')}
     </svg>
   );
 }
@@ -131,27 +76,7 @@ export default function Login() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
 
-      {/* 左欄 — 插圖區（桌面才顯示） */}
-      <div className="login-left" style={{
-        flex: 1,
-        background: d.leftBg,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 40px',
-        gap: 28,
-      }}>
-        <PixelScene />
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: 13, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 10 }}>
-            {lang === 'zh' ? '抗焦慮成長導航' : 'Anxiety Growth Nav'}
-          </p>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.4, margin: 0 }}>
-            {lang === 'zh' ? '不需要比任何人好，\n只需要比昨天的自己\n更理解自己' : "You don't need to be better\nthan anyone.\nJust a little more you."}
-          </h2>
-        </div>
-      </div>
+      <AuthPixelPanel lang={lang} />
 
       {/* 右欄 — 表單區 */}
       <div style={{
@@ -167,8 +92,8 @@ export default function Login() {
         <div style={{ width: '100%', maxWidth: 360 }}>
 
           {/* 手機版插圖 */}
-          <div className="login-mobile-illus" style={{ textAlign: 'center', marginBottom: 24 }}>
-            <PixelScene />
+          <div className="login-mobile-illus" style={{ marginBottom: 24, maxHeight: 160, overflow: 'hidden' }}>
+            <PixelBoard />
           </div>
 
           <div style={{ marginBottom: 32 }}>
