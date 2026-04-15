@@ -13,14 +13,33 @@ function HomeIcon({ active }) {
   );
 }
 
-function JournalIcon({ active }) {
+function BreathIcon({ active }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.15 : 1} />
+      <circle cx="12" cy="12" r="9" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.12 : 1} />
+      <path d="M8 12c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4" />
+      <circle cx="12" cy="12" r="2" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.5 : 1} />
+    </svg>
+  );
+}
+
+function HistoryIcon({ active }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.12 : 1} />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
       <line x1="16" y1="17" x2="8" y2="17" />
-      <polyline points="10 9 9 9 8 9" />
+      <line x1="10" y1="9" x2="8" y2="9" />
+    </svg>
+  );
+}
+
+function AchieveIcon({ active }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="6" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.15 : 1} />
+      <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
     </svg>
   );
 }
@@ -43,14 +62,17 @@ export default function BottomTabBar() {
   if (AUTH_PAGES.includes(location.pathname)) return null;
 
   const tabs = [
-    { path: '/',         label: t.tabHome,    Icon: HomeIcon },
-    { path: '/emotions', label: t.tabJournal, Icon: JournalIcon },
-    { path: isLoggedIn ? '/account' : '/login', label: t.tabProfile, Icon: ProfileIcon },
+    { path: '/',                                  label: t.tabHome,    Icon: HomeIcon    },
+    { path: '/breathing',                         label: t.tabBreath,  Icon: BreathIcon  },
+    { path: '/emotions/history',                  label: t.tabHistory, Icon: HistoryIcon },
+    { path: '/achievements',                      label: t.tabAchieve, Icon: AchieveIcon },
+    { path: isLoggedIn ? '/account' : '/login',   label: t.tabProfile, Icon: ProfileIcon },
   ];
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path === '/account' ? '/account' : path);
+    if (path === '/account' || path === '/login') return location.pathname.startsWith('/account');
+    return location.pathname.startsWith(path);
   };
 
   const bg      = isDark ? 'rgba(28,24,22,0.85)' : 'rgba(255,253,250,0.82)';
@@ -87,7 +109,7 @@ export default function BottomTabBar() {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
-        padding: '0 12px',
+        padding: '0 4px',
       }}
     >
       {tabs.map(({ path, label, Icon }) => {
