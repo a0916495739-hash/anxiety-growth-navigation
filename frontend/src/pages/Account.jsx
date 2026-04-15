@@ -168,19 +168,19 @@ export default function Account() {
   }
 
   const c = isDark ? {
-    card: 'rgba(41,37,36,0.85)', cardBorder: '1.5px solid rgba(255,255,255,0.08)',
-    heading: '#f5f5f4', label: '#a8a29e', text: '#e7e5e4', textMid: '#78716c',
-    input: 'rgba(28,25,23,0.6)', inputBorder: '1.5px solid rgba(255,255,255,0.1)',
+    card: '#1e2d27', cardBorder: '2px solid rgba(127,181,160,0.5)', cardShadow: '4px 4px 0px 0px rgba(45,106,79,0.35)',
+    heading: '#c8e6c9', label: '#81c995', text: '#e7e5e4', textMid: '#78716c',
+    input: 'rgba(20,35,27,0.8)', inputBorder: '1.5px solid rgba(127,181,160,0.35)',
     successBg: '#14532d22', successBorder: '#166534', successText: '#4ade80',
     errorBg: '#7f1d1d22', errorBorder: '#991b1b', errorText: '#f87171',
-    submitBg: '#7fb5a0',
+    submitBg: '#2d6a4f',
   } : {
-    card: '#fff', cardBorder: '1.5px solid #e8e0d0',
-    heading: '#2d3748', label: '#9ca3af', text: '#374151', textMid: '#6b7280',
-    input: '#faf8f3', inputBorder: '1.5px solid #e8e0d0',
+    card: '#f0faf5', cardBorder: '2px solid #2d6a4f', cardShadow: '4px 4px 0px 0px rgba(45,106,79,0.25)',
+    heading: '#1b4332', label: '#40916c', text: '#1b4332', textMid: '#40916c',
+    input: '#fff', inputBorder: '1.5px solid rgba(45,106,79,0.3)',
     successBg: '#f0fdf4', successBorder: '#bbf7d0', successText: '#16a34a',
     errorBg: '#fef2f2', errorBorder: '#fecaca', errorText: '#dc2626',
-    submitBg: '#7fb5a0',
+    submitBg: '#2d6a4f',
   };
 
   return (
@@ -192,7 +192,7 @@ export default function Account() {
       <GrowthAvatarCard isDark={isDark} />
 
       {/* Profile card */}
-      <div style={{ ...s.section, background: c.card, border: c.cardBorder, padding: 0, overflow: 'hidden' }}>
+      <div style={{ ...s.section, background: c.card, border: c.cardBorder, boxShadow: c.cardShadow, padding: 0, overflow: 'hidden' }}>
 
         {/* Cover Photo */}
         <div style={{ position: 'relative', width: '100%', height: 120 }}>
@@ -297,19 +297,19 @@ export default function Account() {
         onClick={() => navigate('/settings')}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: c.card, border: c.cardBorder, borderRadius: 14,
+          background: c.card, border: c.cardBorder, boxShadow: c.cardShadow, borderRadius: 14,
           padding: '18px 20px', cursor: 'pointer', marginBottom: 16,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: isDark ? 'rgba(127,181,160,0.15)' : '#f0faf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: isDark ? 'rgba(127,181,160,0.2)' : 'rgba(45,106,79,0.1)', border: isDark ? '1px solid rgba(127,181,160,0.3)' : '1px solid rgba(45,106,79,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7fb5a0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
           </div>
           <div style={{ textAlign: 'left' }}>
-            <p style={{ fontSize: 15, fontWeight: 600, color: c.text, margin: 0 }}>帳號設定</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: c.text, margin: 0 }}>帳號設定</p>
             <p style={{ fontSize: 12, color: c.label, margin: 0 }}>密碼、語言、主題、訂閱</p>
           </div>
         </div>
