@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
@@ -53,9 +54,18 @@ function ProfileIcon({ active }) {
 }
 
 export default function LeftSidebar() {
-  const { lang, isDark, isLoggedIn } = useApp();
+  const { lang, isDark, isLoggedIn, handleLogout } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => { if (!menuRef.current?.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
 
   if (AUTH_PAGES.includes(location.pathname)) return null;
 
@@ -139,6 +149,67 @@ export default function LeftSidebar() {
             </button>
           );
         })}
+      </div>
+
+      {/* 漢堡選單 — 底部 */}
+      <div ref={menuRef} style={{ position: 'relative', marginBottom: 8 }}>
+        {menuOpen && (
+          <div style={{
+            position: 'absolute',
+            bottom: 'calc(100% + 8px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            minWidth: 180,
+            background: isDark ? 'rgba(28,25,23,0.97)' : 'rgba(255,255,255,0.97)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${border}`,
+            borderRadius: 16,
+            padding: '6px',
+            boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.6)' : '0 8px 32px rgba(0,0,0,0.13)',
+            zIndex: 300,
+          }}>
+            {[
+              { label: lang === 'zh' ? '設定' : 'Settings',       action: () => { navigate('/settings'); setMenuOpen(false); } },
+              { label: lang === 'zh' ? '回報問題' : 'Report Issue', action: () => { window.open('https://github.com/a0916495739-hash/anxiety-growth-navigation/issues', '_blank'); setMenuOpen(false); } },
+            ].map(({ label, action }) => (
+              <button key={label} onClick={action} style={{
+                width: '100%', display: 'block', background: 'none', border: 'none',
+                textAlign: 'left', padding: '9px 14px', borderRadius: 10,
+                fontSize: 14, cursor: 'pointer',
+                color: isDark ? '#e7e5e4' : '#2d3748',
+              }}>{label}</button>
+            ))}
+            {isLoggedIn && (
+              <>
+                <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', margin: '4px 6px' }} />
+                <button onClick={() => { handleLogout(); setMenuOpen(false); }} style={{
+                  width: '100%', display: 'block', background: 'none', border: 'none',
+                  textAlign: 'left', padding: '9px 14px', borderRadius: 10,
+                  fontSize: 14, cursor: 'pointer', color: '#ef4444',
+                }}>
+                  {lang === 'zh' ? '登出' : 'Log out'}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          style={{
+            width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: menuOpen ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(0,0,0,0.06)') : 'none',
+            border: 'none', borderRadius: 14, cursor: 'pointer',
+            color: isDark ? '#6b6560' : '#b8b2ab',
+            transition: 'background 0.2s',
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6"  x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
       </div>
     </aside>
   );
