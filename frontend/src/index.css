@@ -155,36 +155,34 @@ input, textarea { font-family: inherit; }
   50%       { box-shadow: 0 0 80px 24px rgba(248,177,149,0.55); }
 }
 
-/* Bottom tab bar — hidden on desktop, shown on mobile */
-/* Do NOT set display in inline style on BottomTabBar; only CSS controls it */
+/* Bottom tab bar — mobile only */
 .bottom-tab-bar { display: none !important; }
 
-/* RWD */
-@media (max-width: 480px) {
+/* Left sidebar + right panel — desktop only */
+.app-shell > aside { display: flex; }
+
+/* ── Mobile (≤768px) ── */
+@media (max-width: 768px) {
   body { font-size: 15px; }
 
-  /* Show tab bar + add bottom padding so content doesn't hide behind floating capsule */
+  /* Show bottom tab bar */
   .bottom-tab-bar { display: flex !important; }
   #root { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 
-  /* Ensure tap targets meet 44px minimum on mobile */
-  button {
-    min-height: 44px;
-    min-width: 44px;
-  }
+  /* Hide sidebars */
+  .app-shell > aside { display: none !important; }
 
-  /* Exception: small inline action buttons (delete, tags) */
-  button[data-small] {
-    min-height: unset;
-    min-width: unset;
-  }
+  /* Tap target minimums */
+  button { min-height: 44px; min-width: 44px; }
+  button[data-small] { min-height: unset; min-width: unset; }
 
-  /* 手機版：隱藏桌面導覽，顯示漢堡 */
+  /* 手機：隱藏桌面導覽，顯示漢堡 */
   .nav-desktop-only { display: none !important; }
   .nav-hamburger { display: flex !important; }
 }
 
-@media (min-width: 481px) {
+/* ── Desktop (>768px) ── */
+@media (min-width: 769px) {
   /* 桌面：顯示桌面導覽，隱藏漢堡 */
   .nav-desktop-only { display: flex !important; }
   .nav-hamburger { display: none !important; }

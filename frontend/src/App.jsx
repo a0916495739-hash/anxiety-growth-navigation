@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './components/Toast';
 import BottomTabBar from './components/BottomTabBar';
+import LeftSidebar from './components/LeftSidebar';
+import RightPanel from './components/RightPanel';
 import PageTransition from './components/PageTransition';
 
 import Home from './pages/Home';
@@ -28,34 +30,41 @@ function AppRoutes() {
     </div>
   );
   const location = useLocation();
+  const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const isAuth = AUTH_PAGES.includes(location.pathname);
+
   return (
-    <>
-      <PageTransition>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/emotions" element={<EmotionRecorder />} />
-          <Route path="/emotions/history" element={<EmotionHistory />} />
-          <Route path="/achievements" element={<AchievementList />} />
-          <Route path="/achievements/new" element={<AchievementNew />} />
-          <Route path="/conflicts" element={<ConflictList />} />
-          <Route path="/conflicts/new" element={<ConflictNew />} />
-          <Route path="/conflicts/stats" element={<ConflictStats />} />
-          <Route path="/breathing" element={<BreathingTool />} />
-          <Route path="/cognitive/new" element={<CognitiveReframeNew />} />
-          <Route path="/cognitive/history" element={<CognitiveReframeList />} />
-          <Route path="/report" element={<WeeklyReport />} />
-          <Route path="/demo/nav" element={<ThreadsNavDemo />} />
-        </Routes>
-      </PageTransition>
+    <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
+      {!isAuth && <LeftSidebar />}
+      <main style={{ flex: 1, minWidth: 0 }}>
+        <PageTransition>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/emotions" element={<EmotionRecorder />} />
+            <Route path="/emotions/history" element={<EmotionHistory />} />
+            <Route path="/achievements" element={<AchievementList />} />
+            <Route path="/achievements/new" element={<AchievementNew />} />
+            <Route path="/conflicts" element={<ConflictList />} />
+            <Route path="/conflicts/new" element={<ConflictNew />} />
+            <Route path="/conflicts/stats" element={<ConflictStats />} />
+            <Route path="/breathing" element={<BreathingTool />} />
+            <Route path="/cognitive/new" element={<CognitiveReframeNew />} />
+            <Route path="/cognitive/history" element={<CognitiveReframeList />} />
+            <Route path="/report" element={<WeeklyReport />} />
+            <Route path="/demo/nav" element={<ThreadsNavDemo />} />
+          </Routes>
+        </PageTransition>
+      </main>
+      {!isAuth && <RightPanel />}
       <BottomTabBar />
-    </>
+    </div>
   );
 }
 
