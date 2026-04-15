@@ -259,9 +259,7 @@ export default function Home() {
         <p style={s.heroEyebrow}>{t.homeEyebrow}</p>
         <h1 style={{ ...s.heroTitle, color: text_head }}>
           {t.homeTitle1}<br />
-          <span style={{ display: 'inline-block', wordBreak: 'keep-all' }}>
-            {t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
-          </span>
+          {t.homeTitle2}<span style={s.heroAccent}>{t.homeAccent}</span>
         </h1>
         <p style={{ ...s.heroSub, color: text_sub }}>{t.homeSub}</p>
 
@@ -686,22 +684,24 @@ const s = {
     marginBottom: 16,
   },
   heroTitle: {
-    fontSize: 'clamp(18px, 5vw, 30px)',
+    fontSize: 'clamp(20px, 5.5vw, 28px)',
     fontWeight: 700,
-    lineHeight: 1.45,
+    lineHeight: 1.5,
     color: '#2d3748',
     marginBottom: 16,
     letterSpacing: '-0.2px',
+    textWrap: 'balance',
   },
   heroAccent: {
     color: '#7fb5a0',
     borderBottom: '3px solid #b8d9cf',
   },
   heroSub: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#6b7280',
     lineHeight: 1.7,
     marginBottom: 24,
+    textWrap: 'balance',
   },
   guestBanner: {
     display: 'inline-flex',
