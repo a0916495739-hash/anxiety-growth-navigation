@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { setNavDirection } from '../utils/navDirection';
 
 // Tab order for swipe navigation (must match BottomTabBar order)
 const TAB_PATHS = ['/', '/breathing', '/emotions/history', '/achievements', '/account'];
@@ -49,9 +50,11 @@ export default function useSwipeNav(isLoggedIn) {
 
       if (dx < 0 && idx < paths.length - 1) {
         // Swipe left → next tab
+        setNavDirection(1);
         navigate(paths[idx + 1]);
       } else if (dx > 0 && idx > 0) {
         // Swipe right → previous tab
+        setNavDirection(-1);
         navigate(paths[idx - 1]);
       }
     }

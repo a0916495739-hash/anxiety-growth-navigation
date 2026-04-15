@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
+import { setNavDirection } from '../utils/navDirection';
 
 const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
 
@@ -140,7 +141,12 @@ export default function BottomTabBar() {
         return (
           <button
             key={path}
-            onClick={() => navigate(path)}
+            onClick={() => {
+              const fromIdx = activeIndex;
+              const toIdx = tabs.findIndex((t) => t.path === path);
+              setNavDirection(toIdx > fromIdx ? 1 : toIdx < fromIdx ? -1 : 0);
+              navigate(path);
+            }}
             style={{
               flex: 1,
               display: 'flex',
