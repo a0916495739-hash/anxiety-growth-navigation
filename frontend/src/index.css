@@ -164,9 +164,6 @@ input, textarea { font-family: inherit; }
 /* Main column padding */
 .app-main { padding: 0 32px; }
 
-/* Login page responsive */
-.login-left { display: flex; }
-.login-mobile-illus { display: none; }
 
 /* ── Mobile (≤768px) ── */
 @media (max-width: 768px) {
@@ -182,9 +179,6 @@ input, textarea { font-family: inherit; }
   /* Tighter horizontal padding on mobile */
   .app-main { padding: 0 16px; }
 
-  /* Login: hide left panel, show top illus */
-  .login-left { display: none !important; }
-  .login-mobile-illus { display: block !important; }
 
   /* Tap target minimums */
   button { min-height: 44px; min-width: 44px; }

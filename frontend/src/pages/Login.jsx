@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
-import AuthPixelPanel, { PixelBoard } from '../components/AuthPixelPanel';
+import AuthPixelBg from '../components/AuthPixelPanel';
 
 function EyeIcon({ open }) {
   return open ? (
@@ -28,35 +28,9 @@ export default function Login() {
   const t = getT(lang);
   const navigate = useNavigate();
 
-  const d = isDark ? {
-    leftBg:   'linear-gradient(160deg,#1a2e25 0%,#0f1f18 100%)',
-    rightBg:  '#1c1917',
-    title:    '#f5f5f4',
-    sub:      '#a8a29e',
-    label:    '#d6d3d1',
-    inputBg:  'rgba(28,25,23,0.8)',
-    inputBdr: '1.5px solid rgba(255,255,255,0.1)',
-    inputC:   '#e7e5e4',
-    errBg:    'rgba(127,29,29,0.3)',
-    errBdr:   '1px solid rgba(153,27,27,0.5)',
-    errC:     '#f87171',
-    footer:   '#57534e',
-    divider:  'rgba(255,255,255,0.08)',
-  } : {
-    leftBg:   'linear-gradient(160deg,#1a3a2a 0%,#2d6a4f 100%)',
-    rightBg:  '#faf8f3',
-    title:    '#2d3748',
-    sub:      '#6b7280',
-    label:    '#374151',
-    inputBg:  '#fff',
-    inputBdr: '1.5px solid #e8e0d0',
-    inputC:   '#2d3748',
-    errBg:    '#fef2f2',
-    errBdr:   '1px solid #fecaca',
-    errC:     '#dc2626',
-    footer:   '#9ca3af',
-    divider:  '#e8e0d0',
-  };
+  const card = isDark
+    ? { bg: 'rgba(28,24,22,0.92)', bdr: '1px solid rgba(255,255,255,0.08)', title: '#f5f5f4', sub: '#a8a29e', label: '#d6d3d1', inputBg: 'rgba(28,25,23,0.8)', inputBdr: '1.5px solid rgba(255,255,255,0.1)', inputC: '#e7e5e4', errBg: 'rgba(127,29,29,0.3)', errBdr: '1px solid rgba(153,27,27,0.5)', errC: '#f87171', footer: '#57534e', divider: 'rgba(255,255,255,0.12)' }
+    : { bg: 'rgba(255,252,250,0.88)', bdr: '1px solid rgba(255,255,255,0.5)', title: '#2d3748', sub: '#6b7280', label: '#374151', inputBg: '#fff', inputBdr: '1.5px solid #e8e0d0', inputC: '#2d3748', errBg: '#fef2f2', errBdr: '1px solid #fecaca', errC: '#dc2626', footer: '#9ca3af', divider: 'rgba(0,0,0,0.1)' };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -74,85 +48,77 @@ export default function Login() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '24px 16px' }}>
+      <AuthPixelBg isDark={isDark} />
 
-      <AuthPixelPanel lang={lang} />
-
-      {/* 右欄 — 表單區 */}
+      {/* 居中卡片 */}
       <div style={{
-        width: '100%',
-        maxWidth: 480,
-        background: d.rightBg,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 40px',
-        flexShrink: 0,
+        position: 'relative', zIndex: 1,
+        width: '100%', maxWidth: 400,
+        background: card.bg,
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        border: card.bdr,
+        borderRadius: 24,
+        padding: '40px 36px',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.25)',
       }}>
-        <div style={{ width: '100%', maxWidth: 360 }}>
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: card.title, marginBottom: 6 }}>{t.welcomeBack}</h1>
+          <p style={{ fontSize: 14, color: card.sub }}>{t.loginSub}</p>
+        </div>
 
-          {/* 手機版插圖 */}
-          <div className="login-mobile-illus" style={{ marginBottom: 24, maxHeight: 160, overflow: 'hidden' }}>
-            <PixelBoard />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontSize: 13, fontWeight: 600, color: card.label }}>Email</label>
+            <input
+              style={{ ...s.input, background: card.inputBg, border: card.inputBdr, color: card.inputC }}
+              type="email" placeholder="your@email.com"
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              required autoComplete="email"
+            />
           </div>
 
-          <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontSize: 26, fontWeight: 700, color: d.title, marginBottom: 6 }}>{t.welcomeBack}</h1>
-            <p style={{ fontSize: 14, color: d.sub }}>{t.loginSub}</p>
-          </div>
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: d.label, letterSpacing: 0.2 }}>Email</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontSize: 13, fontWeight: 600, color: card.label }}>{t.password}</label>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
-                style={{ ...s.input, background: d.inputBg, border: d.inputBdr, color: d.inputC }}
-                type="email" placeholder="your@email.com"
-                value={email} onChange={(e) => setEmail(e.target.value)}
-                required autoComplete="email"
+                style={{ ...s.pwInput, background: card.inputBg, border: card.inputBdr, color: card.inputC }}
+                type={showPw ? 'text' : 'password'} placeholder="••••••••"
+                value={password} onChange={(e) => setPassword(e.target.value)}
+                required autoComplete="current-password"
               />
+              <button type="button" style={s.eyeBtn} onClick={() => setShowPw(v => !v)} tabIndex={-1}>
+                <EyeIcon open={showPw} />
+              </button>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: d.label, letterSpacing: 0.2 }}>{t.password}</label>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <input
-                  style={{ ...s.pwInput, background: d.inputBg, border: d.inputBdr, color: d.inputC }}
-                  type={showPw ? 'text' : 'password'} placeholder="••••••••"
-                  value={password} onChange={(e) => setPassword(e.target.value)}
-                  required autoComplete="current-password"
-                />
-                <button type="button" style={s.eyeBtn} onClick={() => setShowPw(v => !v)} tabIndex={-1}>
-                  <EyeIcon open={showPw} />
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div style={{ ...s.errorBox, background: d.errBg, border: d.errBdr, color: d.errC }}>
-                <span>⚠️</span> {error}
-              </div>
-            )}
-
-            <button style={loading ? s.btnDisabled : s.btn} type="submit" disabled={loading}>
-              {loading ? t.signingIn : t.signInBtn}
-            </button>
-          </form>
-
-          <Link to="/" style={{
-            display: 'block', textAlign: 'center', marginTop: 12,
-            padding: '11px', borderRadius: 10, fontSize: 14, fontWeight: 500,
-            border: `1.5px solid ${d.divider}`,
-            color: d.sub, textDecoration: 'none',
-            background: 'transparent',
-            transition: 'border-color 0.15s',
-          }}>
-            {t.continueGuest}
-          </Link>
-
-          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-            <Link to="/forgot-password" style={{ fontSize: 13, color: '#7fb5a0' }}>{t.forgotPassword}</Link>
-            <p style={{ fontSize: 13, color: d.footer, margin: 0 }}>{t.noAccount} <Link to="/register" style={{ color: '#7fb5a0', fontWeight: 600 }}>{t.createAccount}</Link></p>
           </div>
+
+          {error && (
+            <div style={{ ...s.errorBox, background: card.errBg, border: card.errBdr, color: card.errC }}>
+              <span>⚠️</span> {error}
+            </div>
+          )}
+
+          <button style={loading ? s.btnDisabled : s.btn} type="submit" disabled={loading}>
+            {loading ? t.signingIn : t.signInBtn}
+          </button>
+        </form>
+
+        <Link to="/" style={{
+          display: 'block', textAlign: 'center', marginTop: 10,
+          padding: '10px', borderRadius: 10, fontSize: 14, fontWeight: 500,
+          border: `1.5px solid ${card.divider}`,
+          color: card.sub, textDecoration: 'none',
+        }}>
+          {t.continueGuest}
+        </Link>
+
+        <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+          <Link to="/forgot-password" style={{ fontSize: 13, color: '#7fb5a0' }}>{t.forgotPassword}</Link>
+          <p style={{ fontSize: 13, color: card.footer, margin: 0 }}>
+            {t.noAccount} <Link to="/register" style={{ color: '#7fb5a0', fontWeight: 600 }}>{t.createAccount}</Link>
+          </p>
         </div>
       </div>
     </div>
@@ -160,45 +126,10 @@ export default function Login() {
 }
 
 const s = {
-  input: {
-    border: '1.5px solid #e8e0d0',
-    borderRadius: 10,
-    padding: '11px 14px',
-    fontSize: 15,
-    outline: 'none',
-    width: '100%',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.15s',
-  },
-  pwInput: {
-    flex: 1, width: '100%',
-    border: '1.5px solid #e8e0d0',
-    borderRadius: 10,
-    padding: '11px 44px 11px 14px',
-    fontSize: 15,
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.15s',
-  },
-  eyeBtn: {
-    position: 'absolute', right: 12,
-    background: 'none', border: 'none', padding: 0,
-    color: '#9ca3af', cursor: 'pointer',
-    display: 'flex', alignItems: 'center', minHeight: 'unset',
-  },
-  errorBox: {
-    borderRadius: 10, padding: '10px 14px',
-    fontSize: 14, display: 'flex', gap: 8, alignItems: 'flex-start',
-  },
-  btn: {
-    background: '#fbbf24', border: 'none', color: '#fff',
-    borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 600,
-    boxShadow: '0 2px 10px rgba(251,191,36,0.4)',
-    marginTop: 4, cursor: 'pointer', width: '100%',
-  },
-  btnDisabled: {
-    background: '#fde68a', border: 'none', color: '#fff',
-    borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 600,
-    marginTop: 4, cursor: 'not-allowed', width: '100%',
-  },
+  input: { border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '11px 14px', fontSize: 15, outline: 'none', width: '100%', boxSizing: 'border-box' },
+  pwInput: { flex: 1, width: '100%', border: '1.5px solid #e8e0d0', borderRadius: 10, padding: '11px 44px 11px 14px', fontSize: 15, outline: 'none', boxSizing: 'border-box' },
+  eyeBtn: { position: 'absolute', right: 12, background: 'none', border: 'none', padding: 0, color: '#9ca3af', cursor: 'pointer', display: 'flex', alignItems: 'center', minHeight: 'unset' },
+  errorBox: { borderRadius: 10, padding: '10px 14px', fontSize: 14, display: 'flex', gap: 8, alignItems: 'flex-start' },
+  btn: { background: '#fbbf24', border: 'none', color: '#fff', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 600, boxShadow: '0 2px 10px rgba(251,191,36,0.4)', marginTop: 4, cursor: 'pointer', width: '100%' },
+  btnDisabled: { background: '#fde68a', border: 'none', color: '#fff', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 600, marginTop: 4, cursor: 'not-allowed', width: '100%' },
 };
