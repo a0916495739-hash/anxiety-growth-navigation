@@ -77,13 +77,16 @@ export default function BottomTabBar() {
     return location.pathname.startsWith(path);
   };
 
-  const bg      = isDark ? 'rgba(28,24,22,0.85)' : 'rgba(255,253,250,0.82)';
-  const border  = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)';
-  const shadow  = isDark
+  const activeIndex = tabs.findIndex(({ path }) => isActive(path));
+
+  const bg            = isDark ? 'rgba(28,24,22,0.85)' : 'rgba(255,253,250,0.82)';
+  const border        = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)';
+  const shadow        = isDark
     ? '0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
     : '0 8px 30px rgba(0,0,0,0.11), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)';
   const activeColor   = '#7fb5a0';
   const inactiveColor = isDark ? '#6b6560' : '#b8b2ab';
+  const indicatorBg   = isDark ? 'rgba(127,181,160,0.14)' : 'rgba(127,181,160,0.12)';
 
   return (
     <nav
@@ -104,7 +107,6 @@ export default function BottomTabBar() {
         boxShadow: shadow,
         zIndex: 150,
         transition: 'background 0.35s ease, box-shadow 0.35s ease',
-        /* GPU compositing for iOS — keeps bar fixed during scroll */
         WebkitTransform: 'translate3d(0,0,0)',
         transform: 'translate3d(0,0,0)',
         willChange: 'transform',
@@ -112,8 +114,27 @@ export default function BottomTabBar() {
         alignItems: 'center',
         justifyContent: 'space-around',
         padding: '0 4px',
+        overflow: 'hidden',
       }}
     >
+      {/* Sliding indicator pill */}
+      {activeIndex >= 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: 4,
+            width: `calc((100% - 8px) / ${tabs.length})`,
+            height: 46,
+            borderRadius: 9999,
+            background: indicatorBg,
+            transform: `translate(calc(${activeIndex} * 100%), -50%)`,
+            transition: 'transform 0.38s cubic-bezier(0.34,0,0.2,1)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {tabs.map(({ path, label, Icon }) => {
         const on = isActive(path);
         return (
@@ -131,9 +152,11 @@ export default function BottomTabBar() {
               border: 'none',
               cursor: 'pointer',
               color: on ? activeColor : inactiveColor,
-              transition: 'color 0.3s ease',
+              transition: 'color 0.25s ease',
               minHeight: 44,
               padding: '6px 0',
+              position: 'relative',
+              zIndex: 1,
             }}
           >
             <Icon active={on} />
@@ -141,7 +164,7 @@ export default function BottomTabBar() {
               fontSize: 10,
               fontWeight: on ? 600 : 400,
               letterSpacing: 0.3,
-              transition: 'font-weight 0.3s ease',
+              transition: 'font-weight 0.25s ease',
             }}>
               {label}
             </span>
