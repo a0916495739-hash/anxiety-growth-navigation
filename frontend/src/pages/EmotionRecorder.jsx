@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext';
 import TagSelector from '../components/TagSelector';
 import PromptCard from '../components/PromptCard';
 import { IllustrationDone, IllustrationEmptyEmotion } from '../components/Illustrations';
+import MorphButton from '../components/MorphButton';
 import { getT } from '../i18n';
 import { detectEmotion } from '../utils/emotionFilter';
 
@@ -175,9 +176,11 @@ function GuidedForm({ onSubmit, onBack, t, isDark }) {
           <p style={styles.tagLabel}>{t.emotionTags}</p>
           <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
             placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
-          <button type="submit" style={styles.submitBtn} disabled={submitting}>
-            {submitting ? t.saving : t.save}
-          </button>
+          <MorphButton
+            label={t.save}
+            loading={submitting}
+            style={{ marginTop: 12 }}
+          />
         </form>
       )}
     </div>
@@ -222,9 +225,11 @@ function FreeForm({ onSubmit, onBack, t, isDark }) {
         <p style={styles.tagLabel}>{t.emotionTags}</p>
         <TagSelector selected={tags} onChange={setTags} presets={t.emotionDefaultTags}
           placeholder={t.tagCustomPlaceholder} addLabel={t.tagAddBtn} />
-        <button type="submit" style={styles.submitBtn} disabled={submitting}>
-          {submitting ? t.saving : t.save}
-        </button>
+        <MorphButton
+          label={t.save}
+          loading={submitting}
+          style={{ marginTop: 12 }}
+        />
       </form>
     </div>
   );
@@ -270,12 +275,11 @@ function CompletionScreen({ todayCount, t, isDark, emotionText, lang }) {
   const [message] = useState(
     () => t.surpriseMessages[Math.floor(Math.random() * t.surpriseMessages.length)]
   );
-  const [aiMessage, setAiMessage] = useState(null);   // null = loading, '' = disabled/failed
-  const [aiLoading, setAiLoading] = useState(!!emotionText);
+  const [aiMessage, setAiMessage] = useState(null);
+  const [aiLoading, setAiLoading] = useState(true);
 
   useEffect(() => {
-    if (!emotionText) { setAiLoading(false); return; }
-    getAIEmotionFeedback(emotionText, lang)
+    getAIEmotionFeedback(emotionText || '（無文字記錄）', lang)
       .then((r) => setAiMessage(r.data.enabled ? r.data.message : ''))
       .catch(() => setAiMessage(''))
       .finally(() => setAiLoading(false));

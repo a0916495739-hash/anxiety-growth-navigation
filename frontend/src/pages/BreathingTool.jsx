@@ -384,26 +384,38 @@ export default function BreathingTool() {
         )}
       </div>
 
-      {/* ── Play / Pause ── */}
-      {!done && (
-        <motion.button
-          whileTap={{ scale: 0.94 }}
-          onClick={togglePlay}
-          style={{
-            width: 76, height: 76, borderRadius: '50%', fontSize: 24,
-            background: playing ? btnBg : accent,
-            border: `2px solid ${playing ? btnBdr : 'transparent'}`,
-            color: playing ? muted : '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: playing ? 'none' : `0 8px 28px ${accent}66`,
-            transition: 'background 0.3s, box-shadow 0.3s',
-          }}
-          aria-label={playing ? 'Pause' : 'Play'}
-        >
-          {playing ? '⏸' : '▶'}
-        </motion.button>
-      )}
+      {/* ── Play / Pause / Done ── */}
+      <motion.button
+        whileTap={done ? {} : { scale: 0.94 }}
+        onClick={done ? undefined : togglePlay}
+        style={{
+          width: 76, height: 76, borderRadius: '50%',
+          background: done ? '#7fb5a0' : playing ? btnBg : accent,
+          border: `2px solid ${playing && !done ? btnBdr : 'transparent'}`,
+          color: playing && !done ? muted : '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: done ? 'default' : 'pointer',
+          boxShadow: (playing || done) ? 'none' : `0 8px 28px ${accent}66`,
+          transition: 'background 0.4s ease, box-shadow 0.3s',
+          fontSize: 24,
+        }}
+        aria-label={done ? 'Done' : playing ? 'Pause' : 'Play'}
+      >
+        {done ? (
+          <svg
+            width="28" height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ animation: 'checkPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both' }}
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : playing ? '⏸' : '▶'}
+      </motion.button>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAchievement, getAchievements, deleteAchievement } from '../api/achievements';
 import { IllustrationDone, IllustrationAchievement } from '../components/Illustrations';
+import MorphButton from '../components/MorphButton';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
 import PolaroidModal from '../components/PolaroidModal';
@@ -323,21 +324,13 @@ export function AchievementNew() {
             >
               {exporting ? '生成中…' : '匯出圖片 📥'}
             </button>
-            <button
+            <MorphButton
+              label="儲存成就"
+              loading={saving}
               onClick={handleSave}
-              disabled={saving}
-              style={{
-                flex: 1, maxWidth: 180,
-                background: 'transparent',
-                border: `1.5px solid ${isDark ? 'rgba(255,255,255,0.2)' : '#d1d5db'}`,
-                color: isDark ? 'rgba(255,255,255,0.65)' : '#6b7280',
-                borderRadius: 12, padding: '11px 8px',
-                fontSize: 14, fontWeight: 500,
-                cursor: saving ? 'not-allowed' : 'pointer',
-              }}
-            >
-              {saving ? '儲存中…' : '儲存成就 ✓'}
-            </button>
+              color="#7fb5a0"
+              style={{ flex: 1, maxWidth: 180 }}
+            />
           </div>
         </div>
       </div>
