@@ -395,50 +395,115 @@ export default function Account() {
           </button>
         </div>
 
-        {/* Section label + avatar row */}
+        {/* ── Retro Profile Card ── */}
         <div style={{ padding: '16px 20px 0' }}>
-        <p style={{ ...s.sectionLabel, color: c.label, marginBottom: 12 }}>{t.profile}</p>
-        <div style={s.avatar}>
-          {/* Hidden avatar file input */}
-          <input
-            ref={avatarInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleAvatarChange}
-          />
-          {/* Clickable avatar circle with camera badge */}
+        {/* Hidden avatar file input */}
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleAvatarChange}
+        />
+
+        {/* Retro card */}
+        <div style={{
+          background: isDark ? '#1e1a17' : '#f8f5f0',
+          border: isDark ? '2px solid rgba(255,255,255,0.15)' : '2px solid #1a1a1a',
+          borderRadius: 12,
+          boxShadow: isDark
+            ? '4px 4px 0px 0px rgba(0,0,0,0.5)'
+            : '4px 4px 0px 0px rgba(0,0,0,0.10)',
+          padding: '14px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          marginBottom: 16,
+        }}>
+          {/* Pixel avatar */}
           <div
             style={{ position: 'relative', flexShrink: 0, cursor: 'pointer' }}
             onClick={() => !avatarUploading && avatarInputRef.current?.click()}
             title="點擊更換頭貼"
           >
-            <div style={{ ...s.avatarCircle, overflow: 'hidden' }}>
+            <div style={{
+              width: 64, height: 64,
+              border: isDark ? '2px solid rgba(255,255,255,0.6)' : '2px solid #1a1a1a',
+              borderRadius: 8,
+              imageRendering: 'pixelated',
+              overflow: 'hidden',
+              background: isDark ? '#2a2520' : '#e8e4df',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: isDark ? '2px 2px 0 rgba(255,255,255,0.1)' : '2px 2px 0 rgba(0,0,0,0.15)',
+            }}>
               {avatarUrl
-                ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                : (displayName ? displayName[0].toUpperCase() : email ? email[0].toUpperCase() : '?')
+                ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', imageRendering: 'pixelated' }} />
+                : (
+                  /* Pixel-art person SVG */
+                  <svg width="36" height="36" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="1" width="4" height="4" fill={isDark ? '#c8b8a8' : '#6b5c4e'} />
+                    <rect x="5" y="5" width="6" height="5" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                    <rect x="3" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                    <rect x="11" y="5" width="2" height="4" fill={isDark ? '#95d5b2' : '#7fb5a0'} />
+                    <rect x="5" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
+                    <rect x="9" y="10" width="2" height="5" fill={isDark ? '#a8c8b8' : '#5a8a78'} />
+                    <rect x="7" y="1" width="2" height="1" fill={isDark ? '#8b7060' : '#4a3828'} />
+                  </svg>
+                )
               }
             </div>
+            {/* Uploading indicator */}
+            {avatarUploading && (
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: 8,
+                background: 'rgba(0,0,0,0.4)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <div style={{ width: 16, height: 16, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+              </div>
+            )}
             {/* Camera badge */}
             <div style={{
-              position: 'absolute', bottom: 0, right: 0,
-              width: 20, height: 20, borderRadius: '50%',
+              position: 'absolute', bottom: -6, right: -6,
+              width: 20, height: 20,
               background: '#7fb5a0',
-              border: `2px solid ${c.card}`,
+              border: '2px solid #1a1a1a',
+              borderRadius: 4,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              {avatarUploading
-                ? <div style={{ width: 8, height: 8, borderRadius: '50%', border: '1.5px solid #fff', borderTopColor: 'transparent', animation: 'spin 0.7s linear infinite' }} />
-                : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                  </svg>
-              }
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
             </div>
           </div>
-          <div>
-            <p style={{ ...s.avatarName, color: c.text }}>{displayName || t.noDisplayName}</p>
-            <p style={{ ...s.avatarEmail, color: c.textMid }}>{email}</p>
+
+          {/* Stats */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: isDark ? '#e7e5e4' : '#1a1a1a', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {displayName || t.noDisplayName}
+            </p>
+            <p style={{ fontSize: 11, color: isDark ? '#78716c' : '#9ca3af', margin: '0 0 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {email}
+            </p>
+            {/* Retro stat rows */}
+            {(() => {
+              const { lv, title, days } = getGrowthLevel();
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>LVL</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(lv).padStart(2, '0')}</span>
+                    <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{title}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: '#7fb5a0', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'monospace' }}>DAY</span>
+                    <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: isDark ? '#95d5b2' : '#2d6a4f', letterSpacing: -0.5 }}>{String(days).padStart(3, '0')}</span>
+                    <span style={{ fontSize: 11, color: isDark ? '#a8a29e' : '#6b7280' }}>{lang === 'zh' ? '天陪伴' : 'days'}</span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
