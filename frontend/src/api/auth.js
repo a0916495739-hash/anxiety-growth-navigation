@@ -25,6 +25,8 @@ export const updateProfile = (displayName) =>
   client.put('/auth/profile', { display_name: displayName });
 export const updateAvatar = (avatarData) =>
   client.put('/auth/avatar', { avatar_data: avatarData });
+export const updateCover = (coverData) =>
+  client.put('/auth/cover', { cover_data: coverData });
 export const forgotPassword = (email) =>
   client.post('/auth/forgot-password', { email });
 export const resetPassword = (token, newPassword) =>

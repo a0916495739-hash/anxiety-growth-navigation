@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sprout } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getMe, updateProfile, updateAvatar } from '../api/auth';
+import { getMe, updateProfile, updateAvatar, updateCover } from '../api/auth';
 import { useApp } from '../context/AppContext';
 import { getT } from '../i18n';
 
@@ -85,7 +85,8 @@ export default function Account() {
   const [nameMsg, setNameMsg] = useState(null);
   const [nameSaving, setNameSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [coverUrl, setCoverUrl] = useState(() => localStorage.getItem('cover_url') || null);
+  const [coverUrl, setCoverUrl] = useState(null);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [growthGoal, setGrowthGoal] = useState(() => localStorage.getItem('growth_goal') || '');
   const [goalEditing, setGoalEditing] = useState(false);
   const avatarInputRef = useRef(null);
@@ -101,6 +102,7 @@ export default function Account() {
       .then((r) => {
         setEmail(r.data.email || '');
         setNameInput(r.data.displayName || '');
+        if (r.data.coverData) setCoverUrl(r.data.coverData);
       })
       .catch((err) => {
         if (err?.response?.status === 401) navigate('/');
@@ -139,14 +141,20 @@ export default function Account() {
     }
   }
 
-  function handleCoverChange(e) {
+  async function handleCoverChange(e) {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    if (coverUrl?.startsWith('blob:')) URL.revokeObjectURL(coverUrl);
-    setCoverUrl(objectUrl);
-    localStorage.setItem('cover_url', objectUrl);
-    e.target.value = '';
+    if (!file || coverUploading) return;
+    setCoverUploading(true);
+    try {
+      const base64 = await toBase64(file);
+      await updateCover(base64);
+      setCoverUrl(base64);
+    } catch (err) {
+      console.error('封面上傳失敗', err);
+    } finally {
+      setCoverUploading(false);
+      e.target.value = '';
+    }
   }
 
   function handleGoalBlur() {
