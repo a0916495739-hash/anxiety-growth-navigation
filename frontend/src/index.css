@@ -158,7 +158,7 @@ input, textarea { font-family: inherit; }
 /* Bottom tab bar — mobile only */
 .bottom-tab-bar { display: none !important; }
 
-/* Left sidebar + right panel — desktop only */
+/* Left sidebar — desktop only */
 .app-shell > aside { display: flex; }
 
 /* ── Mobile (≤768px) ── */

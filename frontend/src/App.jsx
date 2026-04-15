@@ -3,7 +3,6 @@ import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './components/Toast';
 import BottomTabBar from './components/BottomTabBar';
 import LeftSidebar from './components/LeftSidebar';
-import RightPanel from './components/RightPanel';
 import PageTransition from './components/PageTransition';
 
 import Home from './pages/Home';
@@ -62,7 +61,6 @@ function AppRoutes() {
           </Routes>
         </PageTransition>
       </main>
-      {!isAuth && <RightPanel />}
       <BottomTabBar />
     </div>
   );
