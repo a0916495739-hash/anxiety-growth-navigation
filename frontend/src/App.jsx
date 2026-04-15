@@ -36,7 +36,7 @@ function AppRoutes() {
   return (
     <div className="app-shell" style={{ display: 'flex', minHeight: '100vh' }}>
       {!isAuth && <LeftSidebar />}
-      <main style={{ flex: 1, minWidth: 0 }}>
+      <main style={{ flex: 1, minWidth: 0, padding: '0 32px' }}>
         <PageTransition>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home />} />

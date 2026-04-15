@@ -30,7 +30,7 @@ export default function RightPanel() {
       display: 'flex',
       flexDirection: 'column',
       gap: 12,
-      padding: '28px 16px',
+      padding: '28px 20px',
       background: bg,
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
