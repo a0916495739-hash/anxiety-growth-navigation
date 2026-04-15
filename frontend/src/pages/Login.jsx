@@ -77,7 +77,7 @@ export default function Login() {
 
   return (
     <div style={{ ...s.bg, background: d.bg }}>
-      <div style={{ ...s.card, background: d.card, border: d.cardBdr, boxShadow: d.cardShd }}>
+      <div style={s.inner}>
         <div style={s.header}>
           <div style={s.illusWrap}><IllustrationLogin width={100} /></div>
           <h1 style={{ ...s.title, color: d.title }}>{t.welcomeBack}</h1>
@@ -138,22 +138,14 @@ export default function Login() {
 const s = {
   bg: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #f5f3f0 0%, #ede8e3 50%, #f0ebe8 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
   },
-  card: {
-    background: 'rgba(255, 252, 250, 0.65)',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
-    border: '1px solid rgba(255, 255, 255, 0.45)',
-    borderRadius: 32,
-    padding: '40px 36px',
+  inner: {
     width: '100%',
-    maxWidth: 400,
-    boxShadow: '0 24px 48px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04)',
+    maxWidth: 480,
+    padding: '48px 40px',
   },
   header: { textAlign: 'center', marginBottom: 32 },
   illusWrap: { display: 'flex', justifyContent: 'center', marginBottom: 8 },
