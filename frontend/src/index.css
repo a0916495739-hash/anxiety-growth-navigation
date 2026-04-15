@@ -161,6 +161,9 @@ input, textarea { font-family: inherit; }
 /* Left sidebar — desktop only */
 .app-shell > aside { display: flex; }
 
+/* Main column padding */
+.app-main { padding: 0 32px; }
+
 /* ── Mobile (≤768px) ── */
 @media (max-width: 768px) {
   body { font-size: 15px; }
@@ -171,6 +174,9 @@ input, textarea { font-family: inherit; }
 
   /* Hide sidebars */
   .app-shell > aside { display: none !important; }
+
+  /* Tighter horizontal padding on mobile */
+  .app-main { padding: 0 16px; }
 
   /* Tap target minimums */
   button { min-height: 44px; min-width: 44px; }
