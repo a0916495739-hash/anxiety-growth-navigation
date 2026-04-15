@@ -5,7 +5,7 @@ const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'
 
 function HomeIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={active ? 0 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={active ? 0 : 1.8} strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
       <path d="M9 21V12h6v9" fill={active ? 'rgba(255,255,255,0.3)' : 'none'} stroke="currentColor" strokeWidth="1.8" />
     </svg>
@@ -14,7 +14,7 @@ function HomeIcon({ active }) {
 
 function BreathIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="9" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.12 : 1} />
       <path d="M8 12c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4" />
       <circle cx="12" cy="12" r="2" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.5 : 1} />
@@ -24,7 +24,7 @@ function BreathIcon({ active }) {
 
 function HistoryIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.12 : 1} />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
@@ -36,7 +36,7 @@ function HistoryIcon({ active }) {
 
 function AchieveIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="8" r="6" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.15 : 1} />
       <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
     </svg>
@@ -45,7 +45,7 @@ function AchieveIcon({ active }) {
 
 function ProfileIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" fill={active ? 'currentColor' : 'none'} opacity={active ? 0.2 : 1} />
     </svg>
@@ -122,8 +122,8 @@ export default function LeftSidebar() {
               onClick={() => navigate(path)}
               title={label}
               style={{
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
