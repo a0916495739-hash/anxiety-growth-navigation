@@ -213,10 +213,20 @@ export default function Login() {
             </button>
           </form>
 
-          <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
-            <Link to="/forgot-password" style={{ fontSize: 14, color: '#7fb5a0' }}>{t.forgotPassword}</Link>
-            <p style={{ fontSize: 14, color: d.footer, margin: 0 }}>{t.noAccount} <Link to="/register" style={{ color: '#7fb5a0', fontWeight: 600 }}>{t.createAccount}</Link></p>
-            <Link to="/" style={{ fontSize: 13, color: d.footer }}>{t.continueGuest}</Link>
+          <Link to="/" style={{
+            display: 'block', textAlign: 'center', marginTop: 12,
+            padding: '11px', borderRadius: 10, fontSize: 14, fontWeight: 500,
+            border: `1.5px solid ${d.divider}`,
+            color: d.sub, textDecoration: 'none',
+            background: 'transparent',
+            transition: 'border-color 0.15s',
+          }}>
+            {t.continueGuest}
+          </Link>
+
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+            <Link to="/forgot-password" style={{ fontSize: 13, color: '#7fb5a0' }}>{t.forgotPassword}</Link>
+            <p style={{ fontSize: 13, color: d.footer, margin: 0 }}>{t.noAccount} <Link to="/register" style={{ color: '#7fb5a0', fontWeight: 600 }}>{t.createAccount}</Link></p>
           </div>
         </div>
       </div>
