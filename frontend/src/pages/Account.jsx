@@ -1,4 +1,107 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Sprout } from 'lucide-react';
+
+// ── Growth Level System ──────────────────────────────────────────────────────
+const LEVELS = [
+  { lv: 1,  title: '種子萌芽者', minDays: 0   },
+  { lv: 2,  title: '嫩芽探索者', minDays: 4   },
+  { lv: 3,  title: '生長冒險者', minDays: 10  },
+  { lv: 4,  title: '綠意守護者', minDays: 20  },
+  { lv: 5,  title: '茁壯旅行者', minDays: 35  },
+  { lv: 6,  title: '心靈探索者', minDays: 55  },
+  { lv: 7,  title: '智慧行者',   minDays: 80  },
+  { lv: 8,  title: '花朵綻放者', minDays: 110 },
+  { lv: 9,  title: '大樹庇護者', minDays: 150 },
+  { lv: 10, title: '成長傳說者', minDays: 200 },
+];
+
+function getGrowthLevel() {
+  // 以首次使用日期計算成長天數
+  let firstUse = localStorage.getItem('first_use_date');
+  if (!firstUse) {
+    firstUse = new Date().toISOString();
+    localStorage.setItem('first_use_date', firstUse);
+  }
+  const days = Math.floor((Date.now() - new Date(firstUse).getTime()) / 86400000);
+  const current = [...LEVELS].reverse().find((l) => days >= l.minDays) || LEVELS[0];
+  const next = LEVELS.find((l) => l.lv === current.lv + 1);
+  const progress = next
+    ? Math.min(100, Math.round(((days - current.minDays) / (next.minDays - current.minDays)) * 100))
+    : 100;
+  return { ...current, days, progress };
+}
+
+function GrowthAvatarCard({ isDark }) {
+  const { lv, title, days, progress } = getGrowthLevel();
+  const bg     = isDark ? '#1e2d27' : '#f0faf5';
+  const border = isDark ? '2px solid rgba(127,181,160,0.5)' : '2px solid #2d6a4f';
+  const shadow = '4px 4px 0px 0px rgba(45,106,79,0.25)';
+  const textPrimary = isDark ? '#c8e6c9' : '#1b4332';
+  const textSub     = isDark ? '#81c995' : '#40916c';
+  const barBg       = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(45,106,79,0.12)';
+
+  return (
+    <div style={{
+      background: bg,
+      border,
+      borderRadius: 16,
+      boxShadow: shadow,
+      padding: '18px 20px',
+      marginBottom: 16,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 18,
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Pixel-feel decorative dots */}
+      <div style={{ position: 'absolute', top: 8, right: 12, display: 'flex', gap: 4 }}>
+        {[0,1,2].map((i) => (
+          <div key={i} style={{ width: 6, height: 6, borderRadius: 1, background: textSub, opacity: 0.4 - i * 0.1 }} />
+        ))}
+      </div>
+
+      {/* Icon box */}
+      <div style={{
+        width: 64, height: 64, flexShrink: 0,
+        background: isDark ? 'rgba(127,181,160,0.15)' : 'rgba(45,106,79,0.08)',
+        border: `2px solid ${isDark ? 'rgba(127,181,160,0.4)' : '#2d6a4f'}`,
+        borderRadius: 12,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        imageRendering: 'pixelated',
+        boxShadow: '2px 2px 0px 0px rgba(45,106,79,0.3)',
+      }}>
+        <Sprout size={34} color={isDark ? '#81c995' : '#2d6a4f'} strokeWidth={1.8} />
+      </div>
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: textSub, letterSpacing: 1.2, textTransform: 'uppercase', margin: '0 0 4px' }}>
+          我的成長化身
+        </p>
+        <p style={{ fontSize: 20, fontWeight: 800, color: textPrimary, margin: '0 0 2px', letterSpacing: -0.3 }}>
+          Lv.{lv} <span style={{ fontWeight: 600, fontSize: 16 }}>{title}</span>
+        </p>
+        <p style={{ fontSize: 12, color: textSub, margin: '0 0 10px' }}>
+          已陪伴 {days} 天
+        </p>
+        {/* Progress bar */}
+        <div style={{ background: barBg, borderRadius: 4, height: 6, overflow: 'hidden', border: `1px solid ${isDark ? 'rgba(127,181,160,0.2)' : 'rgba(45,106,79,0.15)'}` }}>
+          <div style={{
+            height: '100%',
+            width: `${progress}%`,
+            background: isDark ? 'linear-gradient(90deg,#52b788,#95d5b2)' : 'linear-gradient(90deg,#2d6a4f,#52b788)',
+            borderRadius: 4,
+            transition: 'width 0.6s ease',
+          }} />
+        </div>
+        <p style={{ fontSize: 10, color: textSub, margin: '4px 0 0', opacity: 0.8 }}>
+          {progress < 100 ? `距離下一等級 ${progress}%` : '已達最高等級 ✦'}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function SunIcon() {
   return (
@@ -246,6 +349,9 @@ export default function Account() {
     <div style={{ ...s.page }}>
       <button style={{ ...s.back, color: '#7fb5a0' }} onClick={() => navigate('/')}>{t.backToHome}</button>
       <h2 style={{ ...s.heading, color: c.heading }}>{t.accountSettings}</h2>
+
+      {/* ── Growth Avatar ── */}
+      <GrowthAvatarCard isDark={isDark} />
 
       {/* Profile */}
       <div style={{ ...s.section, background: c.card, border: c.cardBorder, padding: 0, overflow: 'hidden' }}>
