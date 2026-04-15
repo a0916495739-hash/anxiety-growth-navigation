@@ -79,11 +79,11 @@ export default function BottomTabBar() {
 
   const activeIndex = tabs.findIndex(({ path }) => isActive(path));
 
-  const bg            = isDark ? 'rgba(28,24,22,0.85)' : 'rgba(255,253,250,0.82)';
-  const border        = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.06)';
+  const bg            = isDark ? 'rgba(20,16,14,0.52)' : 'rgba(255,255,255,0.42)';
+  const border        = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.75)';
   const shadow        = isDark
-    ? '0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
-    : '0 8px 30px rgba(0,0,0,0.11), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)';
+    ? 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.5), 0 8px 40px rgba(0,0,0,0.55)'
+    : 'inset 0 1.5px 0 rgba(255,255,255,0.98), inset 0 -1px 0 rgba(0,0,0,0.04), 0 8px 40px rgba(0,0,0,0.1)';
   const activeColor   = '#7fb5a0';
   const inactiveColor = isDark ? '#6b6560' : '#b8b2ab';
   const indicatorBg   = isDark ? 'rgba(127,181,160,0.14)' : 'rgba(127,181,160,0.12)';
@@ -100,8 +100,8 @@ export default function BottomTabBar() {
         maxWidth: 400,
         height: 60,
         background: bg,
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
+        backdropFilter: 'blur(48px) saturate(1.8)',
+        WebkitBackdropFilter: 'blur(48px) saturate(1.8)',
         border: `1px solid ${border}`,
         borderRadius: 9999,
         boxShadow: shadow,

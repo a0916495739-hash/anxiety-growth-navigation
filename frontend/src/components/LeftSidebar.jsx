@@ -85,8 +85,8 @@ export default function LeftSidebar() {
     return location.pathname.startsWith(path);
   };
 
-  const bg           = isDark ? 'rgba(22,18,16,0.6)'       : 'rgba(255,253,250,0.7)';
-  const border       = isDark ? 'rgba(255,255,255,0.07)'    : 'rgba(0,0,0,0.06)';
+  const bg           = isDark ? 'rgba(20,16,14,0.52)'       : 'rgba(255,255,255,0.42)';
+  const border       = isDark ? 'rgba(255,255,255,0.1)'     : 'rgba(255,255,255,0.72)';
   const activeColor  = '#7fb5a0';
   const inactiveColor= isDark ? '#6b6560' : '#b8b2ab';
 
@@ -101,9 +101,12 @@ export default function LeftSidebar() {
       alignItems: 'center',
       paddingBottom: 24,
       background: bg,
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
+      backdropFilter: 'blur(48px) saturate(1.8)',
+      WebkitBackdropFilter: 'blur(48px) saturate(1.8)',
       borderRight: `1px solid ${border}`,
+      boxShadow: isDark
+        ? 'inset -1px 0 0 rgba(255,255,255,0.06), inset 1px 0 0 rgba(255,255,255,0.03)'
+        : 'inset -1px 0 0 rgba(255,255,255,0.9), 1px 0 24px rgba(0,0,0,0.04)',
       flexShrink: 0,
     }}>
       {/* Logo — 頂部，點擊回首頁 */}
@@ -137,8 +140,17 @@ export default function LeftSidebar() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: on ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(0,0,0,0.06)') : 'none',
-                border: 'none',
+                background: on
+                  ? (isDark ? 'rgba(127,181,160,0.18)' : 'rgba(255,255,255,0.6)')
+                  : 'none',
+                backdropFilter: on ? 'blur(20px)' : 'none',
+                WebkitBackdropFilter: on ? 'blur(20px)' : 'none',
+                border: on
+                  ? (isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.85)')
+                  : '1px solid transparent',
+                boxShadow: on
+                  ? (isDark ? 'inset 0 1px 0 rgba(255,255,255,0.1)' : 'inset 0 1px 0 rgba(255,255,255,0.95), 0 2px 8px rgba(0,0,0,0.06)')
+                  : 'none',
                 borderRadius: 14,
                 cursor: 'pointer',
                 color: on ? activeColor : inactiveColor,

@@ -316,10 +316,26 @@ export default function Home() {
         {features.map((f) => (
           <div
             key={f.path}
-            style={{ ...s.card, background: isDark ? 'rgba(41,37,36,0.7)' : f.color, borderColor: isDark ? 'rgba(255,255,255,0.08)' : f.border }}
+            style={{
+              ...s.card,
+              background: isDark ? 'rgba(22,18,16,0.48)' : 'rgba(255,255,255,0.42)',
+              backdropFilter: 'blur(40px) saturate(1.8)',
+              WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.75)',
+              boxShadow: isDark
+                ? 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.45)'
+                : 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.07)',
+            }}
             onClick={() => navigate(f.path)}
           >
-            <div style={{ ...s.cardIcon, background: isDark ? 'rgba(255,255,255,0.08)' : f.border }}>{f.emoji}</div>
+            <div style={{
+              ...s.cardIcon,
+              background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.65)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.85)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
+            }}>{f.emoji}</div>
             <div style={s.cardBody}>
               <h2 style={{ ...s.cardTitle, color: isDark ? '#d6d3d1' : f.accent }}>{f.label}</h2>
               <p style={{ ...s.cardDesc, color: text_sub }}>{f.desc}</p>
@@ -750,13 +766,10 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     gap: 16,
-    border: '1.5px solid',
-    borderRadius: 18,
+    borderRadius: 20,
     padding: '20px 24px',
     cursor: 'pointer',
-    transition: 'transform 0.15s, box-shadow 0.15s',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-    ':hover': { transform: 'translateY(-2px)' },
+    transition: 'transform 0.18s ease, box-shadow 0.18s ease',
   },
   cardIcon: {
     width: 52,
@@ -791,17 +804,17 @@ const s = {
     justifyContent: 'center',
   },
   quickLink: {
-    background: 'rgba(255,255,255,0.4)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255,255,255,0.55)',
+    background: 'rgba(255,255,255,0.42)',
+    backdropFilter: 'blur(40px) saturate(1.8)',
+    WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+    border: '1px solid rgba(255,255,255,0.72)',
     borderRadius: 99,
     padding: '8px 20px',
     fontSize: 14,
     color: '#4a5568',
     fontWeight: 500,
-    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.7), 0 1px 4px rgba(0,0,0,0.05)',
-    transition: 'background 0.2s',
+    boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06)',
+    transition: 'transform 0.15s, box-shadow 0.15s',
   },
   statsBar: {
     background: 'rgba(245, 241, 237, 0.7)',
@@ -819,22 +832,22 @@ const s = {
   statNum: { fontSize: 28, fontWeight: 700, color: '#2d3748', lineHeight: 1 },
   statDesc: { fontSize: 12, color: '#6b7280' },
   blob1: {
-    position: 'fixed', top: '-60px', right: '-40px',
-    width: 320, height: 320,
-    background: 'radial-gradient(circle, rgba(251,191,36,0.25) 0%, transparent 70%)',
-    borderRadius: '50%', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none',
+    position: 'fixed', top: '-80px', right: '-60px',
+    width: 380, height: 380,
+    background: 'radial-gradient(circle, rgba(251,191,36,0.55) 0%, transparent 65%)',
+    borderRadius: '50%', filter: 'blur(48px)', zIndex: -1, pointerEvents: 'none',
   },
   blob2: {
-    position: 'fixed', bottom: '10%', left: '-80px',
-    width: 280, height: 280,
-    background: 'radial-gradient(circle, rgba(196,181,253,0.2) 0%, transparent 70%)',
-    borderRadius: '50%', filter: 'blur(50px)', zIndex: -1, pointerEvents: 'none',
+    position: 'fixed', bottom: '8%', left: '-100px',
+    width: 340, height: 340,
+    background: 'radial-gradient(circle, rgba(167,139,250,0.45) 0%, transparent 65%)',
+    borderRadius: '50%', filter: 'blur(56px)', zIndex: -1, pointerEvents: 'none',
   },
   blob3: {
-    position: 'fixed', top: '40%', right: '5%',
-    width: 200, height: 200,
-    background: 'radial-gradient(circle, rgba(249,168,212,0.18) 0%, transparent 70%)',
-    borderRadius: '50%', filter: 'blur(35px)', zIndex: -1, pointerEvents: 'none',
+    position: 'fixed', top: '38%', right: '2%',
+    width: 260, height: 260,
+    background: 'radial-gradient(circle, rgba(249,168,212,0.42) 0%, transparent 65%)',
+    borderRadius: '50%', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none',
   },
   footer: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 24, paddingTop: 20, borderTop: '1px solid #e8e0d0' },
   privacyLink: { background: 'none', border: 'none', fontSize: 12, cursor: 'pointer', padding: 0, fontWeight: 500 },
