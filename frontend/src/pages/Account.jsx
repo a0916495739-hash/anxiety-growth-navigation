@@ -168,9 +168,11 @@ export default function Account() {
     if (exporting) return;
     setExporting(true);
     try {
+      const token = localStorage.getItem('auth_token');
       const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       const res = await fetch(`${baseURL}/export/csv`, {
         credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
