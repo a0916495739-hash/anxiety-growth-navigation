@@ -386,7 +386,7 @@ export function AchievementList() {
       {achievements === null && <p style={{ color: c.sub }}>{t.loading}</p>}
       {achievements?.length === 0 && (
         <div style={styles.empty}>
-          <IllustrationAchievement width={150} />
+          <IllustrationAchievement width={150} isDark={isDark} />
           <p style={{ ...styles.emptyTitle, color: c.text }}>{t.noAchievements}</p>
           <p style={{ ...styles.emptyDesc, color: c.sub }}>{t.achievementsEmptyDesc}</p>
           <button style={styles.btn} onClick={() => navigate('/achievements/new')}>{t.firstAchievement}</button>

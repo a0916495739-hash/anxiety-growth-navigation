@@ -60,66 +60,111 @@ export function IllustrationDone({ width = 160 }) {
   );
 }
 
-// Achievement sparkle star
-export function IllustrationAchievement({ width = 160 }) {
+// Achievement empty: hand-drawn trophy + stars
+export function IllustrationAchievement({ width = 160, isDark = false }) {
+  const ink = isDark ? '#d6d3d1' : '#44403c';
+  const cupFill = isDark ? 'rgba(254,249,195,0.15)' : '#fef9c3';
   return (
-    <svg width={width} viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Jar */}
-      <path d="M52 55 Q50 52 54 48 H106 Q110 52 108 55 V108 Q108 116 100 116 H60 Q52 116 52 108 Z" fill="#faf8f3" stroke="#d4b49a" strokeWidth="2" strokeLinecap="round"/>
-      <path d="M54 48 H106 V42 Q106 38 100 38 H60 Q54 38 54 42 Z" fill="#e8e0d0" stroke="#d4b49a" strokeWidth="1.5"/>
-      {/* Stars in jar */}
-      <path d="M80 65 L83 73 L92 73 L85 78 L88 86 L80 81 L72 86 L75 78 L68 73 L77 73 Z" fill="#fde68a" stroke="#f0c430" strokeWidth="1"/>
-      <path d="M65 88 L67 93 L72 93 L68 96 L70 101 L65 98 L60 101 L62 96 L58 93 L63 93 Z" fill="#fde68a" stroke="#f0c430" strokeWidth="1" opacity="0.7"/>
-      <path d="M96 85 L98 89 L102 89 L99 92 L100 96 L96 94 L92 96 L93 92 L90 89 L94 89 Z" fill="#fde68a" stroke="#f0c430" strokeWidth="1" opacity="0.8"/>
-      {/* Sparkle outside */}
-      <path d="M36 48 L38 44 L40 48 L44 50 L40 52 L38 56 L36 52 L32 50 Z" fill="#7fb5a0" opacity="0.8"/>
-      <path d="M120 40 L122 36 L124 40 L128 42 L124 44 L122 48 L120 44 L116 42 Z" fill="#a8c8e8" opacity="0.8"/>
-      <circle cx="126" cy="72" r="4" fill="#f9b8a0" opacity="0.7"/>
-      <circle cx="34" cy="80" r="3" fill="#fde68a" opacity="0.8"/>
+    <svg width={width} viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Trophy cup body */}
+      <path d="M52 38 Q50 70 58 84 Q64 94 80 96 Q96 94 102 84 Q110 70 108 38 Z" fill={cupFill} stroke={ink} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Trophy handles */}
+      <path d="M52 50 Q38 50 36 62 Q34 74 50 76" stroke={ink} strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      <path d="M108 50 Q122 50 124 62 Q126 74 110 76" stroke={ink} strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      {/* Trophy stem */}
+      <path d="M80 96 L80 112" stroke={ink} strokeWidth="2.2" strokeLinecap="round"/>
+      {/* Trophy base */}
+      <path d="M62 112 Q80 108 98 112" stroke={ink} strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M58 118 H102" stroke={ink} strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Star inside trophy */}
+      <path d="M80 52 L83 62 L94 62 L85 68 L88 78 L80 72 L72 78 L75 68 L66 62 L77 62 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* Decorative stars around */}
+      <path d="M28 42 L29.5 38 L31 42 L35 43.5 L31 45 L29.5 49 L28 45 L24 43.5 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1"/>
+      <path d="M128 55 L129.5 51 L131 55 L135 56.5 L131 58 L129.5 62 L128 58 L124 56.5 Z" fill="#7fb5a0" stroke="#5a9a84" strokeWidth="1"/>
+      <path d="M118 28 L119 25 L120 28 L123 29 L120 30 L119 33 L118 30 L115 29 Z" fill="#f9b8a0" stroke="#e07060" strokeWidth="1"/>
+      {/* Small dots */}
+      <circle cx="38" cy="90" r="3.5" fill="#a8c8e8" opacity="0.8"/>
+      <circle cx="130" cy="90" r="3" fill="#fde68a" opacity="0.9"/>
+      <circle cx="25" cy="65" r="2.5" fill="#f9b8a0" opacity="0.7"/>
+      {/* Sparkle lines */}
+      <path d="M140 38 L142 34 M142 36 L138 36" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M22 110 L24 106 M24 108 L20 108" stroke="#7fb5a0" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   );
 }
 
-// Empty emotion: peaceful blank page with a feather
+// Empty emotion: hand-drawn journal / diary with a heart
 export function IllustrationEmptyEmotion({ width = 160 }) {
   return (
-    <svg width={width} viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Page */}
-      <rect x="38" y="20" width="84" height="100" rx="8" fill="#faf8f3" stroke="#e8e0d0" strokeWidth="2"/>
-      <line x1="52" y1="44" x2="108" y2="44" stroke="#e8e0d0" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="52" y1="56" x2="108" y2="56" stroke="#e8e0d0" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="52" y1="68" x2="88" y2="68" stroke="#e8e0d0" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Feather */}
-      <path d="M100 95 Q88 75 80 68 Q85 80 78 98 Q86 88 100 95 Z" fill="#b8d9cf" stroke="#7fb5a0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M80 68 L78 98" stroke="#7fb5a0" strokeWidth="1.2" strokeLinecap="round"/>
-      {/* Small dots */}
-      <circle cx="130" cy="35" r="5" fill="#e8f4f0"/>
-      <circle cx="28" cy="90" r="4" fill="#fde8d8"/>
-      <circle cx="135" cy="95" r="3" fill="#a8c8e8" opacity="0.6"/>
+    <svg width={width} viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Journal cover */}
+      <path d="M36 22 Q34 18 36 15 Q38 12 42 12 L118 12 Q122 12 124 15 Q126 18 124 22 L124 128 Q124 133 120 134 Q116 135 42 135 Q38 135 36 132 Q34 129 36 128 Z" fill="#fef9ec" stroke="#44403c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Spine binding */}
+      <path d="M44 12 L44 135" stroke="#44403c" strokeWidth="1.8" strokeLinecap="round"/>
+      {/* Binding dots */}
+      <circle cx="44" cy="30" r="3" fill="#44403c"/>
+      <circle cx="44" cy="50" r="3" fill="#44403c"/>
+      <circle cx="44" cy="70" r="3" fill="#44403c"/>
+      <circle cx="44" cy="90" r="3" fill="#44403c"/>
+      <circle cx="44" cy="110" r="3" fill="#44403c"/>
+      {/* Ruled lines (empty — nothing written yet) */}
+      <line x1="58" y1="48" x2="112" y2="48" stroke="#e8ddc8" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="58" y1="62" x2="112" y2="62" stroke="#e8ddc8" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="58" y1="76" x2="112" y2="76" stroke="#e8ddc8" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="58" y1="90" x2="96" y2="90" stroke="#e8ddc8" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* Heart doodle on cover */}
+      <path d="M80 32 Q80 27 85 27 Q90 27 90 32 Q90 36 80 42 Q70 36 70 32 Q70 27 75 27 Q80 27 80 32 Z" fill="#f9b8a0" stroke="#e07060" strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* Tiny sparkle top-right */}
+      <path d="M130 18 L131.5 14 L133 18 L137 19.5 L133 21 L131.5 25 L130 21 L126 19.5 Z" fill="#fbbf24" opacity="0.85"/>
+      {/* Small accent dots */}
+      <circle cx="24" cy="55" r="4" fill="#f9b8a0" opacity="0.7"/>
+      <circle cx="140" cy="80" r="3.5" fill="#7fb5a0" opacity="0.6"/>
+      <circle cx="28" cy="110" r="3" fill="#a8c8e8" opacity="0.7"/>
+      {/* Tiny star bottom-left */}
+      <path d="M18 85 L19.2 81 L20.4 85 L24 86.2 L20.4 87.4 L19.2 91 L18 87.4 L14 86.2 Z" fill="#7fb5a0" opacity="0.6"/>
     </svg>
   );
 }
 
-// Empty conflicts: two arrows pointing different ways
+// Empty conflicts: hand-drawn balance scale with thought bubbles
 export function IllustrationEmptyConflict({ width = 160 }) {
   return (
-    <svg width={width} viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      {/* Scale / balance */}
-      <line x1="80" y1="30" x2="80" y2="85" stroke="#d4b49a" strokeWidth="2.5" strokeLinecap="round"/>
-      <line x1="50" y1="55" x2="110" y2="55" stroke="#d4b49a" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* Left pan */}
-      <path d="M50 55 Q40 65 36 75 Q46 80 50 80 Q54 80 64 75 Q60 65 50 55 Z" fill="#e8f4f0" stroke="#7fb5a0" strokeWidth="1.5"/>
-      {/* Right pan - slightly lower (weighed down) */}
-      <path d="M110 58 Q100 68 96 80 Q106 85 110 85 Q114 85 124 80 Q120 68 110 58 Z" fill="#fdf3ee" stroke="#f0b8a0" strokeWidth="1.5"/>
-      {/* Items on pans */}
-      <path d="M44 72 L47 68 L50 72 L53 68 L56 72" stroke="#7fb5a0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <circle cx="110" cy="76" r="5" fill="#f9b8a0" stroke="#e09080" strokeWidth="1.2"/>
-      {/* Base */}
-      <path d="M68 85 H92 Q90 92 80 92 Q70 92 68 85 Z" fill="#e8e0d0" stroke="#d4b49a" strokeWidth="1.5"/>
-      {/* Stars */}
-      <circle cx="30" cy="40" r="3" fill="#fde68a" opacity="0.8"/>
-      <circle cx="130" cy="38" r="4" fill="#a8c8e8" opacity="0.7"/>
-      <path d="M25 80 L27 76 L29 80 L33 82 L29 84 L27 88 L25 84 L21 82 Z" fill="#7fb5a0" opacity="0.6"/>
+    <svg width={width} viewBox="0 0 160 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {/* Scale pole */}
+      <line x1="80" y1="28" x2="80" y2="100" stroke="#44403c" strokeWidth="2.2" strokeLinecap="round"/>
+      {/* Scale top knob */}
+      <circle cx="80" cy="27" r="4" fill="#fef9ec" stroke="#44403c" strokeWidth="2"/>
+      {/* Scale arm — slightly tilted (left side heavier) */}
+      <path d="M38 56 Q58 50 80 52 Q102 50 122 58" stroke="#44403c" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+      {/* Left string */}
+      <line x1="40" y1="56" x2="40" y2="76" stroke="#44403c" strokeWidth="1.6" strokeLinecap="round"/>
+      {/* Right string */}
+      <line x1="120" y1="58" x2="120" y2="82" stroke="#44403c" strokeWidth="1.6" strokeLinecap="round"/>
+      {/* Left pan (lower — heavier side) */}
+      <path d="M26 78 Q33 82 40 82 Q47 82 54 78 Q50 74 40 74 Q30 74 26 78 Z" fill="#e8f4f0" stroke="#44403c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Right pan (higher) */}
+      <path d="M106 82 Q113 86 120 86 Q127 86 134 82 Q130 78 120 78 Q110 78 106 82 Z" fill="#fdf3ee" stroke="#44403c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Left pan item: tiny heart */}
+      <path d="M40 76 Q40 73 42.5 73 Q45 73 45 76 Q45 78 40 80.5 Q35 78 35 76 Q35 73 37.5 73 Q40 73 40 76 Z" fill="#f9b8a0" stroke="#e07060" strokeWidth="1.2" strokeLinejoin="round"/>
+      {/* Right pan item: small star */}
+      <path d="M120 80 L121.2 76.5 L124 76.5 L121.8 78.5 L122.6 82 L120 80.2 L117.4 82 L118.2 78.5 L116 76.5 L118.8 76.5 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="1.2" strokeLinejoin="round"/>
+      {/* Scale base */}
+      <path d="M68 100 H92" stroke="#44403c" strokeWidth="2.2" strokeLinecap="round"/>
+      <path d="M62 108 Q80 103 98 108" stroke="#44403c" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M58 115 H102" stroke="#44403c" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* Thought bubble left */}
+      <circle cx="20" cy="36" r="5" fill="#e8f4f0" stroke="#7fb5a0" strokeWidth="1.4"/>
+      <circle cx="26" cy="28" r="3.5" fill="#e8f4f0" stroke="#7fb5a0" strokeWidth="1.2"/>
+      <circle cx="30" cy="22" r="2.5" fill="#e8f4f0" stroke="#7fb5a0" strokeWidth="1.2"/>
+      {/* Thought bubble right */}
+      <circle cx="140" cy="40" r="5" fill="#fdf3ee" stroke="#f0b8a0" strokeWidth="1.4"/>
+      <circle cx="134" cy="32" r="3.5" fill="#fdf3ee" stroke="#f0b8a0" strokeWidth="1.2"/>
+      <circle cx="130" cy="26" r="2.5" fill="#fdf3ee" stroke="#f0b8a0" strokeWidth="1.2"/>
+      {/* Accent sparkle */}
+      <path d="M138 110 L139.5 106 L141 110 L145 111.5 L141 113 L139.5 117 L138 113 L134 111.5 Z" fill="#fbbf24" opacity="0.8"/>
+      {/* Small dots */}
+      <circle cx="22" cy="90" r="3" fill="#a8c8e8" opacity="0.7"/>
+      <circle cx="145" cy="68" r="2.5" fill="#7fb5a0" opacity="0.6"/>
     </svg>
   );
 }

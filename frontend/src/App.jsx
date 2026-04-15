@@ -23,12 +23,12 @@ import ThreadsNavDemo from './pages/ThreadsNavDemo';
 
 function AppRoutes() {
   const { authChecked } = useApp();
+  const location = useLocation();
   if (!authChecked) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#faf8f3' }}>
       <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTop: '3px solid #7fb5a0', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
     </div>
   );
-  const location = useLocation();
   const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
   const isAuth = AUTH_PAGES.includes(location.pathname);
 

@@ -2,12 +2,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { createContext, useContext } from 'react';
 
 const ToastContext = createContext(null);
+let _toastId = 0;
+const _recentMessages = new Map(); // message → timestamp, for dedup
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
   const addToast = useCallback((message, type = 'error') => {
-    const id = Date.now();
+    const now = Date.now();
+    if (_recentMessages.has(message) && now - _recentMessages.get(message) < 3000) return;
+    _recentMessages.set(message, now);
+    const id = ++_toastId;
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
