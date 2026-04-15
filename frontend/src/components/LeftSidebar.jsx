@@ -89,9 +89,10 @@ export default function LeftSidebar() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: 20,
+      paddingTop: 24,
       paddingBottom: 24,
       gap: 8,
+      justifyContent: 'center',
       background: bg,
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
@@ -99,7 +100,7 @@ export default function LeftSidebar() {
       flexShrink: 0,
     }}>
       {/* Logo mark */}
-      <div style={{ fontSize: 24, marginBottom: 28 }}>🌿</div>
+      <div style={{ fontSize: 24, marginBottom: 16 }}>🌿</div>
 
       {tabs.map(({ path, label, Icon }) => {
         const on = isActive(path);
