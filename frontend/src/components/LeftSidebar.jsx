@@ -89,9 +89,9 @@ export default function LeftSidebar() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: 24,
+      paddingTop: 20,
       paddingBottom: 24,
-      gap: 4,
+      gap: 8,
       background: bg,
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
@@ -99,7 +99,7 @@ export default function LeftSidebar() {
       flexShrink: 0,
     }}>
       {/* Logo mark */}
-      <div style={{ fontSize: 22, marginBottom: 20 }}>🌿</div>
+      <div style={{ fontSize: 24, marginBottom: 28 }}>🌿</div>
 
       {tabs.map(({ path, label, Icon }) => {
         const on = isActive(path);
@@ -112,11 +112,9 @@ export default function LeftSidebar() {
               width: 48,
               height: 48,
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 3,
-              background: on ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(127,181,160,0.12)') : 'none',
+              background: on ? (isDark ? 'rgba(127,181,160,0.15)' : 'rgba(0,0,0,0.06)') : 'none',
               border: 'none',
               borderRadius: 14,
               cursor: 'pointer',
@@ -125,9 +123,6 @@ export default function LeftSidebar() {
             }}
           >
             <Icon active={on} />
-            <span style={{ fontSize: 9, fontWeight: on ? 600 : 400, letterSpacing: 0.2 }}>
-              {label}
-            </span>
           </button>
         );
       })}
