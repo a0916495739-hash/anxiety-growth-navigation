@@ -88,6 +88,7 @@ export default function Home() {
               </svg>
               <span>{lang === 'zh' ? 'EN' : '中文'}</span>
             </button>
+            <button style={{ ...s.ghostBtn, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/achievements')}>{t.tabAchieve}</button>
             {isLoggedIn ? (
               <>
                 {displayName && <span style={{ ...s.greeting, color: nav_text }}>Hi, {displayName}</span>}
