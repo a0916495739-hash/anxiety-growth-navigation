@@ -93,6 +93,7 @@ html, body {
   transition: background 0.3s ease, color 0.3s ease;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 #root {
