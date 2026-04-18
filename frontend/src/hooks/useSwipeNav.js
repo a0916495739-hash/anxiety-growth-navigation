@@ -17,6 +17,7 @@ function getCurrentTabIndex(pathname, isLoggedIn) {
 const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
 const MIN_SWIPE_X = 55;   // px — minimum horizontal distance
 const MAX_SWIPE_Y = 80;   // px — max vertical drift allowed (prevent conflict with scroll)
+const MIN_H_RATIO = 1.5;  // horizontal must be 1.5× greater than vertical
 
 export default function useSwipeNav(isLoggedIn) {
   const navigate = useNavigate();
@@ -39,8 +40,8 @@ export default function useSwipeNav(isLoggedIn) {
       const dy = Math.abs(t.clientY - touchStart.current.y);
       touchStart.current = null;
 
-      // Ignore if too short or too much vertical movement (user scrolling)
-      if (Math.abs(dx) < MIN_SWIPE_X || dy > MAX_SWIPE_Y) return;
+      // Ignore if: too short, too much vertical drift, or not clearly horizontal
+      if (Math.abs(dx) < MIN_SWIPE_X || dy > MAX_SWIPE_Y || dy * MIN_H_RATIO > Math.abs(dx)) return;
 
       const idx = getCurrentTabIndex(location.pathname, isLoggedIn);
       if (idx === -1) return; // not a tab page
