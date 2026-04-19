@@ -844,8 +844,8 @@ const s = {
     borderRadius: '50%', filter: 'blur(56px)', zIndex: -1, pointerEvents: 'none',
   },
   blob3: {
-    position: 'fixed', top: '38%', right: '2%',
-    width: 260, height: 260,
+    position: 'fixed', top: '38%', right: '-40px',
+    width: 220, height: 220,
     background: 'radial-gradient(circle, rgba(249,168,212,0.42) 0%, transparent 65%)',
     borderRadius: '50%', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none',
   },
