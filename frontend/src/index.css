@@ -78,7 +78,6 @@ html.dark {
 html {
   height: 100%;
   overscroll-behavior: none;
-  overflow-x: clip; /* clip 不影響 scroll container，比 hidden 安全 */
 }
 
 html, body {
@@ -99,6 +98,7 @@ html, body {
 #root {
   min-height: 100vh;
   width: 100%;
+  overflow-x: hidden;
 }
 
 h1, h2, h3 {
