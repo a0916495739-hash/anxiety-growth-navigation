@@ -194,6 +194,9 @@ input, textarea { font-family: inherit; }
 /* Left sidebar — desktop only */
 .app-shell > aside { display: flex; }
 
+/* Offset main content by sidebar width on desktop */
+.app-shell { padding-left: 72px; }
+
 /* Main column padding */
 .app-main { padding: 0 32px; }
 
@@ -208,6 +211,7 @@ input, textarea { font-family: inherit; }
 
   /* Hide sidebars */
   .app-shell > aside { display: none !important; }
+  .app-shell { padding-left: 0; }
 
   /* Tighter horizontal padding on mobile */
   .app-main { padding: 0 16px; }
