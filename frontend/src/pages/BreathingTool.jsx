@@ -34,7 +34,18 @@ const PATTERNS = [
     nameEn: 'Box',
     inhale: 4, hold: 4, exhale: 4,
   },
+  {
+    id: 'custom',
+    label: '✏️',
+    descZh: null,
+    descEn: null,
+    nameZh: '自訂',
+    nameEn: 'Custom',
+    inhale: 4, hold: 0, exhale: 4,
+  },
 ];
+
+const CUSTOM_STORAGE_KEY = 'breathing_custom_vals';
 
 // ── Session durations ────────────────────────────────────────────────────────
 const DURATIONS = [
@@ -64,6 +75,12 @@ export default function BreathingTool() {
 
   const [pattern, setPattern]   = useState(PATTERNS[0]);
   const [duration, setDuration] = useState(DURATIONS[1]);
+  const [customVals, setCustomVals] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CUSTOM_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : { inhale: 4, hold: 0, exhale: 6 };
+    } catch { return { inhale: 4, hold: 0, exhale: 6 }; }
+  });
   const [playing, setPlaying]   = useState(false);
   const [timeLeft, setTimeLeft] = useState(DURATIONS[1].seconds);
   const [phase, setPhase]       = useState('idle');
@@ -72,6 +89,17 @@ export default function BreathingTool() {
   const [showHistory, setShowHistory] = useState(false);
   const [showAll, setShowAll]         = useState(false);
   const t = getT(lang);
+
+  const effectivePattern = pattern.id === 'custom'
+    ? { ...pattern, ...customVals }
+    : pattern;
+
+  function updateCustomVal(key, raw) {
+    const val = Math.max(0, Math.min(15, parseInt(raw) || 0));
+    const next = { ...customVals, [key]: val };
+    setCustomVals(next);
+    localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(next));
+  }
 
   const playingRef = useRef(false);
   useEffect(() => { playingRef.current = playing; }, [playing]);
@@ -83,7 +111,10 @@ export default function BreathingTool() {
 
   useEffect(() => {
     if (!done) return;
-    logBreathingSession(pattern.id, duration.seconds)
+    const logId = pattern.id === 'custom'
+      ? `custom-${customVals.inhale}-${customVals.hold}-${customVals.exhale}`
+      : pattern.id;
+    logBreathingSession(logId, duration.seconds)
       .then(() => getBreathingSessions().then((r) => setSessions(r.data)).catch(() => {}))
       .catch(() => {});
   }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -103,16 +134,15 @@ export default function BreathingTool() {
         setPhase('inhale');
         await controls.start({
           scale: 1.55,
-          transition: { duration: pattern.inhale, ease: 'easeInOut' },
+          transition: { duration: effectivePattern.inhale, ease: 'easeInOut' },
         });
         if (!active || !playingRef.current) break;
 
         // Hold: pause at peak
-        if (pattern.hold > 0) {
+        if (effectivePattern.hold > 0) {
           setPhase('hold');
           await new Promise((res) => {
-            const t = setTimeout(res, pattern.hold * 1000);
-            // allow early break by checking ref each tick
+            const t = setTimeout(res, effectivePattern.hold * 1000);
             const check = setInterval(() => {
               if (!active || !playingRef.current) { clearTimeout(t); clearInterval(check); res(); }
             }, 100);
@@ -124,7 +154,7 @@ export default function BreathingTool() {
         setPhase('exhale');
         await controls.start({
           scale: 1,
-          transition: { duration: pattern.exhale, ease: 'easeInOut' },
+          transition: { duration: effectivePattern.exhale, ease: 'easeInOut' },
         });
         if (!active || !playingRef.current) break;
       }
@@ -133,7 +163,7 @@ export default function BreathingTool() {
     controls.set({ scale: 1 });
     cycle();
     return () => { active = false; };
-  }, [playing, pattern, controls]);
+  }, [playing, effectivePattern.inhale, effectivePattern.hold, effectivePattern.exhale, controls]);
 
   // ── Countdown ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -253,9 +283,41 @@ export default function BreathingTool() {
             );
           })}
         </div>
-        <p style={{ margin: '8px 0 0', fontSize: 12, color: muted }}>
-          {lang === 'zh' ? pattern.descZh : pattern.descEn}
-        </p>
+        {pattern.id === 'custom' ? (
+          <div style={{ marginTop: 12, display: 'flex', gap: 10, alignItems: 'center' }}>
+            {[
+              { key: 'inhale', labelZh: '吸氣', labelEn: 'Inhale', min: 1 },
+              { key: 'hold',   labelZh: '憋氣', labelEn: 'Hold',   min: 0 },
+              { key: 'exhale', labelZh: '呼氣', labelEn: 'Exhale', min: 1 },
+            ].map(({ key, labelZh, labelEn, min }) => (
+              <div key={key} style={{ flex: 1, textAlign: 'center' }}>
+                <p style={{ margin: '0 0 4px', fontSize: 11, color: muted }}>
+                  {lang === 'zh' ? labelZh : labelEn}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <button
+                    onClick={() => !playing && updateCustomVal(key, customVals[key] - 1)}
+                    disabled={playing || customVals[key] <= min}
+                    style={{ width: 26, height: 26, borderRadius: 8, border: `1px solid ${btnBdr}`, background: btnBg, color: text, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: customVals[key] <= min ? 0.3 : 1 }}
+                  >−</button>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: accent, minWidth: 24, textAlign: 'center' }}>
+                    {customVals[key]}
+                  </span>
+                  <button
+                    onClick={() => !playing && updateCustomVal(key, customVals[key] + 1)}
+                    disabled={playing || customVals[key] >= 15}
+                    style={{ width: 26, height: 26, borderRadius: 8, border: `1px solid ${btnBdr}`, background: btnBg, color: text, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: customVals[key] >= 15 ? 0.3 : 1 }}
+                  >+</button>
+                </div>
+                <p style={{ margin: '3px 0 0', fontSize: 10, color: muted }}>s</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ margin: '8px 0 0', fontSize: 12, color: muted }}>
+            {lang === 'zh' ? pattern.descZh : pattern.descEn}
+          </p>
+        )}
       </div>
 
       {/* ── Duration selector ── */}

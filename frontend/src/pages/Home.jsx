@@ -358,6 +358,9 @@ export default function Home() {
         <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/breathing')}>
           {lang === 'zh' ? '🌬️ 深呼吸' : '🌬️ Breathe'}
         </button>
+        <button style={{ ...s.quickLink, background: nav_bg, borderColor: nav_bdr, color: nav_text }} onClick={() => navigate('/affirmations')}>
+          {lang === 'zh' ? '🎙️ 激勵牆' : '🎙️ Voice Wall'}
+        </button>
       </section>
 
       {/* Story button */}
