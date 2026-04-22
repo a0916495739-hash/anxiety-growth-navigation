@@ -55,7 +55,8 @@ router.post('/guest', async (req, res) => {
 
 // POST /api/auth/register
 router.post('/register', authLimiter, async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.toLowerCase().trim();
   const guestToken = req.headers['x-guest-token'];
 
   if (!email || !password) {
@@ -113,7 +114,8 @@ router.post('/register', authLimiter, async (req, res) => {
 
 // POST /api/auth/login
 router.post('/login', authLimiter, async (req, res) => {
-  const { email, password } = req.body;
+  const { password } = req.body;
+  const email = req.body.email?.toLowerCase().trim();
 
   if (!email || !password) {
     return res.status(422).json({ error: 'Email and password are required' });
