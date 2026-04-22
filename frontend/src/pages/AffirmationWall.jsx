@@ -147,7 +147,7 @@ export default function AffirmationWall() {
       <p style={{ width: '100%', maxWidth: 420, margin: '12px 0 0', fontSize: 13, color: muted, lineHeight: 1.7 }}>
         {lang === 'zh'
           ? '錄下你最有力量的話。心情低落時，聽聽那個更強大的自己。'
-          : 'Record your most empowering words. When you're struggling, hear the stronger version of you.'}
+          : "Record your most empowering words. When you're struggling, hear the stronger version of you."}
       </p>
 
       {/* Record button */}
