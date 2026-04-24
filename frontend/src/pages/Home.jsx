@@ -66,10 +66,14 @@ export default function Home() {
 
   return (
     <div style={s.page}>
-      {/* 背景光暈球 — 讓磨砂玻璃有東西可以折射 */}
-      <div style={s.blob1} />
-      <div style={s.blob2} />
-      <div style={s.blob3} />
+      {/* 背景光暈球 — light mode 才顯示，dark mode 下彩色光球會造成色帶斷層 */}
+      {!isDark && (
+        <>
+          <div style={s.blob1} />
+          <div style={s.blob2} />
+          <div style={s.blob3} />
+        </>
+      )}
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       {/* Nav */}
       <nav style={{ ...s.nav, borderBottomColor: isDark ? '#3d3530' : '#e8e0d0' }}>
