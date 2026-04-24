@@ -88,7 +88,14 @@ export default function BreathingTool() {
   const [sessions, setSessions]       = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showAll, setShowAll]         = useState(false);
+  const [isDesktop, setIsDesktop]     = useState(() => window.innerWidth > 768);
   const t = getT(lang);
+
+  useEffect(() => {
+    const handler = () => setIsDesktop(window.innerWidth > 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   const effectivePattern = pattern.id === 'custom'
     ? { ...pattern, ...customVals }
@@ -228,8 +235,66 @@ export default function BreathingTool() {
 
   const visibleSessions = showAll ? sessions : sessions.slice(0, 5);
 
+  const historyPanel = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {sessions.length === 0 ? (
+        <p style={{ fontSize: 13, color: muted, textAlign: 'center', padding: '16px 0' }}>
+          {lang === 'zh' ? '還沒有練習記錄' : 'No sessions yet'}
+        </p>
+      ) : sessions.map((s) => (
+        <div
+          key={s.id}
+          style={{
+            display: 'flex', flexDirection: 'column', gap: 3,
+            padding: '9px 12px', borderRadius: 12,
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: accent, background: `${accent}18`, borderRadius: 6, padding: '2px 6px' }}>
+              {s.pattern_id.split('-')[0]?.toUpperCase() ?? s.pattern_id.toUpperCase()}
+            </span>
+            <span style={{ fontSize: 13, color: text }}>
+              {PATTERN_NAME[s.pattern_id] ?? s.pattern_id}
+            </span>
+          </div>
+          <span style={{ fontSize: 11, color: muted }}>
+            {Math.round(s.duration_seconds / 60)} min · {new Date(s.completed_at).toLocaleDateString()}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div style={{ minHeight: '100dvh', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px 40px' }}>
+    <div style={{ minHeight: '100dvh', background: bg, display: 'flex', flexDirection: isDesktop ? 'row' : 'column', alignItems: isDesktop ? 'stretch' : 'center' }}>
+
+      {/* ── Desktop history sidebar ── */}
+      {isDesktop && (
+        <aside style={{
+          width: 220, flexShrink: 0,
+          borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'}`,
+          padding: '28px 16px 24px',
+          display: 'flex', flexDirection: 'column', gap: 12,
+          overflowY: 'auto',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <p style={{ margin: 0, fontSize: 12, color: muted, letterSpacing: 1.2, textTransform: 'uppercase' }}>
+              {lang === 'zh' ? '練習記錄' : 'History'}
+            </p>
+            {sessions.length > 0 && (
+              <span style={{ fontSize: 11, color: accent, fontWeight: 700,
+                background: `${accent}18`, borderRadius: 99, padding: '1px 7px' }}>
+                {sessions.length}
+              </span>
+            )}
+          </div>
+          {historyPanel}
+        </aside>
+      )}
+
+      {/* ── Main content wrapper ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 20px 40px' }}>
 
       {/* ── Header ── */}
       <div style={{ width: '100%', maxWidth: 420, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 0' }}>
@@ -493,89 +558,84 @@ export default function BreathingTool() {
         </motion.button>
       )}
 
-      {/* ── Session history (always visible) ── */}
-      <div style={{ width: '100%', maxWidth: 420, marginTop: 28 }}>
-        <button
-          onClick={() => setShowHistory((v) => !v)}
-          style={{
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
-          }}
-        >
-          <p style={{ margin: 0, fontSize: 12, color: muted, letterSpacing: 1.2, textTransform: 'uppercase' }}>
-            {lang === 'zh' ? '練習記錄' : 'History'}
-            {sessions.length > 0 && (
-              <span style={{ marginLeft: 6, fontSize: 11, color: accent, fontWeight: 600 }}>
-                {sessions.length}
-              </span>
-            )}
-          </p>
-          <span style={{ fontSize: 12, color: muted, transition: 'transform 0.2s', display: 'inline-block', transform: showHistory ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-            ▾
-          </span>
-        </button>
-
-        {showHistory && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22 }}
-            style={{ marginTop: 10 }}
+      {/* ── Session history — mobile only accordion ── */}
+      {!isDesktop && (
+        <div style={{ width: '100%', maxWidth: 420, marginTop: 28 }}>
+          <button
+            onClick={() => setShowHistory((v) => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
+            }}
           >
-            {sessions.length === 0 ? (
-              <p style={{ fontSize: 13, color: muted, textAlign: 'center', padding: '16px 0' }}>
-                {lang === 'zh' ? '還沒有練習記錄' : 'No sessions yet'}
-              </p>
-            ) : (
-              <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {visibleSessions.map((s) => (
-                    <div
-                      key={s.id}
-                      style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '9px 14px', borderRadius: 12,
-                        background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, color: accent,
-                          background: `${accent}18`, borderRadius: 6, padding: '2px 7px',
-                        }}>
-                          {s.pattern_id.toUpperCase()}
-                        </span>
-                        <span style={{ fontSize: 13, color: text }}>
-                          {PATTERN_NAME[s.pattern_id] ?? s.pattern_id}
+            <p style={{ margin: 0, fontSize: 12, color: muted, letterSpacing: 1.2, textTransform: 'uppercase' }}>
+              {lang === 'zh' ? '練習記錄' : 'History'}
+              {sessions.length > 0 && (
+                <span style={{ marginLeft: 6, fontSize: 11, color: accent, fontWeight: 600 }}>
+                  {sessions.length}
+                </span>
+              )}
+            </p>
+            <span style={{ fontSize: 12, color: muted, transition: 'transform 0.2s', display: 'inline-block', transform: showHistory ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+              ▾
+            </span>
+          </button>
+
+          {showHistory && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22 }}
+              style={{ marginTop: 10 }}
+            >
+              {sessions.length === 0 ? (
+                <p style={{ fontSize: 13, color: muted, textAlign: 'center', padding: '16px 0' }}>
+                  {lang === 'zh' ? '還沒有練習記錄' : 'No sessions yet'}
+                </p>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {visibleSessions.map((s) => (
+                      <div
+                        key={s.id}
+                        style={{
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          padding: '9px 14px', borderRadius: 12,
+                          background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: accent, background: `${accent}18`, borderRadius: 6, padding: '2px 7px' }}>
+                            {s.pattern_id.toUpperCase()}
+                          </span>
+                          <span style={{ fontSize: 13, color: text }}>
+                            {PATTERN_NAME[s.pattern_id] ?? s.pattern_id}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 12, color: muted }}>
+                          {Math.round(s.duration_seconds / 60)} min · {new Date(s.completed_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <span style={{ fontSize: 12, color: muted }}>
-                        {Math.round(s.duration_seconds / 60)} min · {new Date(s.completed_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  {sessions.length > 5 && (
+                    <button
+                      onClick={() => setShowAll((v) => !v)}
+                      style={{ marginTop: 10, width: '100%', padding: '8px 0', background: 'none', border: `1px dashed ${btnBdr}`, borderRadius: 10, color: muted, fontSize: 12, cursor: 'pointer' }}
+                    >
+                      {showAll
+                        ? (lang === 'zh' ? '收起' : 'Show less')
+                        : (lang === 'zh' ? `查看全部 ${sessions.length} 筆` : `View all ${sessions.length}`)}
+                    </button>
+                  )}
+                </>
+              )}
+            </motion.div>
+          )}
+        </div>
+      )}
 
-                {sessions.length > 5 && (
-                  <button
-                    onClick={() => setShowAll((v) => !v)}
-                    style={{
-                      marginTop: 10, width: '100%', padding: '8px 0',
-                      background: 'none', border: `1px dashed ${btnBdr}`,
-                      borderRadius: 10, color: muted, fontSize: 12,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {showAll
-                      ? (lang === 'zh' ? '收起' : 'Show less')
-                      : (lang === 'zh' ? `查看全部 ${sessions.length} 筆` : `View all ${sessions.length}`)}
-                  </button>
-                )}
-              </>
-            )}
-          </motion.div>
-        )}
-      </div>
+      </div>{/* end main content wrapper */}
     </div>
   );
 }
