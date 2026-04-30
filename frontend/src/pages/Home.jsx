@@ -42,9 +42,10 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    if (!isLoggedIn) return;
     getWeeklyStats().then((r) => setWeekStats(r.data)).catch(() => {});
     getHeatmap().then((r) => setHeatmapData(r.data)).catch(() => {});
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (!notifOpen) return;

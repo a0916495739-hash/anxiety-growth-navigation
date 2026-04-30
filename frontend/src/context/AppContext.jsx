@@ -53,6 +53,22 @@ export function AppProvider({ children }) {
 
   // On mount: check if JWT cookie is still valid; if not, fall back to guest session
   useEffect(() => {
+    if (!localStorage.getItem('auth_token')) {
+      const stored = localStorage.getItem('guest_token');
+      if (stored) {
+        setGuestToken(stored);
+      } else {
+        createGuestSession()
+          .then((res) => {
+            const token = res.data.guest_token;
+            localStorage.setItem('guest_token', token);
+            setGuestToken(token);
+          })
+          .catch(console.error);
+      }
+      setAuthChecked(true);
+      return;
+    }
     getMe()
       .then((r) => {
         setIsLoggedIn(true);
@@ -62,7 +78,8 @@ export function AppProvider({ children }) {
         setAuthChecked(true);
       })
       .catch(() => {
-        // Not logged in — initialize guest session
+        // Token expired — clear and initialize guest session
+        localStorage.removeItem('auth_token');
         const stored = localStorage.getItem('guest_token');
         if (stored) {
           setGuestToken(stored);

@@ -7,5 +7,6 @@ export default defineConfig({
     host: '0.0.0.0',
     port: process.env.PORT ? parseInt(process.env.PORT) : 4173,
     allowedHosts: ['eloquent-reflection-production-da94.up.railway.app'],
+    historyApiFallback: true,
   },
 })
